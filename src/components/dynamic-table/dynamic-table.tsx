@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
   type RowSelectionState,
 } from "@tanstack/react-table";
 
-import { Checkbox } from "../ui/checkbox";
 import {
   Table,
   TableBody,
@@ -17,112 +15,37 @@ import {
   TableRow,
 } from "../ui/table";
 import { DynamicTableLayout } from "./dynamic-table-layout";
-import type { DynamicTableColumn } from "./types";
-import { cn } from "@/lib/utils";
+import type { DynamicTableAction, DynamicTableColumn } from "./types";
 import type { AnyRoute } from "@tanstack/react-router";
 import { SorteableHead } from "./sorteableHead";
 import { PencilIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
-
-const get_row_id_value = (original_row: object, index: number) => {
-  const id = (original_row as Record<string, unknown>)["id"];
-  if (typeof id === "string" || typeof id === "number") {
-    return String(id);
-  }
-  return `row_${index}`;
-};
-
-const get_role_label = (value: unknown) => {
-  if (value && typeof value === "object" && "name" in value) {
-    return String((value as { name: string }).name);
-  }
-  if (value === null || value === undefined) {
-    return "—";
-  }
-  return String(value);
-};
-
-const build_table_columns = <TData extends object>(
-  columns: DynamicTableColumn[],
-) => {
-  const column_helper = createColumnHelper<TData>();
-
-  return columns.map((col) => {
-    if (col.type === "checkbox" && col.accessorKey === "select") {
-      return column_helper.display({
-        id: "select",
-        size: 48,
-        header: ({ table }) => (
-          <Checkbox
-            aria-label="Seleccionar todas las filas"
-            checked={table.getIsAllRowsSelected()}
-            indeterminate={
-              table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
-            }
-            onCheckedChange={(checked) =>
-              table.toggleAllRowsSelected(Boolean(checked))
-            }
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            aria-label={`Seleccionar fila ${row.index + 1}`}
-            checked={row.getIsSelected()}
-            disabled={!row.getCanSelect()}
-            onCheckedChange={(checked) => row.toggleSelected(Boolean(checked))}
-          />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-      });
-    }
-
-    return column_helper.accessor(
-      (row) => (row as Record<string, unknown>)[col.accessorKey],
-      {
-        id: col.accessorKey,
-        header: col.header,
-        cell: ({ getValue }) => {
-          const value = getValue();
-          if (col.type === "badge") {
-            return (
-              <span
-                className={cn(
-                  "inline-flex max-w-48 truncate rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium text-foreground",
-                )}
-              >
-                {get_role_label(value)}
-              </span>
-            );
-          }
-          if (value === null || value === undefined) {
-            return "—";
-          }
-          if (typeof value === "object") {
-            return get_role_label(value);
-          }
-          return String(value);
-        },
-      },
-    );
-  });
-};
+import { useColumnVisibilityStore } from "@/stores/useColumnVisibilityStore";
+import { ColumnVisibilityPopover } from "./columnVisibilityPopover";
+import { build_table_columns } from "./buildTableColumns";
+import { get_row_id_value } from "./utils";
+import type { FormSize } from "@/types/form.types";
 
 export type DynamicTableProps<TData extends object = object> = {
   columns: DynamicTableColumn[];
+  actions?: (row: TData) => DynamicTableAction[];
+  /** Clave estable para persistir visibilidad de columnas (localStorage). */
+  table_id?: string;
   data: TData[];
   title: string;
   total: number;
-  filters: React.ReactNode;
-  form: React.ReactNode;
+  filters?: React.ReactNode;
+  form?: React.ReactNode;
   on_row_selection_change?: (selected_rows: TData[]) => void;
   route: AnyRoute;
+  form_size?: FormSize;
 };
 
 export function DynamicTable<TData extends object>({
   columns,
+  table_id,
   data,
   title,
   total,
@@ -130,19 +53,46 @@ export function DynamicTable<TData extends object>({
   form,
   route,
   on_row_selection_change,
+  actions,
+  form_size = "md",
 }: DynamicTableProps<TData>) {
   const [row_selection, set_row_selection] = useState<RowSelectionState>({});
   const setSelectedId = useSelectedIdStore((state) => state.setSelectedId);
   const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
+  const visibility_overrides = useColumnVisibilityStore((s) =>
+    table_id ? s.visibility_by_table[table_id] : undefined,
+  );
+
+  const visible_columns = useMemo(() => {
+    if (!table_id) {
+      return columns;
+    }
+    return columns.filter((col) => {
+      if (col.type === "checkbox" && col.accessorKey === "select") {
+        return true;
+      }
+      const stored = visibility_overrides?.[col.accessorKey];
+      if (stored !== undefined) {
+        return stored;
+      }
+      return true;
+    });
+  }, [columns, table_id, visibility_overrides]);
+
   const has_selection_column = useMemo(
     () =>
       columns.some((c) => c.type === "checkbox" && c.accessorKey === "select"),
     [columns],
   );
 
+  const table_toolbar =
+    table_id !== undefined && table_id.length > 0 ? (
+      <ColumnVisibilityPopover table_id={table_id} columns={columns} />
+    ) : null;
+
   const table_columns = useMemo(
-    () => build_table_columns<TData>(columns),
-    [columns],
+    () => build_table_columns<TData>(visible_columns),
+    [visible_columns],
   );
 
   const get_row_id = useMemo(
@@ -190,10 +140,13 @@ export function DynamicTable<TData extends object>({
 
   return (
     <DynamicTableLayout
+      path={route.fullPath}
       title={title}
       total={total}
       filters={filters}
       form={form}
+      table_toolbar={table_toolbar}
+      form_size={form_size}
     >
       <Table>
         <TableHeader className="border-y bg-background/50">
@@ -228,39 +181,51 @@ export function DynamicTable<TData extends object>({
           {table.getRowModel().rows.length === 0 ? (
             <TableRow>
               <TableCell
-                colSpan={table_columns.length}
+                colSpan={table_columns.length + 1}
                 className="h-24 text-center text-muted-foreground"
               >
                 No hay datos
               </TableCell>
             </TableRow>
           ) : (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() ? "selected" : undefined}
-                className="data-[state=selected]:bg-muted/50"
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-muted-foreground">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            table.getRowModel().rows.map((row) => {
+              return (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() ? "selected" : undefined}
+                  className="data-[state=selected]:bg-muted/50"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="text-muted-foreground">
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {form && (
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          className="text-muted-foreground hover:text-foreground"
+                          onClick={() => {
+                            setSelectedId(row.id);
+                            setIsOpen(true);
+                          }}
+                        >
+                          <PencilIcon className="size-4" />
+                        </Button>
+                      )}
+                      {actions?.(row.original).map(
+                        (action) => action.component,
+                      )}
+                    </div>
                   </TableCell>
-                ))}
-                <TableCell>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="text-muted-foreground hover:text-foreground"
-                    onClick={() => {
-                      setSelectedId(row.id);
-                      setIsOpen(true);
-                    }}
-                  >
-                    <PencilIcon className="size-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>

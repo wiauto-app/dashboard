@@ -8,6 +8,7 @@ export const PasswordInput = ({ ...props }: React.ComponentProps<"input">) => {
     <div className="relative">
       <Input autoComplete="current-password" type={showPassword ? "text" : "password"} {...props} />
       <button
+        type="button"
         className="absolute right-2 top-1/2 -translate-y-1/2"
         onClick={() => setShowPassword(!showPassword)}
       >

@@ -14,8 +14,13 @@ const PER_PAGE_OPTIONS = [
   { label: "100", value: 100 },
 ];
 
-export const PerPageDropdown = () => {
-  const { values, handleChange } = useFiltersManager({ path: "/users" });
+export const PerPageDropdown = ({ path }: { path: string }) => {
+  const { values, handleLimitChange } = useFiltersManager({ path });
+  const limit_value =
+    values.limit !== undefined && values.limit !== ""
+      ? String(values.limit)
+      : "10";
+
   return (
     <div className="flex flex-row items-center gap-2">
       <label htmlFor="per-page" className="text-sm text-muted-foreground">
@@ -23,10 +28,11 @@ export const PerPageDropdown = () => {
       </label>
 
       <Select
-        value={values.limit?.toString()}
+        value={limit_value}
         onValueChange={(value) => {
-          console.log(value);
-          handleChange("limit", value);
+          if (value) {
+            handleLimitChange(value);
+          }
         }}
       >
         <SelectTrigger className="border-none shadow-none">

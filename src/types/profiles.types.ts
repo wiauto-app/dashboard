@@ -1,10 +1,12 @@
 import type { userParamsSchema } from "@/validations/queryParams/user-params.schema";
 import type z from "zod";
+import type { User } from "./user.types";
+import type { Role } from "@/components/roles/types/role.types";
 
 
 export interface Profile {
   id: string;
-  // user: User;
+  user: User;
   name?: string;
   last_name?: string;
   avatar_url: string;
@@ -16,12 +18,5 @@ export interface Profile {
   // dealership_invitations: DealershipInvitationsEntity[];
 }
 
-export interface Role {
-  id: string;
-  name: string;
-  is_admin: boolean;
-  is_developer: boolean;
-  is_default: boolean;
-}
 
 export type UserParams = z.infer<typeof userParamsSchema>;

@@ -1,0 +1,11 @@
+export { vehicleTypesService } from "./vehicleTypesService";
+export { tractionsService } from "./tractionsService";
+export { colorsService } from "./colorsService";
+export { dgtLabelsService } from "./dgtLabelsService";
+export { warrantyTypesService } from "./warrantyTypesService";
+export { catalogServicesService } from "./catalogServicesService";
+export { catalogVersionsService } from "./catalogVersionsService";
+export { makesService } from "./makesService";
+export { bodyTypesService } from "./bodyTypesService";
+export { fuelTypesService } from "./fuelTypesService";
+export { yearsService } from "./yearsService";

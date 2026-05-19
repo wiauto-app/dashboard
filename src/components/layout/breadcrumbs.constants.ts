@@ -17,5 +17,38 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
       label: "Usuarios",
       href: "/users",
     }
+  ],
+  "/permissions":[
+    {
+      label: "Inicio",
+      icon: HomeIcon,
+      href: "/",
+    },
+    {
+      label: "Permisos",
+      href: "/permissions",
+    }
+  ],
+  "/role":[
+    {
+      label: "Inicio",
+      icon: HomeIcon,
+      href: "/",
+    },
+    {
+      label: "Roles",
+      href: "/role",
+    }
+  ],
+  "/dealership":[
+    {
+      label: "Inicio",
+      icon: HomeIcon,
+      href: "/",
+    },
+    {
+      label: "Concesionarios",
+      href: "/dealerships",
+    }
   ]
 }

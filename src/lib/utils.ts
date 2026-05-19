@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { MINIO_ENDPOINT } from "./media.constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -31,3 +32,26 @@ export const objectToQueryString = (obj?: any) => {
 
   return params.toString();
 }
+
+
+export const getImageUrl = (fileKey: string) => {
+  return `${MINIO_ENDPOINT}/${fileKey}`;
+};
+
+export const getDirtyValues = (dirtyFields: any, allValues: any): any => {
+  if (dirtyFields === true || Array.isArray(dirtyFields)) {
+    return allValues;
+  }
+
+  return Object.fromEntries(
+    Object.keys(dirtyFields).map((key) => [
+      key,
+      getDirtyValues(dirtyFields[key], allValues[key]),
+    ])
+  );
+};
+
+export const pickDirtyValues = <T extends object>(
+  dirty: Partial<Record<keyof T, any>>,
+  values: T,
+) => getDirtyValues(dirty, values);

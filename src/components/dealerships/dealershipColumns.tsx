@@ -1,0 +1,92 @@
+import type { DynamicTableColumn } from "../dynamic-table/types";
+
+export const dealershipColumns: DynamicTableColumn[] = [
+  {
+    accessorKey: "name",
+    header: "Nombre",
+    type: "text",
+    sortable: true,
+  },
+  {
+    accessorKey: "slug",
+    header: "Slug",
+    type: "text",
+    sortable: true,
+  },
+  {
+    accessorKey: "avatar_url",
+    header: "Avatar",
+    type: "image",
+    sortable: false,
+    bucketName: "dealership-images",
+  },
+  {
+    accessorKey: "banner_url",
+    header: "Banner",
+    type: "image",
+    sortable: false,
+    bucketName: "dealership-images",
+  },
+  {
+    accessorKey: "description",
+    header: "Descripción",
+    type: "text",
+    sortable: false,
+  },
+  {
+    accessorKey: "website_url",
+    header: "Sitio web",
+    type: "link",
+    sortable: false,
+  },
+  {
+    accessorKey: "email",
+    header: "Email",
+    type: "text",
+    sortable: true,
+  },
+  {
+    accessorKey: "phone_code",
+    header: "Código país",
+    type: "text",
+    sortable: false,
+  },
+  {
+    accessorKey: "phone",
+    header: "Teléfono",
+    type: "text",
+    sortable: false,
+  },
+  {
+    accessorKey: "address",
+    header: "Dirección",
+    type: "text",
+    sortable: false,
+  },
+  {
+    accessorKey: "lat",
+    header: "Latitud",
+    type: "text",
+    sortable: false,
+  },
+  {
+    accessorKey: "lng",
+    header: "Longitud",
+    type: "text",
+    sortable: false,
+  },
+  {
+    accessorKey: "created_at",
+    header: "Creado",
+    type: "date",
+    modifiable: false,
+    sortable: true,
+  },
+  {
+    accessorKey: "updated_at",
+    header: "Actualizado",
+    type: "date",
+    modifiable: false,
+    sortable: true,
+  },
+];

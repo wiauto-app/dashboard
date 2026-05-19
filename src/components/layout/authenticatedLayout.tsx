@@ -26,7 +26,7 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   if (isLoading) {
     return (
       <div
-        className="auth-app-shell flex min-h-screen items-center justify-center bg-background"
+        className="auth-app-shell flex min-h-screen items-center justify-center bg-background w-full"
         aria-busy="true"
         aria-live="polite"
       >
@@ -53,7 +53,7 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
       >
         <div className="@container/main flex flex-1 flex-col gap-2 bg-background rounded-3xl">
           <Navbar />
-          <main className=" p-4 lg:p-8">{children}</main>
+          <main className=" p-4 lg:p-8 lg:pt-0">{children}</main>
         </div>
       </div>
     </>

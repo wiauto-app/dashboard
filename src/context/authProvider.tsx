@@ -1,4 +1,4 @@
-import type { User } from "@/interfaces/user.interface";
+import type { User } from "@/types/user.types";
 import { AuthContext } from "@/context/authContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authService } from "@/services/authServices/AuthService";

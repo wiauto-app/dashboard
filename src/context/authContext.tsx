@@ -1,4 +1,4 @@
-import type { User } from "@/interfaces/user.interface";
+import type { User } from "@/types/user.types";
 import { createContext } from "react";
 
 export type AuthContextValue = {

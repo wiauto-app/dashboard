@@ -8,6 +8,7 @@ import { Button } from "../ui/button";
 import { SearchIcon, XIcon } from "lucide-react";
 import { useFilterPopoverStore } from "@/stores/useFilterPopoverStore";
 import { userParamsSchema } from "@/validations/queryParams/user-params.schema";
+import { Field, FieldError } from "../ui/field";
 
 const SelectedFieldsSchema = userParamsSchema.pick({
   name: true,
@@ -49,15 +50,30 @@ export const UsersFilter = () => {
       <Controller
         name="name"
         control={form.control}
-        render={({ field }) => (
-          <Input type="text" placeholder="Buscar" {...field} />
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <Input
+              aria-invalid={fieldState.invalid}
+              type="text"
+              placeholder="Buscar"
+              {...field}
+            />
+            {fieldState.error && <FieldError errors={[fieldState.error]} />}
+          </Field>
         )}
       />
       <Controller
         name="role_id"
         control={form.control}
-        render={({ field }) => (
-          <RolesSelector onValueChange={field.onChange} value={field.value} />
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <RolesSelector
+              ariaInvalid={fieldState.invalid}
+              onValueChange={field.onChange}
+              value={field.value ?? null}
+            />
+            {fieldState.error && <FieldError errors={[fieldState.error]} />}
+          </Field>
         )}
       />
       <div className="flex flex-row gap-2 justify-end">

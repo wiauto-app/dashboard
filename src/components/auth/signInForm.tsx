@@ -25,7 +25,7 @@ export const SignInForm = () => {
 
   const onSubmit = async (data: SignInSchemaType) => {
     const response = await authService.login(data.email, data.password);
-    if (response.ok) {
+    if (response.ok && response.status !== 401) {
       await refreshUser();
       navigate({ to: "/" });
     } else {

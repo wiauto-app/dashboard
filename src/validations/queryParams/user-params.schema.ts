@@ -4,5 +4,5 @@ import { paginationParamsSchema } from "./pagination-params.schema";
 
 export const userParamsSchema = z.object({
   name: z.string().optional(),
-  role_id: z.uuid().optional(),
+  role_id: z.string().optional(),
 }).extend(paginationParamsSchema.shape);
