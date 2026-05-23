@@ -72,7 +72,12 @@ export const fileSchema = z.object({
 export const fileArray = z.array(fileSchema);
 
 export const vehicleSchema = z.object({
-  vin_code: z.string().min(1, { error: "El VIN es obligatorio." }),
+  vin_code: z
+    .union([
+      z.literal(""),
+      z.string().min(1, { error: "El VIN debe tener al menos 1 carácter." }),
+    ])
+    .optional(),
   images: optional_vehicle_images_array,
   videos: optional_vehicle_videos_array,
   // --- Anuncio ---
@@ -110,8 +115,9 @@ export const vehicleSchema = z.object({
   }).default("manual"),
   power: z.coerce
     .number({ error: "Introduce la potencia." })
-    .min(0, { error: "La potencia no puede ser negativa." }),
-  displacement: optionalNonNegativeNumber,
+    .optional(),
+  displacement: z.coerce
+    .number({ error: "Introduce la cilindrada." }),
   autonomy: optionalNonNegativeNumber,
   battery_capacity: optionalNonNegativeNumber,
   time_to_charge: optionalNonNegativeNumber,

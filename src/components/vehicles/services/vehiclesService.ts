@@ -1,7 +1,7 @@
-import { apiGet } from "@/services/api";
+import { apiDelete, apiGet, apiPost, type apiResponse } from "@/services/api";
 import type { PaginatedResult } from "@/types/general.types";
-import type { Vehicle, VehiclesParams } from "../types/vehicles.types";
-import { V1_ADMIN_VEHICLES } from "./route.constants";
+import type { Vehicle, VehicleSchema, VehiclesParams } from "../types/vehicles.types";
+import { V1_ADMIN_VEHICLES, V1_VEHICLES } from "./route.constants";
 import { objectToQueryString } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -38,5 +38,19 @@ export const vehiclesService = {
       `${V1_ADMIN_VEHICLES}${queryString ? `?${queryString}` : ""}`,
     );
     return response.data;
+  },
+
+  async create(data: VehicleSchema): Promise<apiResponse<Vehicle>> {
+    const response = await apiPost<Vehicle>(`${V1_VEHICLES}`, {
+      ...data,
+      phone_code: data.phone.phone_code,
+      phone: data.phone.phone,
+    });
+    return response;
+  },
+
+  async delete(id: string): Promise<apiResponse<void>> {
+    const response = await apiDelete<void>(`${V1_VEHICLES}/${id}`);
+    return response;
   },
 };

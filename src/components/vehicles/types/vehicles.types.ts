@@ -67,7 +67,7 @@ export type UpdateVehicleSchema = z.infer<typeof updateVehicleSchema>;
 /** Valores del formulario antes de validar (permite strings vacíos en selects). */
 
 export const createVehicleDefaultValues: VehicleSchema = {
-  vin_code: "",
+  vin_code: undefined,
   vehicle_type_id: "",
   title: "",
   description: "",
@@ -82,6 +82,7 @@ export const createVehicleDefaultValues: VehicleSchema = {
   traction_id: "",
   transmission_type: "manual",
   power: 0,
+  displacement: 0,
   publisher_type: "professional",
   phone: { phone_code: "", phone: "" },
   email: "",

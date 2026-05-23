@@ -5,10 +5,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { ControllerInput } from "@/components/ui/controllerInput";
+import { TractionsSelector } from "@/components/dynamicSelectors/tractionsSelector";
 import { VehicleConditionSelector } from "@/components/dynamicSelectors/vehicleConditionSelector";
 import { VehicleTransmissionTypeSelector } from "@/components/dynamicSelectors/vehicleTransmissionTypeSelector";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { OptionalFieldLabel } from "./optionalFieldLabel";
 
 const toggle_feature_id_in_list = (
   current_ids: string[],
@@ -34,7 +35,6 @@ export const FeaturesForm = () => {
   return (
     <div className="flex flex-col gap-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ControllerInput name="price" control={form.control} label="Precio" />
         <ControllerInput
           name="mileage"
           control={form.control}
@@ -58,6 +58,7 @@ export const FeaturesForm = () => {
           name="transmission_type"
           control={form.control}
           label="Tipo de transmisión"
+          optional
         >
           {({ field }) => (
             <VehicleTransmissionTypeSelector
@@ -67,16 +68,35 @@ export const FeaturesForm = () => {
             />
           )}
         </ControllerInput>
-        <ControllerInput name="power" control={form.control} label="Potencia" />
+        <ControllerInput
+          name="traction_id"
+          control={form.control}
+          label="Tracción"
+        >
+          {({ field, fieldState }) => (
+            <TractionsSelector
+              value={field.value as string | undefined}
+              onValueChange={field.onChange}
+              ariaInvalid={fieldState.invalid}
+              disabled={field.disabled}
+            />
+          )}
+        </ControllerInput>
         <ControllerInput
           name="displacement"
           control={form.control}
-          label="Cilindrada"
+          label="Cilindrada (cc)"
+        />
+        <ControllerInput
+          name="power"
+          control={form.control}
+          label="Potencia CV o kW"
+          optional
         />
       </div>
       <Separator />
       <div className="flex flex-col gap-4">
-        <Label>Características</Label>
+        <OptionalFieldLabel optional>Características</OptionalFieldLabel>
         <Controller
           name="features_ids"
           control={form.control}

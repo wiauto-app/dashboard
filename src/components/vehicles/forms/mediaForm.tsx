@@ -2,24 +2,24 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ImageIcon, VideoIcon } from "lucide-react";
 import { Controller, useFormContext } from "react-hook-form";
 import type { VehicleSchema } from "../types/vehicles.types";
+import { OPTIONAL_FIELD_SUFFIX } from "../constants/vehicle-form-field-meta";
 import { ImagesForm } from "./imagesForm";
 import { VideosForm } from "./videosForm";
 
 export const MediaForm = () => {
   const form = useFormContext<VehicleSchema>();
-  const videos = form.watch("videos");
-  console.log(videos);
+
   return (
     <div>
       <Tabs defaultValue="images">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="images">
             <ImageIcon className="size-4" />
-            Imágenes
+            Imágenes {OPTIONAL_FIELD_SUFFIX}
           </TabsTrigger>
           <TabsTrigger value="videos">
             <VideoIcon className="size-4" />
-            Vídeos
+            Vídeos {OPTIONAL_FIELD_SUFFIX}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="images">

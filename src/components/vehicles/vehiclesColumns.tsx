@@ -1,7 +1,21 @@
 import type { DynamicTableColumn } from "../dynamic-table/types";
 
 export const vehiclesColumns: DynamicTableColumn[] = [
+  {
+    header: "Id",
+    accessorKey: "id",
+    type: "text",
+    sortable: false,
+  },
   //Identificación básica
+  {
+    header: "Images",
+    accessorKey: "images",
+    type: "array",
+    showArrayItems: false,
+    arrayDisplayKey: "url",
+    sortable: true,
+  },
   {
     header: "Title",
     accessorKey: "title",
@@ -137,5 +151,25 @@ export const vehiclesColumns: DynamicTableColumn[] = [
     header: "Version",
     accessorKey: "version_id",
     type: "text",
+  },
+
+  //fechas
+  {
+    header: "Created At",
+    accessorKey: "created_at",
+    type: "date",
+    sortable: true,
+  },
+  {
+    header: "Updated At",
+    accessorKey: "updated_at",
+    type: "date",
+    sortable: true,
+  },
+  {
+    header: "Expires At",
+    accessorKey: "expires_at",
+    type: "date",
+    sortable: true,
   },
 ];

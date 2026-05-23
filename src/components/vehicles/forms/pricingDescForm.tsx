@@ -6,7 +6,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { PricingSuggestion } from "./pricingSuggestion";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Label } from "@/components/ui/label";
+import { OptionalFieldLabel } from "./optionalFieldLabel";
 import { useQuery } from "@tanstack/react-query";
 import { cuotasService } from "../services/cuotasService";
 
@@ -59,7 +59,9 @@ export const PricingDescForm = () => {
       />
       <Separator />
       <div className="flex flex-col gap-4">
-        <Label>Planes de financiación / cuotas</Label>
+        <OptionalFieldLabel optional>
+          Planes de financiación / cuotas
+        </OptionalFieldLabel>
         <p className="text-sm text-muted-foreground">
           Marca uno o más planes disponibles para este anuncio (p. ej. plazos en
           meses).

@@ -13,9 +13,14 @@ export const VehicleDataForm = () => {
           name="license_plate"
           control={form.control}
           label="Matrícula"
+          optional
         />
-        <ControllerInput name="vin_code" control={form.control} label="VIN" />
-        <ControllerInput name="title" control={form.control} label="Título" />
+        <ControllerInput
+          name="vin_code"
+          control={form.control}
+          label="VIN"
+          optional
+        />
         <ControllerInput
           name="vehicle_type_id"
           control={form.control}

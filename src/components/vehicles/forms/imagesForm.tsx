@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { cn, getImageUrl } from "@/lib/utils";
 import { filesService, split_storage_compound_path } from "@/services/files/filesService";
+import { VEHICLE_GALLERY_TEMP_PREFIX } from "@/services/files/temp-storage-path";
 
 import type { VehicleFormImage } from "../schemas/vehicle.schema";
 
@@ -222,7 +223,7 @@ export const ImagesForm = ({
         const { path } = await filesService.uploadFile({
           file,
           bucket_name: "vehicles-images",
-          file_key: filesService.generateFileKey("vehicle-gallery", file),
+          file_key: filesService.generateFileKey(VEHICLE_GALLERY_TEMP_PREFIX, file),
           content_type: file.type as
             | "image/jpeg"
             | "image/png"

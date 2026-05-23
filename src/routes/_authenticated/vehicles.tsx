@@ -7,6 +7,8 @@ import type { PaginatedResult } from '@/types/general.types';
 import { vehiclesColumns } from '@/components/vehicles/vehiclesColumns';
 import { VehiclesFilter } from '@/components/vehicles/filters/vehicles.filters';
 import { VehicleForm } from '@/components/vehicles/forms/vehicleForm';
+import { vehicleActions } from '@/components/vehicles/actions/vehicleActions';
+import { useInvalidateData } from '@/hooks/useInvalidateData';
 
 export const Route = createFileRoute('/_authenticated/vehicles')({
   component: RouteComponent,
@@ -20,6 +22,9 @@ export const Route = createFileRoute('/_authenticated/vehicles')({
 
 function RouteComponent() {
   const response = Route.useLoaderData() as PaginatedResult<Vehicle>;
+  console.log("response", response);
+  const invalidateData = useInvalidateData("/_authenticated/vehicles");
+
   return (
     <DynamicTable
       table_id="vehicles"
@@ -29,8 +34,9 @@ function RouteComponent() {
       route={Route}
       total={response?.total ?? 0}
       filters={<VehiclesFilter />}
-      form={<VehicleForm />}
+      form={<VehicleForm onSuccess={invalidateData} />}
       form_size="5xl"
+      actions={(row) => vehicleActions(row, invalidateData)}
     />
   )
 }
