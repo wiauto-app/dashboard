@@ -1,3 +1,4 @@
+import type { VehicleFormImage } from "../schemas/vehicle.schema";
 import type z from "zod";
 import type { vehiclesSchema } from "../schemas/vehicles-params.schema";
 import type { createVehicleSchema, updateVehicleSchema, vehicleSchema } from "../schemas/vehicle.schema";
@@ -14,6 +15,97 @@ export interface Cuota {
   updated_at: Date;
 }
 
+export interface VehicleListItemCatalogRef {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface VehicleListItemImage {
+  id: string;
+  url: string;
+}
+
+export interface VehicleListItemPublisher {
+  id: string;
+  name: string;
+  avatar_url: string;
+}
+
+/** Fila del listado admin (`GET /v1/admin/vehicles`). */
+export interface AdminVehicleListItem {
+  id: string;
+  title: string;
+  price: number;
+  mileage: number;
+  lat: number;
+  lng: number;
+  condition: "new" | "used";
+  status: "active" | "pending" | "inactive" | "sold" | "archived";
+  is_featured: boolean;
+  views: number;
+  publisher_type: "professional" | "particular";
+  transmission_type: "manual" | "automatic";
+  power: number;
+  displacement: number;
+  license_plate: string;
+  autonomy: number;
+  battery_capacity: number;
+  time_to_charge: number;
+  phone_code: string;
+  phone: string;
+  email: string;
+  version_id: number;
+  expires_at: Date;
+  created_at: Date;
+  updated_at: Date;
+  images: VehicleListItemImage[];
+  features: VehicleListItemCatalogRef[];
+  services: VehicleListItemCatalogRef[];
+  vehicle_type: VehicleListItemCatalogRef | null;
+  color: (VehicleListItemCatalogRef & { hex_code: string }) | null;
+  dgt_label: (VehicleListItemCatalogRef & { code: string }) | null;
+  warranty_type: VehicleListItemCatalogRef | null;
+  cuotas: (VehicleListItemCatalogRef & { value: number })[];
+  publisher: VehicleListItemPublisher;
+  traction: VehicleListItemCatalogRef;
+}
+
+/** Detalle admin para edición (`GET /v1/admin/vehicles/:id`). */
+export interface AdminVehicleDetail {
+  id: string;
+  vin_code?: string | null;
+  vehicle_type_id: string | null;
+  title: string;
+  description: string;
+  price: number;
+  mileage: number;
+  condition: "new" | "used";
+  lat: number;
+  lng: number;
+  version_id: number;
+  traction_id: string;
+  transmission_type: "manual" | "automatic";
+  power: number;
+  displacement: number;
+  autonomy: number;
+  battery_capacity: number;
+  time_to_charge: number;
+  license_plate: string;
+  publisher_type: "professional" | "particular";
+  phone_code: string;
+  phone: string;
+  email: string;
+  features_ids: string[];
+  services_ids: string[];
+  color_id: string | null;
+  dgt_label_id: string | null;
+  warranty_type_id: string | null;
+  cuota_ids: string[];
+  images: VehicleFormImage[];
+}
+
+/** Detalle completo del vehículo (creación / edición). */
 export interface Vehicle {
   id: string;
   title: string;

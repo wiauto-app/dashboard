@@ -1,8 +1,8 @@
-import type { Vehicle } from "../types/vehicles.types";
+import type { AdminVehicleListItem } from "../types/vehicles.types";
 import { vehiclesService } from "../services/vehiclesService";
 import { deleteRowAction } from "@/components/dynamic-table/deleteResourceDialog";
 
-export const vehicleActions = (row: Vehicle, onSuccess?: () => void) => [
+export const vehicleActions = (row: AdminVehicleListItem, onSuccess?: () => void) => [
   deleteRowAction(row.id, onSuccess, {
     deleteFn: vehiclesService.delete,
     title: "Eliminar anuncio",

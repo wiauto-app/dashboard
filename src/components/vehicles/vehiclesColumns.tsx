@@ -2,172 +2,176 @@ import type { DynamicTableColumn } from "../dynamic-table/types";
 
 export const vehiclesColumns: DynamicTableColumn[] = [
   {
-    header: "Id",
+    header: "ID",
     accessorKey: "id",
     type: "text",
     sortable: false,
+    modifiable: false,
   },
-  //Identificación básica
   {
-    header: "Images",
+    header: "Imágenes",
     accessorKey: "images",
     type: "array",
     showArrayItems: false,
-    arrayDisplayKey: "url",
-    sortable: true,
+    sortable: false,
+    modifiable: false,
   },
   {
-    header: "Title",
+    header: "Título",
     accessorKey: "title",
     type: "text",
     sortable: true,
   },
   {
-    header: "Status",
+    header: "Estado",
     accessorKey: "status",
     type: "badge",
     sortable: true,
   },
   {
-    header: "Featured",
+    header: "Destacado",
     accessorKey: "is_featured",
     type: "boolean",
     sortable: true,
   },
-  //Precio y uso
   {
-    header: "Price",
+    header: "Precio",
     accessorKey: "price",
-    type: "text",
+    type: "number",
     sortable: true,
   },
   {
-    header: "Mileage",
+    header: "Kilometraje",
     accessorKey: "mileage",
-    type: "text",
+    type: "number",
     sortable: true,
   },
   {
-    header: "Views",
+    header: "Visitas",
     accessorKey: "views",
-    type: "text",
+    type: "number",
     sortable: true,
   },
-  //Especificaciones del vehículo
   {
-    header: "Transmission",
+    header: "Transmisión",
     accessorKey: "transmission_type",
-    type: "text",
+    type: "badge",
     sortable: false,
   },
   {
-    header: "Power (HP)",
+    header: "Potencia (CV)",
     accessorKey: "power",
-    type: "text",
+    type: "number",
     sortable: false,
   },
   {
-    header: "Displacement (cc)",
+    header: "Cilindrada (cc)",
     accessorKey: "displacement",
-    type: "text",
+    type: "number",
     sortable: false,
   },
   {
-    header: "Condition",
+    header: "Condición",
     accessorKey: "condition",
     type: "badge",
     sortable: false,
   },
   {
-    header: "Traction",
-    accessorKey: "traction_id",
+    header: "Tracción",
+    accessorKey: "traction.name",
     type: "text",
     sortable: false,
+    modifiable: false,
   },
-
-  //Eléctrico / híbrido (si aplica)
-
   {
-    header: "Autonomy (km)",
+    header: "Autonomía (km)",
     accessorKey: "autonomy",
-    type: "text",
+    type: "number",
     sortable: false,
   },
   {
-    header: "Battery Capacity",
+    header: "Capacidad batería",
     accessorKey: "battery_capacity",
-    type: "text",
+    type: "number",
     sortable: false,
   },
   {
-    header: "Charge Time",
+    header: "Tiempo de carga",
     accessorKey: "time_to_charge",
-    type: "text",
+    type: "number",
     sortable: false,
   },
-
-  // Ubicación
   {
-    header: "Latitude",
+    header: "Latitud",
     accessorKey: "lat",
     type: "text",
     sortable: false,
   },
   {
-    header: "Longitude",
+    header: "Longitud",
     accessorKey: "lng",
     type: "text",
     sortable: false,
   },
-
-  //Publicador / contacto
-
   {
-    header: "Publisher Type",
+    header: "Tipo de publicador",
     accessorKey: "publisher_type",
-    type: "text",
+    type: "badge",
     sortable: false,
   },
   {
-    header: "Phone",
+    header: "Publicador",
+    accessorKey: "publisher.name",
+    type: "text",
+    sortable: false,
+    modifiable: false,
+  },
+  {
+    header: "Teléfono",
     accessorKey: "phone",
     type: "text",
     sortable: false,
   },
   {
-    header: "Email",
+    header: "Correo electrónico",
     accessorKey: "email",
     type: "text",
     sortable: false,
   },
-
-  //Extras útiles (opcionales
   {
-    header: "License Plate",
+    header: "Matrícula",
     accessorKey: "license_plate",
     type: "text",
   },
   {
-    header: "Version",
+    header: "Versión",
     accessorKey: "version_id",
-    type: "text",
+    type: "number",
+    sortable: false,
   },
-
-  //fechas
   {
-    header: "Created At",
+    header: "Tipo de vehículo",
+    accessorKey: "vehicle_type.name",
+    type: "text",
+    sortable: false,
+    modifiable: false,
+  },
+  {
+    header: "Fecha de creación",
     accessorKey: "created_at",
     type: "date",
     sortable: true,
+    modifiable: false,
   },
   {
-    header: "Updated At",
+    header: "Fecha de actualización",
     accessorKey: "updated_at",
     type: "date",
     sortable: true,
+    modifiable: false,
   },
   {
-    header: "Expires At",
+    header: "Fecha de expiración",
     accessorKey: "expires_at",
     type: "date",
     sortable: true,

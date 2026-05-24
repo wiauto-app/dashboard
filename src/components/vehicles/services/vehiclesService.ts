@@ -1,9 +1,10 @@
-import { apiDelete, apiGet, apiPost, type apiResponse } from "@/services/api";
+import { apiDelete, apiGet, apiPatch, apiPost, type apiResponse } from "@/services/api";
 import type { PaginatedResult } from "@/types/general.types";
-import type { Vehicle, VehicleSchema, VehiclesParams } from "../types/vehicles.types";
+import type { AdminVehicleDetail, AdminVehicleListItem, Vehicle, VehicleSchema, UpdateVehicleSchema, VehiclesParams } from "../types/vehicles.types";
 import { V1_ADMIN_VEHICLES, V1_VEHICLES } from "./route.constants";
 import { objectToQueryString } from "@/lib/utils";
 import { format } from "date-fns";
+import { serializeVehiclePayload } from "../utils/serializeVehiclePayload";
 
 const DATE_PARAM_KEYS = [
   "since_created_at",
@@ -32,20 +33,34 @@ const serializeVehiclesParams = (params?: VehiclesParams) => {
 };
 
 export const vehiclesService = {
-  async findAll(params?: VehiclesParams): Promise<PaginatedResult<Vehicle>> {
+  async findAll(params?: VehiclesParams): Promise<PaginatedResult<AdminVehicleListItem>> {
     const queryString = serializeVehiclesParams(params);
-    const response = await apiGet<PaginatedResult<Vehicle>>(
+    const response = await apiGet<PaginatedResult<AdminVehicleListItem>>(
       `${V1_ADMIN_VEHICLES}${queryString ? `?${queryString}` : ""}`,
     );
     return response.data;
   },
 
+  async findOne(id: string): Promise<AdminVehicleDetail> {
+    const response = await apiGet<{ vehicle: AdminVehicleDetail }>(
+      `${V1_ADMIN_VEHICLES}/${id}`,
+    );
+    return response.data.vehicle;
+  },
+
   async create(data: VehicleSchema): Promise<apiResponse<Vehicle>> {
-    const response = await apiPost<Vehicle>(`${V1_VEHICLES}`, {
-      ...data,
-      phone_code: data.phone.phone_code,
-      phone: data.phone.phone,
-    });
+    const response = await apiPost<Vehicle>(`${V1_VEHICLES}`, serializeVehiclePayload(data));
+    return response;
+  },
+
+  async update(
+    id: string,
+    data: UpdateVehicleSchema,
+  ): Promise<apiResponse<Vehicle>> {
+    const response = await apiPatch<Vehicle>(
+      `${V1_VEHICLES}/${id}`,
+      serializeVehiclePayload(data, { only_temp_images: true }),
+    );
     return response;
   },
 
