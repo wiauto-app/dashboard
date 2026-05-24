@@ -9,6 +9,14 @@ const is_temp_storage_path = (stored_path: string): boolean => {
   return normalized.split("/").filter(Boolean).includes(TEMP_STORAGE_SEGMENT);
 };
 
+const catalog_form_field_keys = [
+  "catalog_make_id",
+  "catalog_model_id",
+  "catalog_body_type_id",
+  "catalog_fuel_type_id",
+  "catalog_year_id",
+] as const;
+
 export const serializeVehiclePayload = (
   data: VehicleSchema | UpdateVehicleSchema,
   options?: { only_temp_images?: boolean },
@@ -20,6 +28,10 @@ export const serializeVehiclePayload = (
     phone_code: phone?.phone_code,
     phone: phone?.phone,
   };
+
+  for (const key of catalog_form_field_keys) {
+    delete payload[key];
+  }
 
   if (images !== undefined) {
     const filtered_images = options?.only_temp_images

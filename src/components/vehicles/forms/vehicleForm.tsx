@@ -45,7 +45,8 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
 
   useEffect(() => {
     if (vehicleDetail) {
-      form.reset(mapAdminVehicleDetailToFormValues(vehicleDetail));
+      const initialValues = mapAdminVehicleDetailToFormValues(vehicleDetail);
+      form.reset(initialValues);
     }
   }, [vehicleDetail, form]);
 

@@ -15,4 +15,10 @@ export const modelService = {
     const response = await apiGet<PaginatedResult<CatalogModelItem>>(`${V1_CATALOG_MODELS}${queryString ? `?${queryString}` : ""}`);
     return response.data;
   },
+  findOne: async (id: number): Promise<CatalogModelItem> => {
+    const response = await apiGet<{ model: CatalogModelItem }>(
+      `${V1_CATALOG_MODELS}/${id}`,
+    );
+    return response.data.model;
+  },
 };

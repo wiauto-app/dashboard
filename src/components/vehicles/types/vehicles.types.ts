@@ -72,6 +72,15 @@ export interface AdminVehicleListItem {
 }
 
 /** Detalle admin para edición (`GET /v1/admin/vehicles/:id`). */
+export interface AdminVehicleVersionCatalog {
+  make_id: number;
+  model_id: number;
+  body_type_id: number;
+  fuel_type_id: number;
+  year_id: number;
+}
+
+/** Detalle admin para edición (`GET /v1/admin/vehicles/:id`). */
 export interface AdminVehicleDetail {
   id: string;
   vin_code?: string | null;
@@ -84,6 +93,7 @@ export interface AdminVehicleDetail {
   lat: number;
   lng: number;
   version_id: number;
+  version_catalog: AdminVehicleVersionCatalog;
   traction_id: string;
   transmission_type: "manual" | "automatic";
   power: number;

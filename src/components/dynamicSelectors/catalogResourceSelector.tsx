@@ -42,11 +42,10 @@ export const CatalogResourceSelector = <T,>({
     label: getItemLabel(item),
   }));
 
-  const resolved_value = value?.trim() ? value : undefined;
 
   return (
     <Select
-      value={resolved_value}
+      value={value ?? ""}
       onValueChange={(next_value) => {
         if (next_value != null) {
           onValueChange(next_value);

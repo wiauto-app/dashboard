@@ -44,6 +44,10 @@ export const ModelSelector = ({
         placeholder={placeholder ?? "Seleccionar modelo"}
         searchPlaceholder="Buscar modelo"
         searchFn={searchModels}
+        resolveOption={async (model_id) => {
+          const model = await modelService.findOne(Number(model_id));
+          return { label: model.name, value: String(model.id) };
+        }}
       />
     </Field>
   );

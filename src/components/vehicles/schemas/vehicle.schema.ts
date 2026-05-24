@@ -109,6 +109,12 @@ export const vehicleSchema = z.object({
     .number({ error: "Selecciona una versión del catálogo." })
     .int({ error: "Selecciona una versión del catálogo." })
     .positive({ error: "Selecciona una versión del catálogo." }),
+  /** Solo formulario: precarga la cascada del catálogo al editar. No se envía al API. */
+  catalog_make_id: z.coerce.number().int().positive().optional(),
+  catalog_model_id: z.coerce.number().int().positive().optional(),
+  catalog_body_type_id: z.coerce.number().int().positive().optional(),
+  catalog_fuel_type_id: z.coerce.number().int().positive().optional(),
+  catalog_year_id: z.coerce.number().int().positive().optional(),
   traction_id: z.uuid({ error: "Selecciona un tipo de tracción." }),
   transmission_type: z.enum(VEHICLE_TRANSMISSION_TYPE, {
     error: "Selecciona un tipo de transmisión.",

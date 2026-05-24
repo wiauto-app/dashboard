@@ -1,11 +1,54 @@
 import { ControllerInput } from "@/components/ui/controllerInput";
 import { VehicleTypesSelector } from "@/components/dynamicSelectors/vehicleTypesSelector";
 import { VersionForm } from "./versionForm";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import type { VehicleSchema } from "../types/vehicles.types";
+import { useMemo } from "react";
 
 export const VehicleDataForm = () => {
   const form = useFormContext<VehicleSchema>();
+
+  const [
+    catalog_make_id,
+    catalog_model_id,
+    catalog_body_type_id,
+    catalog_fuel_type_id,
+    catalog_year_id,
+  ] = useWatch({
+    control: form.control,
+    name: [
+      "catalog_make_id",
+      "catalog_model_id",
+      "catalog_body_type_id",
+      "catalog_fuel_type_id",
+      "catalog_year_id",
+    ],
+  });
+
+  const initialCatalogIds = useMemo(() => {
+    if (!catalog_make_id) {
+      return undefined;
+    }
+
+    return {
+      makeId: String(catalog_make_id),
+      modelId: catalog_model_id ? String(catalog_model_id) : undefined,
+      bodyTypeId: catalog_body_type_id
+        ? String(catalog_body_type_id)
+        : undefined,
+      fuelTypeId: catalog_fuel_type_id
+        ? String(catalog_fuel_type_id)
+        : undefined,
+      yearId: catalog_year_id ? String(catalog_year_id) : undefined,
+    };
+  }, [
+    catalog_make_id,
+    catalog_model_id,
+    catalog_body_type_id,
+    catalog_fuel_type_id,
+    catalog_year_id,
+  ]);
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -45,6 +88,7 @@ export const VehicleDataForm = () => {
               <div className="grid grid-cols-2 gap-3">
                 <VersionForm
                   ariaInvalid={fieldState.invalid}
+                  initialCatalogIds={initialCatalogIds}
                   versionId={
                     field.value === "" ||
                     field.value === undefined ||
@@ -62,8 +106,6 @@ export const VehicleDataForm = () => {
             )}
           </ControllerInput>
         </div>
-   
-    
       </div>
     </div>
   );

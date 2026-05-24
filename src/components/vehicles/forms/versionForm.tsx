@@ -4,10 +4,10 @@ import { MakeSelector } from "@/components/dynamicSelectors/makeSelector";
 import { ModelSelector } from "@/components/dynamicSelectors/modelSelector";
 import { VersionSelector } from "@/components/dynamicSelectors/versionSelector";
 import { YearSelector } from "@/components/dynamicSelectors/yearSelector";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 /** IDs del asistente de catálogo (la versión elegida vive en el formulario padre vía `versionId`). */
-type CatalogCascadeIds = {
+export type CatalogCascadeIds = {
   makeId?: string;
   modelId?: string;
   bodyTypeId?: string;
@@ -20,6 +20,8 @@ export type VersionFormProps = {
   versionId?: string;
   /** Notifica cambios de versión al padre (string id del catálogo). */
   onVersionIdChange?: (value: string | undefined) => void;
+  /** Precarga marca → año al editar un vehículo existente. */
+  initialCatalogIds?: CatalogCascadeIds;
   ariaInvalid?: boolean;
   /** Oculta la etiqueta del último selector si el padre ya muestra label (p. ej. `ControllerInput`). */
   hideVersionLabel?: boolean;
@@ -40,13 +42,37 @@ const patchIds = (
   return next;
 };
 
+const catalog_ids_signature = (ids?: CatalogCascadeIds) =>
+  [
+    ids?.makeId ?? "",
+    ids?.modelId ?? "",
+    ids?.bodyTypeId ?? "",
+    ids?.fuelTypeId ?? "",
+    ids?.yearId ?? "",
+  ].join(":");
+
 export const VersionForm = ({
   versionId,
   onVersionIdChange,
+  initialCatalogIds,
   ariaInvalid,
   hideVersionLabel = false,
 }: VersionFormProps) => {
-  const [ids, setIds] = useState<CatalogCascadeIds>({});
+  const [ids, setIds] = useState<CatalogCascadeIds>(
+    () => initialCatalogIds ?? {},
+  );
+
+  const initialCatalogSignature = useMemo(
+    () => catalog_ids_signature(initialCatalogIds),
+    [initialCatalogIds],
+  );
+
+  useEffect(() => {
+    if (!initialCatalogIds) {
+      return;
+    }
+    setIds(initialCatalogIds);
+  }, [initialCatalogSignature, initialCatalogIds]);
 
   const updateIds = (
     field: keyof CatalogCascadeIds,

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import React from "react";
 
 export const VehicleFormSteps = ({ currentStep }: { currentStep: number }) => {
   const steps = [
@@ -28,7 +29,7 @@ export const VehicleFormSteps = ({ currentStep }: { currentStep: number }) => {
     <div className="max-w-[90%] mx-auto mb-10">
       <div className="flex items-start relative  justify-between">
         {steps.map((step, index) => (
-          <>
+          <React.Fragment key={step.key}>
             <div
               className="flex  flex-col items-center gap-2 relative"
               key={step.key}
@@ -57,7 +58,7 @@ export const VehicleFormSteps = ({ currentStep }: { currentStep: number }) => {
                 currentStep >= index + 1 && "bg-primary",
               )}
             ></div>
-          </>
+          </React.Fragment>
         ))}
       </div>
     </div>
