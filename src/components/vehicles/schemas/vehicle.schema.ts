@@ -144,6 +144,7 @@ export const vehicleSchema = z.object({
   email: z.email({ error: "Introduce un correo electrónico válido." }),
 
   // --- Relaciones opcionales (IDs) ---
+  category_id: optionalUuid,
   color_id: optionalUuid,
   dgt_label_id: optionalUuid,
   warranty_type_id: optionalUuid,

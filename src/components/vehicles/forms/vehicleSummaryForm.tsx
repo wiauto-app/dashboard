@@ -21,7 +21,7 @@ export const VehicleSummaryForm = () => {
           control={form.control}
           label="Tipo de publicador"
         >
-          {({ field, fieldState }) => (
+          {({ field }) => (
             <VehiclePublisherTypeSelector
               value={field.value as string | undefined}
               onValueChange={field.onChange}
@@ -61,9 +61,10 @@ export const VehicleSummaryForm = () => {
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <ControllerInput name="lat" control={form.control} label="Latitud">
-            {({ field, fieldState }) => (
-              <Input
+          {({ field, fieldState }) => (
+            <Input
                 {...field}
+                value={field.value == null ? "" : String(field.value)}
                 type="number"
                 step="any"
                 inputMode="decimal"
@@ -73,9 +74,10 @@ export const VehicleSummaryForm = () => {
             )}
           </ControllerInput>
           <ControllerInput name="lng" control={form.control} label="Longitud">
-            {({ field, fieldState }) => (
-              <Input
+          {({ field, fieldState }) => (
+            <Input
                 {...field}
+                value={field.value == null ? "" : String(field.value)}
                 type="number"
                 step="any"
                 inputMode="decimal"

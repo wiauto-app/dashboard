@@ -1,12 +1,12 @@
-import type { User } from "@/types/user.types";
 import { AuthContext } from "@/context/authContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authService } from "@/services/authServices/AuthService";
 import { useNavigate } from "@tanstack/react-router";
+import type { AuthUser } from "@/types/auth.types";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [user, setUser] = useState<AuthUser | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,8 +19,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (cancelled) {
           return;
         }
-        if (response.ok && response.data?.id) {
-          setUser(response.data);
+        if (
+          response.ok &&
+          response.data?.id &&
+          response.data.type === "session"
+        ) {
+          setUser(response.data as AuthUser);
         } else {
           setUser(undefined);
         }
@@ -44,7 +48,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const refreshUser = useCallback(async () => {
     try {
       const response = await authService.getMe();
-      if (response.ok && response.data?.id) {
+      if (
+        response.ok &&
+        response.data?.id &&
+        response.data.type === "session"
+      ) {
         setUser(response.data);
       } else {
         setUser(undefined);

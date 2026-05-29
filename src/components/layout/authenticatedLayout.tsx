@@ -1,3 +1,4 @@
+import { ChatSocketProvider } from "@/components/chat/context/chatSocketContext";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
@@ -43,7 +44,7 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   }
 
   return (
-    <>
+    <ChatSocketProvider>
       <AppSidebar variant="sidebar" className="" />
       <div
         className={cn(
@@ -56,6 +57,6 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
           <main className=" p-4 lg:p-8 lg:pt-0">{children}</main>
         </div>
       </div>
-    </>
+    </ChatSocketProvider>
   );
 };

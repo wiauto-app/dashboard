@@ -20,13 +20,16 @@ import { Route as AuthenticatedTractionsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedRoleRouteImport } from './routes/_authenticated/role'
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
 import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
 import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
 import { Route as AuthenticatedCuotasRouteImport } from './routes/_authenticated/cuotas'
 import { Route as AuthenticatedColorsRouteImport } from './routes/_authenticated/colors'
+import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedCatalogServicesRouteImport } from './routes/_authenticated/catalog-services'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as AuthenticatedProfileConfigRouteImport } from './routes/_authenticated/profile/config'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
@@ -85,6 +88,11 @@ const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
   path: '/moderation',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
   id: '/features',
   path: '/features',
@@ -110,6 +118,11 @@ const AuthenticatedColorsRoute = AuthenticatedColorsRouteImport.update({
   path: '/colors',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCatalogServicesRoute =
   AuthenticatedCatalogServicesRouteImport.update({
     id: '/catalog-services',
@@ -121,16 +134,24 @@ const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedProfileConfigRoute =
+  AuthenticatedProfileConfigRouteImport.update({
+    id: '/profile/config',
+    path: '/profile/config',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/about': typeof AuthenticatedAboutRoute
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
+  '/categories': typeof AuthenticatedCategoriesRoute
   '/colors': typeof AuthenticatedColorsRoute
   '/cuotas': typeof AuthenticatedCuotasRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
   '/role': typeof AuthenticatedRoleRoute
@@ -140,15 +161,18 @@ export interface FileRoutesByFullPath {
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/warranty-types': typeof AuthenticatedWarrantyTypesRoute
   '/signIn/': typeof SignInIndexRoute
+  '/profile/config': typeof AuthenticatedProfileConfigRoute
 }
 export interface FileRoutesByTo {
   '/about': typeof AuthenticatedAboutRoute
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
+  '/categories': typeof AuthenticatedCategoriesRoute
   '/colors': typeof AuthenticatedColorsRoute
   '/cuotas': typeof AuthenticatedCuotasRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
   '/role': typeof AuthenticatedRoleRoute
@@ -159,17 +183,20 @@ export interface FileRoutesByTo {
   '/warranty-types': typeof AuthenticatedWarrantyTypesRoute
   '/': typeof AuthenticatedIndexRoute
   '/signIn': typeof SignInIndexRoute
+  '/profile/config': typeof AuthenticatedProfileConfigRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/catalog-services': typeof AuthenticatedCatalogServicesRoute
+  '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/colors': typeof AuthenticatedColorsRoute
   '/_authenticated/cuotas': typeof AuthenticatedCuotasRoute
   '/_authenticated/dealership': typeof AuthenticatedDealershipRoute
   '/_authenticated/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
+  '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
   '/_authenticated/role': typeof AuthenticatedRoleRoute
@@ -180,6 +207,7 @@ export interface FileRoutesById {
   '/_authenticated/warranty-types': typeof AuthenticatedWarrantyTypesRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/signIn/': typeof SignInIndexRoute
+  '/_authenticated/profile/config': typeof AuthenticatedProfileConfigRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,11 +215,13 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/catalog-services'
+    | '/categories'
     | '/colors'
     | '/cuotas'
     | '/dealership'
     | '/dgt-labels'
     | '/features'
+    | '/messages'
     | '/moderation'
     | '/permissions'
     | '/role'
@@ -201,15 +231,18 @@ export interface FileRouteTypes {
     | '/vehicles'
     | '/warranty-types'
     | '/signIn/'
+    | '/profile/config'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
     | '/catalog-services'
+    | '/categories'
     | '/colors'
     | '/cuotas'
     | '/dealership'
     | '/dgt-labels'
     | '/features'
+    | '/messages'
     | '/moderation'
     | '/permissions'
     | '/role'
@@ -220,16 +253,19 @@ export interface FileRouteTypes {
     | '/warranty-types'
     | '/'
     | '/signIn'
+    | '/profile/config'
   id:
     | '__root__'
     | '/_authenticated'
     | '/_authenticated/about'
     | '/_authenticated/catalog-services'
+    | '/_authenticated/categories'
     | '/_authenticated/colors'
     | '/_authenticated/cuotas'
     | '/_authenticated/dealership'
     | '/_authenticated/dgt-labels'
     | '/_authenticated/features'
+    | '/_authenticated/messages'
     | '/_authenticated/moderation'
     | '/_authenticated/permissions'
     | '/_authenticated/role'
@@ -240,6 +276,7 @@ export interface FileRouteTypes {
     | '/_authenticated/warranty-types'
     | '/_authenticated/'
     | '/signIn/'
+    | '/_authenticated/profile/config'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -326,6 +363,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModerationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/features': {
       id: '/_authenticated/features'
       path: '/features'
@@ -361,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedColorsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/categories': {
+      id: '/_authenticated/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/catalog-services': {
       id: '/_authenticated/catalog-services'
       path: '/catalog-services'
@@ -375,17 +426,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAboutRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/profile/config': {
+      id: '/_authenticated/profile/config'
+      path: '/profile/config'
+      fullPath: '/profile/config'
+      preLoaderRoute: typeof AuthenticatedProfileConfigRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedCatalogServicesRoute: typeof AuthenticatedCatalogServicesRoute
+  AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedColorsRoute: typeof AuthenticatedColorsRoute
   AuthenticatedCuotasRoute: typeof AuthenticatedCuotasRoute
   AuthenticatedDealershipRoute: typeof AuthenticatedDealershipRoute
   AuthenticatedDgtLabelsRoute: typeof AuthenticatedDgtLabelsRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
+  AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
   AuthenticatedRoleRoute: typeof AuthenticatedRoleRoute
@@ -395,16 +455,19 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedVehiclesRoute: typeof AuthenticatedVehiclesRoute
   AuthenticatedWarrantyTypesRoute: typeof AuthenticatedWarrantyTypesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedProfileConfigRoute: typeof AuthenticatedProfileConfigRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedCatalogServicesRoute: AuthenticatedCatalogServicesRoute,
+  AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedColorsRoute: AuthenticatedColorsRoute,
   AuthenticatedCuotasRoute: AuthenticatedCuotasRoute,
   AuthenticatedDealershipRoute: AuthenticatedDealershipRoute,
   AuthenticatedDgtLabelsRoute: AuthenticatedDgtLabelsRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
+  AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
   AuthenticatedRoleRoute: AuthenticatedRoleRoute,
@@ -414,6 +477,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedVehiclesRoute: AuthenticatedVehiclesRoute,
   AuthenticatedWarrantyTypesRoute: AuthenticatedWarrantyTypesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedProfileConfigRoute: AuthenticatedProfileConfigRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

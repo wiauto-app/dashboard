@@ -1,8 +1,8 @@
-import type { User } from "@/types/user.types";
+import type { AuthUser } from "@/types/auth.types";
 import { createContext } from "react";
 
 export type AuthContextValue = {
-  user?: User;
+  user?: AuthUser;
   isLoading: boolean;
   isAuthenticated: boolean;
   refreshUser: () => Promise<void>;

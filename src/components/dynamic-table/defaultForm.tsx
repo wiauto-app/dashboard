@@ -12,7 +12,6 @@ import { ImageInput } from "../ui/imageInput";
 import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { apiResponse } from "@/services/api";
-import { scheduleDefaultFormUndo } from "@/lib/defaultFormPendingUndo";
 import { toast } from "sonner";
 
 export type DefaultFormMutationMessages = {
@@ -20,22 +19,12 @@ export type DefaultFormMutationMessages = {
   update_success?: string;
   create_error?: string;
   update_error?: string;
-  /** Toast antes de ejecutar el guardado (flujo Deshacer). */
-  create_pending?: string;
-  update_pending?: string;
-  /** Etiqueta del botón en el toast (p. ej. "Deshacer"). */
-  undo_label?: string;
 };
 
 const default_create_success = "Registro creado correctamente";
 const default_update_success = "Registro actualizado correctamente";
 const default_create_error = "No se pudo crear el registro";
 const default_update_error = "No se pudo actualizar el registro";
-const default_create_pending =
-  "Se creará el registro en unos segundos. Pulsa Deshacer para cancelar.";
-const default_update_pending =
-  "Cambios guardados correctamente.";
-
 export const DefaultForm = ({
   columns,
   createService,
@@ -44,8 +33,6 @@ export const DefaultForm = ({
   isTest = false,
   onMutationSuccess,
   messages = {},
-  use_undo_toast = true,
-  undo_delay_ms = 5000,
 }: {
   columns: DynamicTableColumn[];
   findOneService: (id: string) => Promise<any>;
@@ -58,13 +45,6 @@ export const DefaultForm = ({
   /** Invalidar loader de la ruta, refetch de lista, etc. */
   onMutationSuccess?: () => void;
   messages?: DefaultFormMutationMessages;
-  /**
-   * Si es true, el guardado se retrasa mostrando un toast con "Deshacer".
-   * Si el usuario pulsa Deshacer, no se hace la petición.
-   */
-  use_undo_toast?: boolean;
-  /** ms de espera antes de enviar si no hay Deshacer. */
-  undo_delay_ms?: number;
 }) => {
   const [images, setImages] = useState<Record<string, string | null>>({});
   const [is_submitting, setIsSubmitting] = useState(false);
@@ -149,67 +129,39 @@ export const DefaultForm = ({
 
       const row_id_at_submit = selectedId;
 
-      const runMutate = async (skip_success_toast?: boolean) => {
-        const response = row_id_at_submit
-          ? await updateService(row_id_at_submit, submittedData)
-          : await createService(submittedData);
+      const response = row_id_at_submit
+        ? await updateService(row_id_at_submit, submittedData)
+        : await createService(submittedData);
 
-        if (!response.ok) {
-          toast.error(
-            response.message ||
-              (row_id_at_submit
-                ? (messages.update_error ?? default_update_error)
-                : (messages.create_error ?? default_create_error)),
-          );
-          return;
-        }
-
-        if (!skip_success_toast) {
-          toast.success(
-            row_id_at_submit
-              ? (messages.update_success ?? default_update_success)
-              : (messages.create_success ?? default_create_success),
-          );
-        }
-
-        onMutationSuccess?.();
-
-        if (!isTest) {
-          setSelectedId(null);
-          setIsOpen(false);
-        }
-
-        queryClient.invalidateQueries({
-          queryKey: ["selectedData"],
-        });
-      };
-
-      if (!use_undo_toast) {
-        try {
-          await runMutate();
-        } finally {
-          release_submit_lock();
-        }
+      if (!response.ok) {
+        toast.error(
+          response.message ||
+            (row_id_at_submit
+              ? (messages.update_error ?? default_update_error)
+              : (messages.create_error ?? default_create_error)),
+        );
         return;
       }
 
-      const pending_message = row_id_at_submit
-        ? (messages.update_pending ?? default_update_pending)
-        : (messages.create_pending ?? default_create_pending);
+      toast.success(
+        row_id_at_submit
+          ? (messages.update_success ?? default_update_success)
+          : (messages.create_success ?? default_create_success),
+      );
 
-      scheduleDefaultFormUndo({
-        message: pending_message,
-        undo_label: messages.undo_label,
-        delay_ms: undo_delay_ms,
-        on_commit: () => runMutate(true),
-      });
+      onMutationSuccess?.();
 
       if (!isTest) {
-        setIsOpen(false);
         setSelectedId(null);
+        setIsOpen(false);
       }
-      release_submit_lock();
+
+      queryClient.invalidateQueries({
+        queryKey: ["selectedData"],
+      });
     } catch {
+      // Sin toast de error genérico: el servicio ya muestra el mensaje del API.
+    } finally {
       release_submit_lock();
     }
   };
@@ -247,7 +199,7 @@ export const DefaultForm = ({
                 setImages({ ...images, [column.accessorKey]: value })
               }
               bucketName={column.bucketName!}
-              path={column.accessorKey}
+              path={column.image_upload_path ?? column.accessorKey}
             />
           )}
           {column.type === "text" && (

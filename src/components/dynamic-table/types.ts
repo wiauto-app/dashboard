@@ -22,6 +22,8 @@ export interface DynamicTableColumn {
   modifiable?: boolean;
   arrayDisplayKey?: string;
   bucketName?: BucketName;
+  /** Prefijo de clave en MinIO para columnas `image` (p. ej. `categories`). */
+  image_upload_path?: string;
 }
 
 export interface DynamicTableAction {

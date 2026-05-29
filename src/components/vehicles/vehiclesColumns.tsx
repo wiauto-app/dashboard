@@ -23,6 +23,13 @@ export const vehiclesColumns: DynamicTableColumn[] = [
     sortable: true,
   },
   {
+    header: "Categoría",
+    accessorKey: "category.name",
+    type: "text",
+    sortable: false,
+    modifiable: false,
+  },
+  {
     header: "Estado",
     accessorKey: "status",
     type: "badge",

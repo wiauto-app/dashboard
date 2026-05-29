@@ -36,6 +36,7 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/moderation": with_home("Moderación", "/moderation"),
   "/about": with_home("Acerca", "/about"),
   "/vehicles": vehicle_admin_trail("Anuncios", "/vehicles"),
+  "/categories": vehicle_admin_trail("Categorías", "/categories"),
   "/features": vehicle_admin_trail("Características", "/features"),
   "/cuotas": vehicle_admin_trail("Cuotas", "/cuotas"),
   "/tractions": vehicle_admin_trail("Tracciones", "/tractions"),
@@ -44,4 +45,5 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/dgt-labels": vehicle_admin_trail("Etiquetas DGT", "/dgt-labels"),
   "/warranty-types": vehicle_admin_trail("Tipos de garantía", "/warranty-types"),
   "/catalog-services": vehicle_admin_trail("Servicios", "/catalog-services"),
+  "/profile/config": with_home("Configuración", "/profile/config"),
 };

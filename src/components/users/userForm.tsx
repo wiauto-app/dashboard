@@ -44,9 +44,11 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       last_name: "",
       role_id: "",
       avatar_url: "",
-      image_url: "",
+      // image_url: "",
     },
   });
+
+  console.log(form.formState.errors);
 
   useEffect(() => {
     if (profile) {
@@ -56,7 +58,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         email: profile.user.email,
         role_id: profile.role?.id,
         avatar_url: profile.avatar_url,
-        image_url: profile.image_url,
+        // image_url: profile.image_url,
       });
     }
   }, [profile]);
@@ -77,7 +79,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           last_name: formData.last_name,
           role_id: formData.role_id,
           avatar_url: formData.avatar_url,
-          image_url: formData.image_url,
+          // image_url: formData.image_url,
         };
 
         const profileResponse = await profileService.updateProfile(
@@ -108,7 +110,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             last_name: formData.last_name,
             role_id: formData.role_id,
             avatar_url: formData.avatar_url,
-            image_url: formData.image_url,
+            // image_url: formData.image_url,
           },
         );
         if (profileResponse?.ok) {
@@ -196,7 +198,10 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <Field data-invalid={fieldState.invalid}>
                   <ImageInput
                     value={field.value}
-                    onChange={field.onChange}
+                    onChange={(value) => {
+                      console.log("value", value);
+                      field.onChange(value);
+                    }}
                     bucketName="profile-images"
                     path="avatars"
                   />

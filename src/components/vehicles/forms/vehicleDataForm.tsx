@@ -1,4 +1,5 @@
 import { ControllerInput } from "@/components/ui/controllerInput";
+import { CategoriesSelector } from "@/components/dynamicSelectors/categoriesSelector";
 import { VehicleTypesSelector } from "@/components/dynamicSelectors/vehicleTypesSelector";
 import { VersionForm } from "./versionForm";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -73,6 +74,25 @@ export const VehicleDataForm = () => {
             <VehicleTypesSelector
               onValueChange={field.onChange}
               value={field.value as string}
+              ariaInvalid={fieldState.invalid}
+              disabled={field.disabled}
+            />
+          )}
+        </ControllerInput>
+        <ControllerInput
+          name="category_id"
+          control={form.control}
+          label="Categoría"
+          optional
+        >
+          {({ field, fieldState }) => (
+            <CategoriesSelector
+              onValueChange={(next) => field.onChange(next ?? null)}
+              value={
+                field.value === null || field.value === undefined
+                  ? undefined
+                  : String(field.value)
+              }
               ariaInvalid={fieldState.invalid}
               disabled={field.disabled}
             />

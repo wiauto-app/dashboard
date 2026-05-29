@@ -24,12 +24,14 @@ import {
   HomeIcon,
   Info,
   LogOut,
+  MessageCircle,
   ShieldCheck,
   Store,
   UserKey,
   Users,
 } from "lucide-react";
 import { SidebarItem } from "./components/sidebarItem";
+import { MessagesNavBadge } from "./components/messagesNavBadge";
 import { BrandIcon } from "@/assets/brandIcon";
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
@@ -43,15 +45,17 @@ const dashboard_nav_item = {
 
 const rest_nav_items = [
   { to: "/users" as const, label: "Usuarios", icon: Users },
+  { to: "/messages" as const, label: "Mensajes", icon: MessageCircle },
   { to: "/permissions" as const, label: "Permisos", icon: ShieldCheck },
-  { to: "/role" as const, label: "Roles", icon: UserKey },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
+  { to: "/role" as const, label: "Roles", icon: UserKey },
   { to: "/moderation" as const, label: "Moderación", icon: ShieldCheck },
   { to: "/about" as const, label: "Acerca", icon: Info },
 ] as const;
 
 const vehicle_admin_children = [
   { to: "/vehicles" as const, label: "Anuncios" },
+  { to: "/categories" as const, label: "Categorías" },
   { to: "/features" as const, label: "Características" },
   { to: "/cuotas" as const, label: "Cuotas" },
   { to: "/tractions" as const, label: "Tracciones" },
@@ -189,7 +193,10 @@ export const AppSidebar = ({
                     Icon={Icon}
                     props={{ isActive, tooltip: label }}
                   >
-                    {label}
+                    <span className="flex w-full items-center gap-2">
+                      {label}
+                      {to === "/messages" ? <MessagesNavBadge /> : null}
+                    </span>
                   </SidebarItem>
                 );
               })}

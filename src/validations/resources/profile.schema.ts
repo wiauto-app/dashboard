@@ -12,7 +12,7 @@ export const profileSchema = z.object({
     .max(40, { error: "Los apellidos admiten como máximo 40 caracteres." }),
   role_id: z.uuid({ error: "Selecciona un rol válido." }),
   avatar_url: z.string().optional(),
-  image_url: z.string().optional(),
+  // image_url: z.string().optional(),
 })
 
 export type ProfileSchema = z.infer<typeof profileSchema>;

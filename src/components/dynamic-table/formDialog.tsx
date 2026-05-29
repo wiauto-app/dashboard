@@ -39,7 +39,7 @@ export const FormDialog = ({
       </DialogTrigger>
       <DialogContent
         className={cn(
-          "md:max-w-2xl max-w-",
+          "md:max-w-2xl max-w-full",
           size === "sm" && "md:max-w-sm",
           size === "md" && "md:max-w-md",
           size === "lg" && "md:max-w-lg",

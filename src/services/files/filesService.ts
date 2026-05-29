@@ -8,7 +8,13 @@ import {
 } from "./route.constants";
 import { toast } from "sonner";
 
-export type BucketName = "files" | "vehicles-videos" | "vehicles-images" | "profile-images" | "dealership-images";
+export type BucketName =
+  | "files"
+  | "vehicles-videos"
+  | "vehicles-images"
+  | "profile-images"
+  | "dealership-images"
+  | "chat-attachments";
 
 const bucket_names_allowlist: BucketName[] = [
   "files",
@@ -16,6 +22,7 @@ const bucket_names_allowlist: BucketName[] = [
   "vehicles-images",
   "profile-images",
   "dealership-images",
+  "chat-attachments",
 ];
 
 /** Convierte `bucket/object/key` tal como guarda la subida en `uploadFile`. */
@@ -36,9 +43,27 @@ export const split_storage_compound_path = (
   }
   return { bucket_name: bucket_segment as BucketName, object_key };
 };
+export type UploadContentType =
+  | "image/jpeg"
+  | "image/png"
+  | "image/jpg"
+  | "image/webp"
+  | "video/mp4"
+  | "video/mov"
+  | "video/avi"
+  | "video/mkv"
+  | "video/webm"
+  | "audio/mp3"
+  | "audio/m4a"
+  | "audio/webm"
+  | "audio/ogg"
+  | "audio/wav"
+  | "application/pdf"
+  | "application/octet-stream";
+
 interface GenerateFileSignedUrlDto {
   file_key: string;
-  content_type: "image/jpeg" | "image/png" | "image/jpg" | "image/webp" | "video/mp4" | "video/mov" | "video/avi" | "video/mkv" | "video/webm" | "audio/mp3" | "audio/m4a";
+  content_type: UploadContentType;
   bucket_name: BucketName;
 }
 
@@ -59,10 +84,12 @@ interface ConfirmVideoUploadResponse {
   file_key_en_storage: string;
 }
 
-interface UploadFileDto extends GenerateFileSignedUrlDto {
-  file: File;
+interface UploadFileDto {
+  file_key: string;
+  content_type?: UploadContentType;
   bucket_name: BucketName;
-  reference_id: string;
+  file: File;
+  reference_id?: string;
 }
 
 /** Tipos MIME de vídeo aceptados por el backend (`GenerateFileSignedUrlHttpDto`). */
@@ -144,14 +171,10 @@ export const filesService = {
     return response.data.signed_url
   },
 
-  async uploadFile(uploadFileDto: UploadFileDto): Promise<{  path: string | null }> {
+  async uploadFile(uploadFileDto: UploadFileDto): Promise<{ path: string | null }> {
     const signedUrl = await filesService.generateFileSignedUrl({
       file_key: uploadFileDto.file_key,
-      content_type: uploadFileDto.file.type as
-        | "image/jpeg"
-        | "image/png"
-        | "image/jpg"
-        | "image/webp",
+      content_type: uploadFileDto.content_type ?? (uploadFileDto.file.type as UploadContentType),
       bucket_name: uploadFileDto.bucket_name,
     });
     console.log(signedUrl);
@@ -227,4 +250,73 @@ export const filesService = {
     return `${path}/${crypto.randomUUID()}.${extension}`;
   },
 
+  normalize_chat_attachment_content_type(file: File): UploadContentType | null {
+    const type_key = file.type.trim().toLowerCase();
+    const MIME_MAP: Record<string, UploadContentType> = {
+      "image/jpeg": "image/jpeg",
+      "image/jpg": "image/jpg",
+      "image/png": "image/png",
+      "image/webp": "image/webp",
+      "audio/webm": "audio/webm",
+      "audio/ogg": "audio/ogg",
+      "audio/wav": "audio/wav",
+      "audio/x-wav": "audio/wav",
+      "audio/mp3": "audio/mp3",
+      "audio/mpeg": "audio/mp3",
+      "audio/m4a": "audio/m4a",
+      "audio/mp4": "audio/m4a",
+      "application/pdf": "application/pdf",
+      "application/octet-stream": "application/octet-stream",
+    };
+    if (type_key && MIME_MAP[type_key]) {
+      return MIME_MAP[type_key];
+    }
+    const extension = file.name.includes(".")
+      ? file.name.split(".").pop()?.toLowerCase()
+      : "";
+    const EXT_MAP: Record<string, UploadContentType> = {
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      webp: "image/webp",
+      webm: "audio/webm",
+      ogg: "audio/ogg",
+      wav: "audio/wav",
+      mp3: "audio/mp3",
+      m4a: "audio/m4a",
+      pdf: "application/pdf",
+    };
+    return extension ? (EXT_MAP[extension] ?? null) : null;
+  },
+
+  async uploadChatAttachment(file: File): Promise<{ path: string | null }> {
+    const content_type = filesService.normalize_chat_attachment_content_type(file);
+    if (!content_type) {
+      toast.error(`${file.name}: formato no admitido para el chat.`);
+      return { path: null };
+    }
+
+    const file_key = filesService.generateFileKey("chat", file);
+    const signed_url = await filesService.generateFileSignedUrl({
+      file_key,
+      content_type,
+      bucket_name: "chat-attachments",
+    });
+
+    if (!signed_url) {
+      toast.error("No se pudo generar la URL de subida.");
+      return { path: null };
+    }
+
+    const put_result = await uploadSignedFile<void>(signed_url, file, {
+      content_type,
+    });
+
+    if (!put_result.ok) {
+      toast.error(`No se pudo subir el archivo (${file.name}).`);
+      return { path: null };
+    }
+
+    return { path: `chat-attachments/${file_key}` };
+  },
 }

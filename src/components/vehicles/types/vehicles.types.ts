@@ -63,6 +63,7 @@ export interface AdminVehicleListItem {
   features: VehicleListItemCatalogRef[];
   services: VehicleListItemCatalogRef[];
   vehicle_type: VehicleListItemCatalogRef | null;
+  category: VehicleListItemCatalogRef | null;
   color: (VehicleListItemCatalogRef & { hex_code: string }) | null;
   dgt_label: (VehicleListItemCatalogRef & { code: string }) | null;
   warranty_type: VehicleListItemCatalogRef | null;
@@ -85,6 +86,7 @@ export interface AdminVehicleDetail {
   id: string;
   vin_code?: string | null;
   vehicle_type_id: string | null;
+  category_id: string | null;
   title: string;
   description: string;
   price: number;
@@ -188,6 +190,7 @@ export const createVehicleDefaultValues: VehicleSchema = {
   publisher_type: "professional",
   phone: { phone_code: "", phone: "" },
   email: "",
+  category_id: undefined,
   features_ids: [],
   services_ids: [],
   cuota_ids: [],

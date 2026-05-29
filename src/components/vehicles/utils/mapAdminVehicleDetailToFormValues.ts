@@ -5,6 +5,7 @@ export const mapAdminVehicleDetailToFormValues = (
 ): VehicleSchema => ({
   vin_code: detail.vin_code ?? undefined,
   vehicle_type_id: detail.vehicle_type_id ?? "",
+  category_id: detail.category_id ?? undefined,
   title: detail.title,
   description: detail.description,
   price: detail.price,
