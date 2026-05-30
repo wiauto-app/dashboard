@@ -1,0 +1,13 @@
+
+
+
+services:
+  front:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      # host:puerto_contenedor → nginx escucha en 80 dentro de la imagen
+      - "3002:80"
+
