@@ -25,12 +25,14 @@ export const dealershipColumns: DynamicTableColumn[] = [
     header: "Miembros",
     type: "number",
     sortable: true,
+    modifiable: false,
   },
   {
     accessorKey: "reviews_count",
     header: "Reviews",
     type: "number",
     sortable: true,
+    modifiable: false,
   },
   {
     accessorKey: "banner_url",

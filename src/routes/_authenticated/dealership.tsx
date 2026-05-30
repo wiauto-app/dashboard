@@ -5,9 +5,10 @@ import type { PaginatedResult } from '@/types/general.types';
 import type { Dealership, DealershipParams } from '@/components/dealerships/types/dealership.types';
 import { dealershipColumns } from '@/components/dealerships/dealershipColumns';
 import { dealershipParamsSchema } from '@/components/dealerships/schemas/dealership-params.schema';
-import { DefaultForm } from '@/components/dynamic-table/defaultForm';
+import { DealershipForm } from '@/components/dealerships/forms/dealershipForm';
 import { useInvalidateData } from '@/hooks/useInvalidateData';
 import { dealershipActions } from '@/components/dealerships/actions/dealershipActions';
+import { useSelectedIdStore } from '@/stores/useSelectedIdStore';
 
 export const Route = createFileRoute('/_authenticated/dealership')({
   component: RouteComponent,
@@ -22,6 +23,8 @@ export const Route = createFileRoute('/_authenticated/dealership')({
 function RouteComponent() {
   const response = Route.useLoaderData() as PaginatedResult<Dealership>; 
   const invalidateData = useInvalidateData('/_authenticated/dealership');
+  const selectedId = useSelectedIdStore((state) => state.selectedId);
+
   return (
     <DynamicTable
       columns={dealershipColumns}
@@ -31,22 +34,9 @@ function RouteComponent() {
       total={response.total}
       route={Route}
       form={
-        <DefaultForm
-          columns={dealershipColumns}
-          findOneService={dealershipService.findOne}
-          createService={(data) =>
-            dealershipService.create(data as Dealership)
-          }
-          updateService={(id, data) =>
-            dealershipService.update(id, data as Dealership)
-          }
-          onMutationSuccess={invalidateData}
-          messages={{
-            create_success: "Concesionario creado correctamente",
-            update_success: "Concesionario actualizado correctamente",
-            create_error: "Error al crear el concesionario",
-            update_error: "Error al actualizar el concesionario",
-          }}
+        <DealershipForm
+          key={selectedId ?? "create"}
+          onSuccess={invalidateData}
         />
       }
       actions={(row) => dealershipActions(row, invalidateData)}
