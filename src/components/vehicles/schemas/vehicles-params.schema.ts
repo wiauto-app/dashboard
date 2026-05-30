@@ -1,3 +1,4 @@
+import { localDateQueryParamSchema } from "@/validations/queryParams/local-date-query-param.schema";
 import { paginationParamsSchema } from "@/validations/queryParams/pagination-params.schema";
 import z from "zod";
 import {
@@ -15,12 +16,12 @@ export const vehiclesSchema = z
     publisher_name: z.string().optional(),
     publisher_email: z.string().optional(),
     status: vehicleStatusSchema.optional(),
-    since_created_at: z.coerce.date().optional(),
-    until_created_at: z.coerce.date().optional(),
-    since_updated_at: z.coerce.date().optional(),
-    until_updated_at: z.coerce.date().optional(),
-    since_expires_at: z.coerce.date().optional(),
-    until_expires_at: z.coerce.date().optional(),
+    since_created_at: localDateQueryParamSchema,
+    until_created_at: localDateQueryParamSchema,
+    since_updated_at: localDateQueryParamSchema,
+    until_updated_at: localDateQueryParamSchema,
+    since_expires_at: localDateQueryParamSchema,
+    until_expires_at: localDateQueryParamSchema,
     is_featured: z.coerce.boolean().optional(),
     publisher_type: publisherTypeSchema.optional(),
     vehicle_type_id: z.string().optional(),

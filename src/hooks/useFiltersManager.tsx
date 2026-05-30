@@ -17,9 +17,13 @@ interface UseFiltersManagerProps {
   path: string;
 }
 
+export type FiltersSearchPatch = Record<string, string | undefined>;
+
 interface UseFiltersManagerReturn {
   values: Record<string, string | undefined>;
   handleChange: (key: string, value?: string) => void;
+  /** Aplica varios query params en una sola navegación. */
+  handleManyChanges: (changes: FiltersSearchPatch) => void;
   handleRemove: (key: string) => void;
   /** Cambia `limit` y reinicia `page` a 1 en una sola navegación. */
   handleLimitChange: (limit: string) => void;
@@ -45,14 +49,22 @@ export const useFiltersManager = ({
 
   const navigate = useNavigate({ from: path  });
 
+  const handleManyChanges = (changes: FiltersSearchPatch) => {
+    navigate({
+      //@ts-expect-error TODO: fix this
+      search: (prev) => ({
+        ...prev,
+        ...changes,
+      }),
+    });
+  };
+
   const handleChange = (key: string, value?: string) => {
-    //@ts-expect-error TODO: fix this
-    navigate({ search: (prev) => ({ ...prev, [key]: value }) });
+    handleManyChanges({ [key]: value });
   };
 
   const handleRemove = (key: string) => {
-    //@ts-expect-error TODO: fix this
-    navigate({ search: (prev) => ({ ...prev, [key]: undefined }) });
+    handleManyChanges({ [key]: undefined });
   };
 
   const handleLimitChange = (limit: string) => {
@@ -82,19 +94,16 @@ export const useFiltersManager = ({
     toKey: string,
     range: FiltersDateRangeValue,
   ) => {
-    navigate({
-      //@ts-expect-error TODO: fix this
-      search: (prev) => ({
-        ...prev,
-        [fromKey]: range.from ? format(range.from, "yyyy-MM-dd") : undefined,
-        [toKey]: range.to ? format(range.to, "yyyy-MM-dd") : undefined,
-      }),
+    handleManyChanges({
+      [fromKey]: range.from ? format(range.from, "yyyy-MM-dd") : undefined,
+      [toKey]: range.to ? format(range.to, "yyyy-MM-dd") : undefined,
     });
   };
 
   return {
     values: search,
     handleChange,
+    handleManyChanges,
     handleRemove,
     handleLimitChange,
     handleSort,
