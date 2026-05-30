@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import { Loader2 } from "lucide-react";
 import type { apiResponse } from "@/services/api";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export type DefaultFormMutationMessages = {
   create_success?: string;
@@ -33,18 +34,17 @@ export const DefaultForm = ({
   isTest = false,
   onMutationSuccess,
   messages = {},
+  columnsLayout = 2,
 }: {
   columns: DynamicTableColumn[];
   findOneService: (id: string) => Promise<any>;
   createService: (data: unknown) => Promise<apiResponse<unknown>>;
-  updateService: (
-    id: string,
-    data: unknown,
-  ) => Promise<apiResponse<unknown>>;
+  updateService: (id: string, data: unknown) => Promise<apiResponse<unknown>>;
   isTest?: boolean;
   /** Invalidar loader de la ruta, refetch de lista, etc. */
   onMutationSuccess?: () => void;
   messages?: DefaultFormMutationMessages;
+  columnsLayout?: 1 | 2 | 3;
 }) => {
   const [images, setImages] = useState<Record<string, string | null>>({});
   const [is_submitting, setIsSubmitting] = useState(false);
@@ -188,7 +188,15 @@ export const DefaultForm = ({
     return <Loader2 className="size-4 animate-spin" />;
   }
   return (
-    <form className="flex flex-col gap-4" onSubmit={onSubmit}>
+    <form
+      className={cn(
+        "grid gap-4",
+        columnsLayout === 1 && "grid-cols-1",
+        columnsLayout === 2 && "grid-cols-1 md:grid-cols-2 ",
+        columnsLayout === 3 && "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 ",
+      )}
+      onSubmit={onSubmit}
+    >
       {filteredColumns.map((column) => (
         <Field key={column.accessorKey}>
           <FieldLabel htmlFor={column.accessorKey}>{column.header}</FieldLabel>
@@ -255,11 +263,7 @@ export const DefaultForm = ({
         </Field>
       ))}
 
-      <Button
-        type="submit"
-        disabled={is_submitting}
-        aria-busy={is_submitting}
-      >
+      <Button type="submit" disabled={is_submitting} aria-busy={is_submitting}>
         Guardar
       </Button>
     </form>

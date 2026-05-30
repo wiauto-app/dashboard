@@ -1,0 +1,39 @@
+---
+description: Cuándo usar ImageInput vs FileInput para subidas a MinIO
+globs: src/components/**/*.tsx
+alwaysApply: false
+---
+
+# Subida de archivos en formularios
+
+## ImageInput (`src/components/ui/imageInput.tsx`)
+
+Usar **solo** cuando el campo es una imagen única con vista previa cuadrada:
+
+- Avatar de perfil o usuario
+- Logo o imagen de concesionario
+- Imagen de categoría o entidad CRUD con `bucketName` en `defaultForm`
+- Cualquier campo donde el valor final sea exclusivamente imagen (PNG, JPG, WEBP)
+
+Props obligatorias: `bucketName`, `path`. Opcional: `referenceId`, `accept` (por defecto solo imágenes).
+
+## FileInput (`src/components/ui/fileInput.tsx`)
+
+Usar cuando el campo admite **varios tipos de archivo** o no requiere preview de imagen obligatoria:
+
+- Adjuntos de tickets de soporte (`bucketName="files"`, `path="tickets"`)
+- Documentos, PDF, capturas mixtas
+- Cualquier formulario donde el usuario suba evidencia o archivos heterogéneos
+
+Props obligatorias: `bucketName`, `path`. Opcional: `referenceId`, `accept` (ver `DEFAULT_FILE_INPUT_ACCEPT`).
+
+El valor guardado en el formulario es la ruta compuesta `bucket/clave-del-objeto` devuelta por `filesService.uploadFile`, no una URL externa.
+
+## Flujo común
+
+Ambos componentes usan `filesService.uploadFile` → URL firmada → MinIO. No pegar URLs manualmente en inputs de texto cuando exista subida al storage del proyecto.
+
+## Chat y vídeos
+
+- Chat: `filesService.uploadChatAttachment` en `chatMessageComposer` (bucket `chat-attachments`).
+- Vídeos de vehículos: `filesService.upload_vehicle_video` (bucket `vehicles-videos`).

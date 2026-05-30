@@ -17,6 +17,8 @@ import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedVehicleTypesRouteImport } from './routes/_authenticated/vehicle-types'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
 import { Route as AuthenticatedTractionsRouteImport } from './routes/_authenticated/tractions'
+import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
+import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_authenticated/ticket-categories'
 import { Route as AuthenticatedRoleRouteImport } from './routes/_authenticated/role'
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
@@ -72,6 +74,17 @@ const AuthenticatedTractionsRoute = AuthenticatedTractionsRouteImport.update({
   path: '/tractions',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTicketCategoriesRoute =
+  AuthenticatedTicketCategoriesRouteImport.update({
+    id: '/ticket-categories',
+    path: '/ticket-categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRoleRoute = AuthenticatedRoleRouteImport.update({
   id: '/role',
   path: '/role',
@@ -155,6 +168,8 @@ export interface FileRoutesByFullPath {
   '/moderation': typeof AuthenticatedModerationRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
   '/role': typeof AuthenticatedRoleRoute
+  '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
+  '/tickets': typeof AuthenticatedTicketsRoute
   '/tractions': typeof AuthenticatedTractionsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/vehicle-types': typeof AuthenticatedVehicleTypesRoute
@@ -176,6 +191,8 @@ export interface FileRoutesByTo {
   '/moderation': typeof AuthenticatedModerationRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
   '/role': typeof AuthenticatedRoleRoute
+  '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
+  '/tickets': typeof AuthenticatedTicketsRoute
   '/tractions': typeof AuthenticatedTractionsRoute
   '/users': typeof AuthenticatedUsersRoute
   '/vehicle-types': typeof AuthenticatedVehicleTypesRoute
@@ -200,6 +217,8 @@ export interface FileRoutesById {
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
   '/_authenticated/role': typeof AuthenticatedRoleRoute
+  '/_authenticated/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
+  '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/tractions': typeof AuthenticatedTractionsRoute
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/vehicle-types': typeof AuthenticatedVehicleTypesRoute
@@ -225,6 +244,8 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/permissions'
     | '/role'
+    | '/ticket-categories'
+    | '/tickets'
     | '/tractions'
     | '/users'
     | '/vehicle-types'
@@ -246,6 +267,8 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/permissions'
     | '/role'
+    | '/ticket-categories'
+    | '/tickets'
     | '/tractions'
     | '/users'
     | '/vehicle-types'
@@ -269,6 +292,8 @@ export interface FileRouteTypes {
     | '/_authenticated/moderation'
     | '/_authenticated/permissions'
     | '/_authenticated/role'
+    | '/_authenticated/ticket-categories'
+    | '/_authenticated/tickets'
     | '/_authenticated/tractions'
     | '/_authenticated/users'
     | '/_authenticated/vehicle-types'
@@ -340,6 +365,20 @@ declare module '@tanstack/react-router' {
       path: '/tractions'
       fullPath: '/tractions'
       preLoaderRoute: typeof AuthenticatedTractionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tickets': {
+      id: '/_authenticated/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof AuthenticatedTicketsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ticket-categories': {
+      id: '/_authenticated/ticket-categories'
+      path: '/ticket-categories'
+      fullPath: '/ticket-categories'
+      preLoaderRoute: typeof AuthenticatedTicketCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/role': {
@@ -449,6 +488,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
   AuthenticatedRoleRoute: typeof AuthenticatedRoleRoute
+  AuthenticatedTicketCategoriesRoute: typeof AuthenticatedTicketCategoriesRoute
+  AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedTractionsRoute: typeof AuthenticatedTractionsRoute
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVehicleTypesRoute: typeof AuthenticatedVehicleTypesRoute
@@ -471,6 +512,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
   AuthenticatedRoleRoute: AuthenticatedRoleRoute,
+  AuthenticatedTicketCategoriesRoute: AuthenticatedTicketCategoriesRoute,
+  AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedTractionsRoute: AuthenticatedTractionsRoute,
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVehicleTypesRoute: AuthenticatedVehicleTypesRoute,

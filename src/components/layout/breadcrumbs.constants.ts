@@ -27,6 +27,16 @@ const vehicle_admin_trail = (
   href: string,
 ): BreadcrumbItem[] => [home_item, vehicle_admin_parent, { label, href }];
 
+const support_admin_parent: BreadcrumbItem = {
+  label: "Soporte",
+  href: "/tickets",
+};
+
+const support_admin_trail = (
+  label: string,
+  href: string,
+): BreadcrumbItem[] => [home_item, support_admin_parent, { label, href }];
+
 export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/": [{ label: "Dashboard", icon: HomeIcon, href: "/" }],
   "/users": with_home("Usuarios", "/users"),
@@ -45,5 +55,10 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/dgt-labels": vehicle_admin_trail("Etiquetas DGT", "/dgt-labels"),
   "/warranty-types": vehicle_admin_trail("Tipos de garantía", "/warranty-types"),
   "/catalog-services": vehicle_admin_trail("Servicios", "/catalog-services"),
+  "/tickets": support_admin_trail("Tickets", "/tickets"),
+  "/ticket-categories": support_admin_trail(
+    "Categorías de ticket",
+    "/ticket-categories",
+  ),
   "/profile/config": with_home("Configuración", "/profile/config"),
 };

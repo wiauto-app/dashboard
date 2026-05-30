@@ -20,12 +20,13 @@ export const Route = createFileRoute('/_authenticated/dealership')({
 })
 
 function RouteComponent() {
-  const response = Route.useLoaderData() as PaginatedResult<Dealership>;  
+  const response = Route.useLoaderData() as PaginatedResult<Dealership>; 
   const invalidateData = useInvalidateData('/_authenticated/dealership');
   return (
     <DynamicTable
       columns={dealershipColumns}
       data={response.data}
+      form_size='5xl'
       title="Concesionarios"
       total={response.total}
       route={Route}

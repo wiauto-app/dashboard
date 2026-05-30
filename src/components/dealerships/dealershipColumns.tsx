@@ -21,6 +21,18 @@ export const dealershipColumns: DynamicTableColumn[] = [
     bucketName: "dealership-images",
   },
   {
+    accessorKey: "members_count",
+    header: "Miembros",
+    type: "number",
+    sortable: true,
+  },
+  {
+    accessorKey: "reviews_count",
+    header: "Reviews",
+    type: "number",
+    sortable: true,
+  },
+  {
     accessorKey: "banner_url",
     header: "Banner",
     type: "image",

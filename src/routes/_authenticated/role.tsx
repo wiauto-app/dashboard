@@ -22,13 +22,13 @@ export const Route = createFileRoute('/_authenticated/role')({
 function RouteComponent() {
   const response = Route.useLoaderData() as PaginatedResult<Role>;
   const roles = response.data;
-  console.log(roles);
   const invalidateData = useInvalidateData('/_authenticated/role');
   return (
     <DynamicTable
       columns={rolesColumns}
       data={roles}
       title="Roles"
+      form_size='5xl'
       total={response.total}
       route={Route}
       form={
