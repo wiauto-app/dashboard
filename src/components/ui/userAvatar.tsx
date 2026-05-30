@@ -6,7 +6,7 @@ export const UserAvatar = (props?: React.ComponentProps<typeof Avatar>) => {
   const { user } = useAuth();
   return (
     <Avatar {...props}>
-      <AvatarImage src={getImageUrl(user?.avatar_url)} />
+      {user?.avatar_url && <AvatarImage src={getImageUrl(user?.avatar_url)} />}
       <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
     </Avatar>
   );
