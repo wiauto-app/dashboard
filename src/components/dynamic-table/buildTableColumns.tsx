@@ -7,6 +7,8 @@ import { Image } from "../ui/image";
 import { format } from "date-fns";
 import { Badge } from "../ui/badge";
 import { ExternalLink } from "lucide-react";
+import { resolve_column_sizing } from "./virtualized/columnSizing";
+import { SELECT_COLUMN_WIDTH } from "./virtualized/constants";
 
 export const build_table_columns = <TData extends object>(
   columns: DynamicTableColumn[],
@@ -17,7 +19,9 @@ export const build_table_columns = <TData extends object>(
     if (col.type === "checkbox" && col.accessorKey === "select") {
       return column_helper.display({
         id: "select",
-        size: 48,
+        size: SELECT_COLUMN_WIDTH,
+        minSize: SELECT_COLUMN_WIDTH,
+        maxSize: SELECT_COLUMN_WIDTH,
         header: ({ table }) => (
           <Checkbox
             aria-label="Seleccionar todas las filas"
@@ -43,12 +47,17 @@ export const build_table_columns = <TData extends object>(
       });
     }
 
+    const sizing = resolve_column_sizing(col);
+
     return column_helper.accessor(
       (row) => get_value_at_path(row, col.accessorKey),
       {
         id: col.accessorKey,
         header: col.header,
         enableSorting: col.sortable,
+        size: sizing.size,
+        minSize: sizing.minSize,
+        maxSize: sizing.maxSize,
         cell: ({ getValue }) => {
           const value = getValue();
           if (col.type === "badge") {

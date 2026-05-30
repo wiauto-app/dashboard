@@ -33,6 +33,7 @@ function RouteComponent() {
       title="Concesionarios"
       total={response.total}
       route={Route}
+      virtualization={{ enabled: true, height: 600 }}
       form={
         <DealershipForm
           key={selectedId ?? "create"}

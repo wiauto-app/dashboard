@@ -27,6 +27,11 @@ import { ColumnVisibilityPopover } from "./columnVisibilityPopover";
 import { build_table_columns } from "./buildTableColumns";
 import { get_row_id_value } from "./utils";
 import type { FormSize } from "@/types/form.types";
+import { VirtualizedTableContainer } from "./virtualized/virtualizedTableContainer";
+import {
+  resolve_virtualization,
+  type DynamicTableVirtualization,
+} from "./virtualized/resolveVirtualization";
 
 export type DynamicTableProps<TData extends object = object> = {
   columns: DynamicTableColumn[];
@@ -41,6 +46,7 @@ export type DynamicTableProps<TData extends object = object> = {
   on_row_selection_change?: (selected_rows: TData[]) => void;
   route: AnyRoute;
   form_size?: FormSize;
+  virtualization?: DynamicTableVirtualization;
 };
 
 export function DynamicTable<TData extends object>({
@@ -55,6 +61,7 @@ export function DynamicTable<TData extends object>({
   on_row_selection_change,
   actions,
   form_size = "md",
+  virtualization,
 }: DynamicTableProps<TData>) {
   const [row_selection, set_row_selection] = useState<RowSelectionState>({});
   const setSelectedId = useSelectedIdStore((state) => state.setSelectedId);
@@ -110,12 +117,27 @@ export function DynamicTable<TData extends object>({
     onRowSelectionChange: (updater) => {
       set_row_selection(updater);
     },
+    defaultColumn: {
+      size: 180,
+      minSize: 80,
+      maxSize: 400,
+    },
     state: has_selection_column
       ? {
           rowSelection: row_selection,
         }
       : {},
   });
+
+  const virtualization_config = resolve_virtualization(
+    virtualization,
+    visible_columns.length,
+  );
+
+  const handle_edit_row = (row_id: string) => {
+    setSelectedId(row_id);
+    setIsOpen(true);
+  };
 
   useEffect(() => {
     if (!has_selection_column || !on_row_selection_change) {
@@ -148,87 +170,98 @@ export function DynamicTable<TData extends object>({
       table_toolbar={table_toolbar}
       form_size={form_size}
     >
-      <Table>
-        <TableHeader className="border-y bg-background/50">
-          {table.getHeaderGroups().map((header_group) => (
-            <TableRow key={header_group.id}>
-              {header_group.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className="text-muted-foreground first:w-12 text-xs"
-                >
-                  {header.column.getCanSort() ? (
-                    <SorteableHead header={header} path={route.fullPath} />
-                  ) : (
-                    <div className="flex items-center gap-1">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </div>
-                  )}
+      {virtualization_config.enabled ? (
+        <VirtualizedTableContainer
+          table={table}
+          route={route}
+          height={virtualization_config.height}
+          form={form}
+          actions={actions}
+          on_edit={handle_edit_row}
+        />
+      ) : (
+        <Table>
+          <TableHeader className="border-y bg-background/50">
+            {table.getHeaderGroups().map((header_group) => (
+              <TableRow key={header_group.id}>
+                {header_group.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="text-muted-foreground first:w-12 text-xs"
+                  >
+                    {header.column.getCanSort() ? (
+                      <SorteableHead header={header} path={route.fullPath} />
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                      </div>
+                    )}
+                  </TableHead>
+                ))}
+                <TableHead className="text-muted-foreground first:w-12 text-xs">
+                  Acciones
                 </TableHead>
-              ))}
-              <TableHead className="text-muted-foreground first:w-12 text-xs">
-                Acciones
-              </TableHead>
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length === 0 ? (
-            <TableRow>
-              <TableCell
-                colSpan={table_columns.length + 1}
-                className="h-24 text-center text-muted-foreground"
-              >
-                No hay datos
-              </TableCell>
-            </TableRow>
-          ) : (
-            table.getRowModel().rows.map((row) => {
-              return (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() ? "selected" : undefined}
-                  className="data-[state=selected]:bg-muted/50"
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={table_columns.length + 1}
+                  className="h-24 text-center text-muted-foreground"
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-muted-foreground">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
+                  No hay datos
+                </TableCell>
+              </TableRow>
+            ) : (
+              table.getRowModel().rows.map((row) => {
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() ? "selected" : undefined}
+                    className="data-[state=selected]:bg-muted/50"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell
+                        key={cell.id}
+                        className="text-muted-foreground"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {form && (
+                          <Button
+                            variant="outline"
+                            size="icon-sm"
+                            className="text-muted-foreground hover:text-foreground"
+                            onClick={() => handle_edit_row(row.id)}
+                          >
+                            <PencilIcon className="size-4" />
+                          </Button>
+                        )}
+                        {actions?.(row.original).map(
+                          (action) => action.component,
+                        )}
+                      </div>
                     </TableCell>
-                  ))}
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {form && (
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          className="text-muted-foreground hover:text-foreground"
-                          onClick={() => {
-                            setSelectedId(row.id);
-                            setIsOpen(true);
-                          }}
-                        >
-                          <PencilIcon className="size-4" />
-                        </Button>
-                      )}
-                      {actions?.(row.original).map(
-                        (action) => action.component,
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              );
-            })
-          )}
-        </TableBody>
-      </Table>
+                  </TableRow>
+                );
+              })
+            )}
+          </TableBody>
+        </Table>
+      )}
     </DynamicTableLayout>
   );
 }
