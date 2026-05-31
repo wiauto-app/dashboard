@@ -72,6 +72,13 @@ export interface AdminVehicleListItem {
   traction: VehicleListItemCatalogRef;
 }
 
+export type VehiclePriceHistoryItem = {
+  id: string;
+  price: number;
+  status: "active" | "inactive";
+  created_at: string;
+};
+
 /** Detalle admin para edición (`GET /v1/admin/vehicles/:id`). */
 export interface AdminVehicleVersionCatalog {
   make_id: number;
@@ -90,6 +97,7 @@ export interface AdminVehicleDetail {
   title: string;
   description: string;
   price: number;
+  vehicle_prices: VehiclePriceHistoryItem[];
   mileage: number;
   condition: "new" | "used";
   lat: number;
@@ -176,6 +184,7 @@ export const createVehicleDefaultValues: VehicleSchema = {
   title: "",
   description: "",
   price: 0,
+  vehicle_price_id: undefined,
   mileage: 0,
   condition: "used", 
   

@@ -124,7 +124,12 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
         </div>
         {currentStep === 1 && <VehicleDataForm />}
         {currentStep === 2 && <FeaturesForm />}
-        {currentStep === 3 && <PricingDescForm />}
+        {currentStep === 3 && (
+          <PricingDescForm
+            vehicle_prices={vehicleDetail?.vehicle_prices ?? []}
+            isEditMode={!!selectedId}
+          />
+        )}
         {currentStep === 4 && <MediaForm />}
         {currentStep === 5 && <VehicleSummaryForm />}
         <div className="col-span-2 flex items-center justify-between">

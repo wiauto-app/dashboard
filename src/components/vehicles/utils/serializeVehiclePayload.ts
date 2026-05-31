@@ -19,9 +19,10 @@ const catalog_form_field_keys = [
 
 export const serializeVehiclePayload = (
   data: VehicleSchema | UpdateVehicleSchema,
-  options?: { only_temp_images?: boolean },
+  options?: { only_temp_images?: boolean; is_update?: boolean },
 ) => {
-  const { phone, videos: _videos, images, ...rest } = data;
+  const { phone, images, vehicle_price_id, ...rest } = data;
+  void data.videos;
 
   const payload: Record<string, unknown> = {
     ...rest,
@@ -31,6 +32,10 @@ export const serializeVehiclePayload = (
 
   for (const key of catalog_form_field_keys) {
     delete payload[key];
+  }
+
+  if (options?.is_update && vehicle_price_id) {
+    payload.vehicle_price_id = vehicle_price_id;
   }
 
   if (images !== undefined) {

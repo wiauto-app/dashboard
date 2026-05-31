@@ -1,5 +1,5 @@
 import { Controller, useFormContext } from "react-hook-form";
-import type { VehicleSchema } from "../types/vehicles.types";
+import type { VehiclePriceHistoryItem, VehicleSchema } from "../types/vehicles.types";
 import { ControllerInput } from "@/components/ui/controllerInput";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
@@ -9,6 +9,12 @@ import { Separator } from "@/components/ui/separator";
 import { OptionalFieldLabel } from "./optionalFieldLabel";
 import { useQuery } from "@tanstack/react-query";
 import { cuotasService } from "../services/cuotasService";
+import { VehiclePriceSelector } from "./vehiclePriceSelector";
+
+type PricingDescFormProps = {
+  vehicle_prices?: VehiclePriceHistoryItem[];
+  isEditMode?: boolean;
+};
 
 const toggleCuotaIdInList = (
   current_ids: string[],
@@ -24,7 +30,10 @@ const toggleCuotaIdInList = (
   return current_ids.filter((id) => id !== cuota_id);
 };
 
-export const PricingDescForm = () => {
+export const PricingDescForm = ({
+  vehicle_prices = [],
+  isEditMode = false,
+}: PricingDescFormProps) => {
   const form = useFormContext<VehicleSchema>();
   const { data: cuotas_page } = useQuery({
     queryKey: ["cuotas", "all-plans"],
@@ -37,7 +46,10 @@ export const PricingDescForm = () => {
     <div className="flex flex-col gap-6">
       <PricingSuggestion />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <ControllerInput name="price" control={form.control} label="Precio" />
+        <VehiclePriceSelector
+          vehicle_prices={vehicle_prices}
+          isEditMode={isEditMode}
+        />
       </div>
       <ControllerInput name="title" control={form.control} label="Título" />
       <Controller

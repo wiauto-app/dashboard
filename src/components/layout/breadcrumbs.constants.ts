@@ -37,6 +37,16 @@ const support_admin_trail = (
   href: string,
 ): BreadcrumbItem[] => [home_item, support_admin_parent, { label, href }];
 
+const reports_admin_parent: BreadcrumbItem = {
+  label: "Denuncias",
+  href: "/reports",
+};
+
+const reports_admin_trail = (
+  label: string,
+  href: string,
+): BreadcrumbItem[] => [home_item, reports_admin_parent, { label, href }];
+
 export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/": [{ label: "Dashboard", icon: HomeIcon, href: "/" }],
   "/users": with_home("Usuarios", "/users"),
@@ -59,6 +69,11 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/ticket-categories": support_admin_trail(
     "Categorías de ticket",
     "/ticket-categories",
+  ),
+  "/reports": reports_admin_trail("Denuncias", "/reports"),
+  "/report-categories": reports_admin_trail(
+    "Categorías de denuncia",
+    "/report-categories",
   ),
   "/profile/config": with_home("Configuración", "/profile/config"),
 };

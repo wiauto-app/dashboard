@@ -59,7 +59,10 @@ export const vehiclesService = {
   ): Promise<apiResponse<Vehicle>> {
     const response = await apiPatch<Vehicle>(
       `${V1_VEHICLES}/${id}`,
-      serializeVehiclePayload(data, { only_temp_images: true }),
+      serializeVehiclePayload(data, {
+        only_temp_images: true,
+        is_update: true,
+      }),
     );
     return response;
   },

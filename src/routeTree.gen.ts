@@ -20,6 +20,8 @@ import { Route as AuthenticatedTractionsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
 import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_authenticated/ticket-categories'
 import { Route as AuthenticatedRoleRouteImport } from './routes/_authenticated/role'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedReportCategoriesRouteImport } from './routes/_authenticated/report-categories'
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
@@ -90,6 +92,17 @@ const AuthenticatedRoleRoute = AuthenticatedRoleRouteImport.update({
   path: '/role',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReportCategoriesRoute =
+  AuthenticatedReportCategoriesRouteImport.update({
+    id: '/report-categories',
+    path: '/report-categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPermissionsRoute =
   AuthenticatedPermissionsRouteImport.update({
     id: '/permissions',
@@ -167,6 +180,8 @@ export interface FileRoutesByFullPath {
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
+  '/report-categories': typeof AuthenticatedReportCategoriesRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
   '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/tickets': typeof AuthenticatedTicketsRoute
@@ -190,6 +205,8 @@ export interface FileRoutesByTo {
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
+  '/report-categories': typeof AuthenticatedReportCategoriesRoute
+  '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
   '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/tickets': typeof AuthenticatedTicketsRoute
@@ -216,6 +233,8 @@ export interface FileRoutesById {
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
+  '/_authenticated/report-categories': typeof AuthenticatedReportCategoriesRoute
+  '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/role': typeof AuthenticatedRoleRoute
   '/_authenticated/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
@@ -243,6 +262,8 @@ export interface FileRouteTypes {
     | '/messages'
     | '/moderation'
     | '/permissions'
+    | '/report-categories'
+    | '/reports'
     | '/role'
     | '/ticket-categories'
     | '/tickets'
@@ -266,6 +287,8 @@ export interface FileRouteTypes {
     | '/messages'
     | '/moderation'
     | '/permissions'
+    | '/report-categories'
+    | '/reports'
     | '/role'
     | '/ticket-categories'
     | '/tickets'
@@ -291,6 +314,8 @@ export interface FileRouteTypes {
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
     | '/_authenticated/permissions'
+    | '/_authenticated/report-categories'
+    | '/_authenticated/reports'
     | '/_authenticated/role'
     | '/_authenticated/ticket-categories'
     | '/_authenticated/tickets'
@@ -386,6 +411,20 @@ declare module '@tanstack/react-router' {
       path: '/role'
       fullPath: '/role'
       preLoaderRoute: typeof AuthenticatedRoleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/report-categories': {
+      id: '/_authenticated/report-categories'
+      path: '/report-categories'
+      fullPath: '/report-categories'
+      preLoaderRoute: typeof AuthenticatedReportCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/permissions': {
@@ -487,6 +526,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
+  AuthenticatedReportCategoriesRoute: typeof AuthenticatedReportCategoriesRoute
+  AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRoleRoute: typeof AuthenticatedRoleRoute
   AuthenticatedTicketCategoriesRoute: typeof AuthenticatedTicketCategoriesRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
@@ -511,6 +552,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
+  AuthenticatedReportCategoriesRoute: AuthenticatedReportCategoriesRoute,
+  AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRoleRoute: AuthenticatedRoleRoute,
   AuthenticatedTicketCategoriesRoute: AuthenticatedTicketCategoriesRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,

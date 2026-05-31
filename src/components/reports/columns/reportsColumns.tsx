@@ -1,7 +1,7 @@
 import { defaultColumn } from "@/components/dynamic-table/defaultColumns";
 import type { DynamicTableColumn } from "@/components/dynamic-table/types";
 
-export const ticketsColumns: DynamicTableColumn[] = [
+export const reportsColumns: DynamicTableColumn[] = [
   defaultColumn,
   {
     header: "Título",
@@ -11,15 +11,29 @@ export const ticketsColumns: DynamicTableColumn[] = [
     modifiable: false,
   },
   {
-    header: "Categoría",
-    accessorKey: "category.name",
+    header: "Tipo",
+    accessorKey: "target_type",
+    type: "badge",
+    sortable: true,
+    modifiable: false,
+  },
+  {
+    header: "Objetivo",
+    accessorKey: "target_label",
     type: "text",
     sortable: false,
     modifiable: false,
   },
   {
-    header: "Usuario",
-    accessorKey: "profile_label",
+    header: "Denunciante",
+    accessorKey: "reporter_label",
+    type: "text",
+    sortable: false,
+    modifiable: false,
+  },
+  {
+    header: "Categoría",
+    accessorKey: "category.name",
     type: "text",
     sortable: false,
     modifiable: false,
