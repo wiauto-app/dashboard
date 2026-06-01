@@ -48,7 +48,6 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     },
   });
 
-  console.log(form.formState.errors);
 
   useEffect(() => {
     if (profile) {
@@ -61,72 +60,51 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         // image_url: profile.image_url,
       });
     }
-  }, [profile]);
+  }, [profile, form]);
 
   const onSubmit = async (formData: FormSchema) => {
     const dirtyFields = form.formState.dirtyFields;
     if (selectedId) {
-      const userData = {
+      const payload = {
         email: formData.email,
+        name: formData.name,
+        last_name: formData.last_name,
+        role_id: formData.role_id,
+        avatar_url: formData.avatar_url,
         ...(dirtyFields.password && formData.password
           ? { password: formData.password }
           : {}),
       };
-      const response = await userService.updateUser(selectedId, userData);
+      const response = await userService.updateUser(selectedId, payload);
       if (response.ok) {
-        const profileData = {
-          name: formData.name,
-          last_name: formData.last_name,
-          role_id: formData.role_id,
-          avatar_url: formData.avatar_url,
-          // image_url: formData.image_url,
-        };
+        toast.success("Usuario actualizado correctamente");
+        setIsOpen(false);
+        setSelectedId(null);
+        onSuccess?.();
+        return;
+      }
 
-        const profileResponse = await profileService.updateProfile(
-          selectedId,
-          profileData,
-        );
-        if (profileResponse.ok) {
-          toast.success("Usuario actualizado correctamente");
-          setIsOpen(false);
-          setSelectedId(null);
-          onSuccess?.();
-        } else {
-          toast.error("Error al actualizar el perfil");
-        }
-      } else {
-        toast.error(response.message || "Error al actualizar el usuario");
-        setIsOpen(false);
-        setSelectedId(null);
-        onSuccess?.();
-      }
+      toast.error(response.message || "Error al actualizar el usuario");
+      return;
     } else {
-      const response = await userService.createUser(formData as any);
+      const response = await userService.createUser({
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        last_name: formData.last_name,
+        role_id: formData.role_id,
+        avatar_url: formData.avatar_url,
+      });
+
       if (response.ok) {
-        const profileResponse = await profileService.createProfile(
-          response.data.id,
-          {
-            name: formData.name,
-            last_name: formData.last_name,
-            role_id: formData.role_id,
-            avatar_url: formData.avatar_url,
-            // image_url: formData.image_url,
-          },
-        );
-        if (profileResponse?.ok) {
-          toast.success("Usuario creado correctamente");
-          setIsOpen(false);
-          setSelectedId(null);
-          onSuccess?.();
-        } else {
-          toast.error("Error al crear el perfil");
-        }
+        toast.success("Usuario creado correctamente");
         setIsOpen(false);
         setSelectedId(null);
         onSuccess?.();
-      } else {
-        toast.error(response.message || "Error al crear el usuario");
+        return;
       }
+
+      toast.error(response.message || "Error al crear el usuario");
     }
   };
   return (
