@@ -1,6 +1,6 @@
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { Controller, useForm } from "react-hook-form";
-import { Lock, Mail } from "lucide-react";
+import { Loader2, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
@@ -26,7 +26,7 @@ export const SignInForm = () => {
   const { refreshUser } = useAuth();
   const [step, set_step] = useState<SignInStep>("credentials");
   const [pending_email, set_pending_email] = useState("");
-
+  const [isLoading, set_isLoading] = useState(false);
   const form = useForm<SignInSchemaType>({
     resolver: standardSchemaResolver(signInSchema),
     defaultValues: {
@@ -53,22 +53,29 @@ export const SignInForm = () => {
   };
 
   const onSubmit = async (data: SignInSchemaType) => {
-    const response = await authService.login(data.email, data.password);
+    set_isLoading(true);
+    try {
+      const response = await authService.login(data.email, data.password);
 
-    if (!response.ok || response.status === 401) {
-      toast.error(response.message || "Credenciales incorrectas");
-      return;
+      if (!response.ok || response.status === 401) {
+        toast.error(response.message || "Credenciales incorrectas");
+        return;
+      }
+
+      const login_data = response.data?.data;
+
+      if (login_data?.type === "2fa_required") {
+        set_pending_email(login_data.email ?? data.email);
+        set_step("two_factor");
+        return;
+      }
+
+      await handleLoginSuccess();
+    } catch (error) {
+      toast.error(error.message || "Credenciales incorrectas");
+    } finally {
+      set_isLoading(false);
     }
-
-    const login_data = response.data?.data;
-
-    if (login_data?.type === "2fa_required") {
-      set_pending_email(login_data.email ?? data.email);
-      set_step("two_factor");
-      return;
-    }
-
-    await handleLoginSuccess();
   };
 
   const handleBackToCredentials = async () => {
@@ -163,8 +170,8 @@ export const SignInForm = () => {
           </span>
         </label>
 
-        <Button type="submit" size="lg" className="h-11 w-full text-base">
-          Iniciar Sesión
+        <Button type="submit" size="lg" className="h-11 w-full text-base" disabled={isLoading}>
+          Iniciar Sesión {isLoading && <Loader2 className="size-4 animate-spin" />}
         </Button>
       </form>
 
