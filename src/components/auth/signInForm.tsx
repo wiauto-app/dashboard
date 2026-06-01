@@ -37,10 +37,14 @@ export const SignInForm = () => {
 
   useEffect(() => {
     const resumePendingChallenge = async () => {
-      const response = await authService.getTwoFactorChallenge();
-      if (response.ok && response.data?.type === "2fa_required") {
-        set_pending_email(response.data.email);
-        set_step("two_factor");
+      try {
+        const response = await authService.getTwoFactorChallenge();
+        if (response.ok && response.data?.type === "2fa_required") {
+          set_pending_email(response.data.email);
+          set_step("two_factor");
+        }
+      } catch {
+        // Sin reto 2FA pendiente: estado inicial de credenciales.
       }
     };
 
@@ -72,10 +76,18 @@ export const SignInForm = () => {
 
       await handleLoginSuccess();
     } catch (error) {
-      toast.error(error.message || "Credenciales incorrectas");
+      if (error instanceof Error) {
+        toast.error(error.message || "Credenciales incorrectas");
+      } else {
+        toast.error("Credenciales incorrectas");
+      }
     } finally {
       set_isLoading(false);
     }
+  };
+
+  const handleGoToRecovery = () => {
+    void navigate({ to: "/auth/recover-password" });
   };
 
   const handleBackToCredentials = async () => {
@@ -178,6 +190,7 @@ export const SignInForm = () => {
       <button
         type="button"
         className="mt-8 flex w-full items-center justify-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        onClick={handleGoToRecovery}
       >
         <Lock aria-hidden className="size-3.5" />
         Olvidó la contraseña?

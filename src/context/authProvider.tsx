@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { authService } from "@/services/authServices/AuthService";
 import { useNavigate } from "@tanstack/react-router";
 import type { AuthUser } from "@/types/auth.types";
+import { isPasswordRecoveryRoute } from "@/lib/publicAuthRoutes";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -14,6 +15,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const loadSession = async () => {
       setIsLoading(true);
+
+      if (isPasswordRecoveryRoute()) {
+        setUser(undefined);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const response = await authService.getMe();
         if (cancelled) {

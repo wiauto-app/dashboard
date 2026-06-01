@@ -1,4 +1,5 @@
 import { API_URL } from "@/constants/env.constants"
+import { isPublicAuthRoute } from "@/lib/publicAuthRoutes"
 
 export interface apiResponse<T> {
   ok: boolean,
@@ -30,9 +31,11 @@ export const fetchWithAuth = async <T>(
     ...fetch_options
   } = options
 
-  const is_signin_route = window.location.pathname.includes("/signIn")
+  const is_public_auth_route = isPublicAuthRoute()
   const is_auth_refresh_request = request_url.includes("/auth/admin/refresh")
   const is_auth_logout_request = request_url.includes("/auth/admin/logout")
+  const is_optional_auth_request =
+    request_url.includes("/auth/admin/two-factor/challenge")
 
   const best_effort_raw_logout = async () => {
     try {
@@ -59,7 +62,8 @@ export const fetchWithAuth = async <T>(
 
   if (
     res.status === 401 &&
-    !is_signin_route &&
+    !is_public_auth_route &&
+    !is_optional_auth_request &&
     !is_auth_refresh_request &&
     !is_auth_logout_request
   ) {
@@ -110,6 +114,48 @@ export const fetchWithAuth = async <T>(
 
   return (await res.json()) as apiResponse<T>
 }
+
+export const fetchOptionalAuth = async <T>(
+  path: string,
+  options: RequestInit & { noResponse?: boolean } = {},
+): Promise<apiResponse<T>> => {
+  const request_url = build_api_url(path)
+  const { noResponse, headers: request_headers, ...fetch_options } = options
+
+  const res = await fetch(request_url, {
+    ...fetch_options,
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...request_headers,
+    },
+  })
+
+  if (noResponse) {
+    return {
+      ok: res.ok,
+      message: res.statusText,
+      status: res.status,
+      data: null as T,
+    }
+  }
+
+  if (!res.ok) {
+    try {
+      return (await res.json()) as apiResponse<T>
+    } catch {
+      return {
+        ok: false,
+        message: res.statusText,
+        status: res.status,
+        data: null as T,
+      }
+    }
+  }
+
+  return (await res.json()) as apiResponse<T>
+}
+
 export const apiGet = async <T>(path: string): Promise<apiResponse<T>> => {
   return fetchWithAuth<T>(path, { method: "GET" })
 }

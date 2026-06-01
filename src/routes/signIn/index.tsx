@@ -4,15 +4,34 @@ import { SignInForm } from "@/components/auth/signInForm";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const sign_in_search_schema = z.object({
+  password_reset: z.enum(["success"]).optional(),
+});
 
 export const Route = createFileRoute("/signIn/")({
+  validateSearch: (search) => sign_in_search_schema.parse(search),
   component: RouteComponent,
 });
 
 function RouteComponent() {
   const { isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const { password_reset } = Route.useSearch();
+  const has_shown_reset_toast = useRef(false);
+
+  useEffect(() => {
+    if (password_reset !== "success" || has_shown_reset_toast.current) {
+      return;
+    }
+
+    has_shown_reset_toast.current = true;
+    toast.success("Contraseña actualizada. Inicia sesión con tu nueva clave.");
+    void navigate({ to: "/signIn/", search: {}, replace: true });
+  }, [password_reset, navigate]);
 
   useEffect(() => {
     if (isLoading || !isAuthenticated) {

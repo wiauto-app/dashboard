@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "../api";
+import { apiGet, apiPost, fetchOptionalAuth } from "../api";
 import type {
   AdminLoginResponse,
   TwoFactorChallengeState,
@@ -12,7 +12,9 @@ export const authService = {
   },
 
   async getTwoFactorChallenge() {
-    return apiGet<TwoFactorChallengeState>("/auth/admin/two-factor/challenge");
+    return fetchOptionalAuth<TwoFactorChallengeState>(
+      "/auth/admin/two-factor/challenge",
+    );
   },
 
   async verifyTwoFactor(code: string) {
@@ -30,6 +32,19 @@ export const authService = {
 
   async refreshToken() {
     return apiPost<{ token: string }>("/auth/admin/refresh", {});
+  },
+
+  async requestAdminPasswordRecovery(email: string) {
+    return apiPost<{ message: string }>("/auth/admin/password-recovery/request", {
+      email,
+    });
+  },
+
+  async changeAdminPasswordRecovery(token: string, password: string) {
+    return apiPost<{ message: string }>("/auth/admin/password-recovery/change", {
+      token,
+      password,
+    });
   },
 
   async logout() {

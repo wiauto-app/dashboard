@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as SignInIndexRouteImport } from './routes/signIn/index'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as AuthRecoverPasswordRouteImport } from './routes/auth/recover-password'
 import { Route as AuthenticatedWarrantyTypesRouteImport } from './routes/_authenticated/warranty-types'
 import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
 import { Route as AuthenticatedVehicleTypesRouteImport } from './routes/_authenticated/vehicle-types'
@@ -48,6 +50,16 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRecoverPasswordRoute = AuthRecoverPasswordRouteImport.update({
+  id: '/auth/recover-password',
+  path: '/auth/recover-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWarrantyTypesRoute =
   AuthenticatedWarrantyTypesRouteImport.update({
@@ -190,6 +202,8 @@ export interface FileRoutesByFullPath {
   '/vehicle-types': typeof AuthenticatedVehicleTypesRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/warranty-types': typeof AuthenticatedWarrantyTypesRoute
+  '/auth/recover-password': typeof AuthRecoverPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/signIn/': typeof SignInIndexRoute
   '/profile/config': typeof AuthenticatedProfileConfigRoute
 }
@@ -215,6 +229,8 @@ export interface FileRoutesByTo {
   '/vehicle-types': typeof AuthenticatedVehicleTypesRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
   '/warranty-types': typeof AuthenticatedWarrantyTypesRoute
+  '/auth/recover-password': typeof AuthRecoverPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/': typeof AuthenticatedIndexRoute
   '/signIn': typeof SignInIndexRoute
   '/profile/config': typeof AuthenticatedProfileConfigRoute
@@ -243,6 +259,8 @@ export interface FileRoutesById {
   '/_authenticated/vehicle-types': typeof AuthenticatedVehicleTypesRoute
   '/_authenticated/vehicles': typeof AuthenticatedVehiclesRoute
   '/_authenticated/warranty-types': typeof AuthenticatedWarrantyTypesRoute
+  '/auth/recover-password': typeof AuthRecoverPasswordRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/signIn/': typeof SignInIndexRoute
   '/_authenticated/profile/config': typeof AuthenticatedProfileConfigRoute
@@ -272,6 +290,8 @@ export interface FileRouteTypes {
     | '/vehicle-types'
     | '/vehicles'
     | '/warranty-types'
+    | '/auth/recover-password'
+    | '/auth/reset-password'
     | '/signIn/'
     | '/profile/config'
   fileRoutesByTo: FileRoutesByTo
@@ -297,6 +317,8 @@ export interface FileRouteTypes {
     | '/vehicle-types'
     | '/vehicles'
     | '/warranty-types'
+    | '/auth/recover-password'
+    | '/auth/reset-password'
     | '/'
     | '/signIn'
     | '/profile/config'
@@ -324,6 +346,8 @@ export interface FileRouteTypes {
     | '/_authenticated/vehicle-types'
     | '/_authenticated/vehicles'
     | '/_authenticated/warranty-types'
+    | '/auth/recover-password'
+    | '/auth/reset-password'
     | '/_authenticated/'
     | '/signIn/'
     | '/_authenticated/profile/config'
@@ -331,6 +355,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRecoverPasswordRoute: typeof AuthRecoverPasswordRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   SignInIndexRoute: typeof SignInIndexRoute
 }
 
@@ -356,6 +382,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/recover-password': {
+      id: '/auth/recover-password'
+      path: '/auth/recover-password'
+      fullPath: '/auth/recover-password'
+      preLoaderRoute: typeof AuthRecoverPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/warranty-types': {
       id: '/_authenticated/warranty-types'
@@ -571,6 +611,8 @@ const AuthenticatedRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRecoverPasswordRoute: AuthRecoverPasswordRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   SignInIndexRoute: SignInIndexRoute,
 }
 export const routeTree = rootRouteImport
