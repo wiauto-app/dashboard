@@ -29,6 +29,8 @@ function RouteComponent() {
       columns={vehicleTypesColumns}
       data={rows}
       title="Tipos de vehículo"
+      form_size="3xl"
+
       route={Route}
       total={data?.total ?? 0}
       actions={(row) => vehicleTypesActions(row, invalidateData)}
@@ -45,6 +47,7 @@ function RouteComponent() {
               ...(payload as Record<string, unknown>),
             })
           }
+          columnsLayout={1}
           onMutationSuccess={invalidateData}
           messages={{
             create_success: "Tipo de vehículo creado correctamente",
