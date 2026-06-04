@@ -18,6 +18,15 @@ export const vehicleTypesColumns: DynamicTableColumn[] = [
     modifiable: false,
   },
   {
+    header: "Imagen",
+    accessorKey: "image_url",
+    type: "image",
+    sortable: false,
+    bucketName: "files",
+    image_upload_path: "vehicle-types",
+    modifiable: true,
+  },
+  {
     header: "Creado",
     accessorKey: "created_at",
     type: "date",
