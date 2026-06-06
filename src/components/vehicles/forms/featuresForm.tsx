@@ -10,20 +10,8 @@ import { VehicleConditionSelector } from "@/components/dynamicSelectors/vehicleC
 import { VehicleTransmissionTypeSelector } from "@/components/dynamicSelectors/vehicleTransmissionTypeSelector";
 import { Separator } from "@/components/ui/separator";
 import { OptionalFieldLabel } from "./optionalFieldLabel";
-
-const toggle_feature_id_in_list = (
-  current_ids: string[],
-  feature_id: string,
-  checked: boolean,
-): string[] => {
-  if (checked) {
-    if (current_ids.includes(feature_id)) {
-      return current_ids;
-    }
-    return [...current_ids, feature_id];
-  }
-  return current_ids.filter((id) => id !== feature_id);
-};
+import { VehicleServicesSelector } from "./vehicleServicesSelector";
+import { toggleCatalogIdInList } from "../utils/toggleCatalogIdInList";
 
 export const FeaturesForm = () => {
   const form = useFormContext<VehicleSchema>();
@@ -126,7 +114,7 @@ export const FeaturesForm = () => {
                           onCheckedChange={(checked) => {
                             const is_on = checked === true;
                             field.onChange(
-                              toggle_feature_id_in_list(ids, feature.id, is_on),
+                              toggleCatalogIdInList(ids, feature.id, is_on),
                             );
                           }}
                           aria-invalid={fieldState.invalid}
@@ -141,6 +129,8 @@ export const FeaturesForm = () => {
           }}
         />
       </div>
+      <Separator />
+      <VehicleServicesSelector />
     </div>
   );
 };
