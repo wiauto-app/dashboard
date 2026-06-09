@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-import { countryCodes } from "@/lib/countryCodes";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +17,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { countryCodes } from "@/lib/countryCodes";
 
 const MAX_SUBSCRIBER_DIGITS_E164 = 15;
 

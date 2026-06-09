@@ -27,5 +27,5 @@
       ]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../../nextjs/wiauto-frontend/lib/countryCodes.ts"]
 }
