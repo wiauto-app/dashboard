@@ -1,8 +1,20 @@
 import type { AdminVehicleListItem } from "../types/vehicles.types";
 import { vehiclesService } from "../services/vehiclesService";
 import { deleteRowAction } from "@/components/dynamic-table/deleteResourceDialog";
+import { VehicleStatusMenu } from "./VehicleStatusMenu";
 
 export const vehicleActions = (row: AdminVehicleListItem, onSuccess?: () => void) => [
+  {
+    key: "vehicle-status",
+    label: "Cambiar estado",
+    component: (
+      <VehicleStatusMenu
+        key={`vehicle-status-${row.id}`}
+        row={row}
+        onSuccess={onSuccess}
+      />
+    ),
+  },
   deleteRowAction(row.id, onSuccess, {
     deleteFn: vehiclesService.delete,
     title: "Eliminar anuncio",

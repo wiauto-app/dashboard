@@ -1,6 +1,7 @@
 import { apiDelete, apiGet, apiPatch, apiPost, type apiResponse } from "@/services/api";
 import type { PaginatedResult } from "@/types/general.types";
 import type { AdminVehicleDetail, AdminVehicleListItem, Vehicle, VehicleSchema, UpdateVehicleSchema, VehiclesParams } from "../types/vehicles.types";
+import type { VehicleStatus } from "../constants/vehicle-status.constants";
 import { V1_ADMIN_VEHICLES, V1_VEHICLES } from "./route.constants";
 import { objectToQueryString } from "@/lib/utils";
 import { format } from "date-fns";
@@ -63,6 +64,17 @@ export const vehiclesService = {
         only_temp_images: true,
         is_update: true,
       }),
+    );
+    return response;
+  },
+
+  async updateStatus(
+    id: string,
+    data: { status: VehicleStatus; message?: string },
+  ): Promise<apiResponse<{ vehicle: Vehicle }>> {
+    const response = await apiPatch<{ vehicle: Vehicle }>(
+      `${V1_ADMIN_VEHICLES}/${id}/status`,
+      data,
     );
     return response;
   },

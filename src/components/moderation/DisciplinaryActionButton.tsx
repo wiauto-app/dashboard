@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { BanIcon } from "lucide-react";
+import { IconButton } from "../ui/iconButton";
 
 type DisciplinaryActionButtonProps = {
   implicated_profile_id: string | null | undefined;
@@ -25,15 +26,15 @@ export const DisciplinaryActionButton = ({
       <Tooltip>
         <TooltipTrigger
           render={
-            <Button
-              type="button"
+            <IconButton
               variant="warning"
               size="icon-sm"
               disabled
+              text="Acción disciplinaria no disponible"
               aria-label="Acción disciplinaria no disponible"
             >
               <BanIcon className="size-4" aria-hidden />
-            </Button>
+            </IconButton>
           }
         />
         <TooltipContent>

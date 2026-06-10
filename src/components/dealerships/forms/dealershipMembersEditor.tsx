@@ -26,6 +26,7 @@ import type {
   DealershipMemberProfile,
   DealershipMemberRole,
 } from "../types/members.types";
+import { IconButton } from "@/components/ui/iconButton";
 
 type DealershipFormValues = z.infer<typeof createDealershipSchema>;
 
@@ -172,15 +173,13 @@ export const DealershipMembersEditor = ({
                   ) : null}
                 </Field>
 
-                <Button
-                  type="button"
+                <IconButton
                   variant="outline"
-                  size="icon"
-                  aria-label="Eliminar miembro"
+                  text="Eliminar miembro"
                   onClick={() => remove(index)}
                 >
                   <Trash2Icon className="size-4" />
-                </Button>
+                </IconButton>
               </li>
             );
           })}

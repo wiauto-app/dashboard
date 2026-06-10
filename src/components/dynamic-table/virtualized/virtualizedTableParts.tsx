@@ -2,7 +2,6 @@ import { flexRender, type Cell, type Header, type Row } from "@tanstack/react-ta
 import { PencilIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import type { DynamicTableAction } from "../types";
 import { SorteableHead } from "../sorteableHead";
 import {
@@ -10,6 +9,7 @@ import {
   SELECT_COLUMN_ID,
   SELECT_COLUMN_WIDTH,
 } from "./constants";
+import { IconButton } from "@/components/ui/iconButton";
 
 export const virtual_table_head_class =
   "h-10 px-2 text-left align-middle text-xs font-medium whitespace-nowrap text-muted-foreground [&:has([role=checkbox])]:pr-0";
@@ -103,16 +103,15 @@ export const VirtualizedActionsCell = <TData,>({
   >
     <div className="flex items-center gap-2">
       {form ? (
-        <Button
+        <IconButton
           variant="outline"
           size="icon-sm"
           type="button"
-          className="text-muted-foreground hover:text-foreground"
           onClick={() => on_edit(row.id)}
-          aria-label="Editar fila"
+          text="Editar"
         >
           <PencilIcon className="size-4" />
-        </Button>
+        </IconButton>
       ) : null}
       {actions?.(row.original).map((action) => (
         <span key={action.key}>{action.component}</span>

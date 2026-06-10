@@ -19,7 +19,6 @@ import type { DynamicTableAction, DynamicTableColumn } from "./types";
 import type { AnyRoute } from "@tanstack/react-router";
 import { SorteableHead } from "./sorteableHead";
 import { PencilIcon } from "lucide-react";
-import { Button } from "../ui/button";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useColumnVisibilityStore } from "@/stores/useColumnVisibilityStore";
@@ -32,6 +31,7 @@ import {
   resolve_virtualization,
   type DynamicTableVirtualization,
 } from "./virtualized/resolveVirtualization";
+import { IconButton } from "../ui/iconButton";
 
 export type DynamicTableProps<TData extends object = object> = {
   columns: DynamicTableColumn[];
@@ -241,14 +241,14 @@ export function DynamicTable<TData extends object>({
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {form && (
-                          <Button
+                          <IconButton
                             variant="outline"
                             size="icon-sm"
-                            className="text-muted-foreground hover:text-foreground"
+                            text="Editar"
                             onClick={() => handle_edit_row(row.id)}
                           >
                             <PencilIcon className="size-4" />
-                          </Button>
+                          </IconButton>
                         )}
                         {actions?.(row.original).map(
                           (action) => action.component,

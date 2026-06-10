@@ -1,10 +1,10 @@
 import CustomAlertDialog from "@/components/ui/customAlertDialog";
-import { Button } from "@/components/ui/button";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 import type { apiResponse } from "@/services/api";
 import type { DynamicTableAction } from "./types";
 import { useUndoDelayedCommit } from "@/hooks/useUndoDelayedCommit";
+import { IconButton } from "../ui/iconButton";
 
 export type DeleteResourceConfig = {
   deleteFn: (id: string) => Promise<apiResponse<unknown>>;
@@ -74,14 +74,14 @@ export const DeleteResourceDialog = ({
       confirmVariant="destructive"
       confirmText={confirmText}
       trigger={
-        <Button
-          type="button"
+        <IconButton
+          text="Eliminar"
           variant="destructive"
           size="icon-sm"
           aria-label={typeof title === "string" ? title : "Eliminar"}
         >
           <TrashIcon className="size-4" aria-hidden />
-        </Button>
+        </IconButton>
       }
     />
   );

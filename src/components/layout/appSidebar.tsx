@@ -35,9 +35,9 @@ import {
 import { SidebarItem } from "./components/sidebarItem";
 import { MessagesNavBadge } from "./components/messagesNavBadge";
 import { BrandIcon } from "@/assets/brandIcon";
-import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 import { useState, type ComponentProps } from "react";
+import { IconButton } from "../ui/iconButton";
 
 const dashboard_nav_item = {
   to: "/" as const,
@@ -279,9 +279,9 @@ export const AppSidebar = ({
             >
               <BrandIcon width={120} className="max-w-full" />
             </SidebarMenuButton>
-            <Button className="text-white " size="icon" onClick={toggleSidebar}>
+            <IconButton text="Toggle Sidebar" variant="ghost" size="icon" onClick={toggleSidebar}>
               <ChevronLeft className="size-5"/>
-            </Button>
+            </IconButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

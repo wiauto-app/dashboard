@@ -1,6 +1,6 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { Button } from "../ui/button";
 import { useFiltersManager } from "@/hooks/useFiltersManager";
+import { IconButton } from "../ui/iconButton";
 
 export const CustomPagination = ({
   total,
@@ -33,8 +33,9 @@ export const CustomPagination = ({
         Página {page} de {total_pages}
       </span>
       <div className="flex flex-row gap-2">
-        <Button
+        <IconButton
           type="button"
+          text="Página anterior"
           variant="ghost"
           size="icon-sm"
           onClick={handle_prev}
@@ -42,9 +43,10 @@ export const CustomPagination = ({
           aria-label="Página anterior"
         >
           <ChevronLeftIcon className="size-5" aria-hidden />
-        </Button>
-        <Button
+        </IconButton>
+        <IconButton
           type="button"
+          text="Página siguiente"
           variant="ghost"
           size="icon-sm"
           onClick={handle_next}
@@ -52,7 +54,7 @@ export const CustomPagination = ({
           aria-label="Página siguiente"
         >
           <ChevronRightIcon className="size-5" aria-hidden />
-        </Button>
+        </IconButton>
       </div>
     </div>
   );

@@ -109,7 +109,9 @@ export const SignInFormContent = ({
       <div className={cn("mx-auto w-full max-w-sm", className)}>
         <TwoFactorLoginStep
           email={pending_email}
-          onSuccess={() => void onSuccess()}
+          onSuccess={async () => {
+            await onSuccess();
+          }}
           onBack={handleBackToCredentials}
         />
       </div>

@@ -1,16 +1,16 @@
 import { EllipsisVerticalIcon } from "lucide-react"
-import { Button } from "../ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import type { DynamicTableAction } from "./types"
+import { IconButton } from "../ui/iconButton"
 
 //TODO: add the rest of the logic of this component
 export const ActionsDropdown = ({ actions }: { actions?: DynamicTableAction[]  }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Button variant="ghost" size="icon">
+        <IconButton variant="ghost" size="icon" text="Acciones">
           <EllipsisVerticalIcon className="size-4" />
-        </Button>
+        </IconButton>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         {actions?.map((action) => (
