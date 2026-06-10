@@ -28,6 +28,12 @@ export const usersColumns: DynamicTableColumn[] = [
     sortable: false,
   },
   {
+    header: "Proveedor",
+    accessorKey: "user.provider",
+    type: "text",
+    sortable: false,
+  },
+  {
     header: "Último inicio de sesión",
     accessorKey: "user.last_sign_in",
     type: "date",

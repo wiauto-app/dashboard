@@ -20,6 +20,7 @@ export const Route = createFileRoute('/_authenticated/users')({
 function RouteComponent() {
   const router = useRouter();
   const data = Route.useLoaderData() as PaginatedResult<Profile>;
+  console.log(data);
   const handleUserCreated = () => {
     void router.invalidate({
       filter: (match) => match.routeId === '/_authenticated/users',
