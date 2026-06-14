@@ -57,11 +57,11 @@ const rest_nav_items = [
 
 const vehicle_admin_children = [
   { to: "/vehicles" as const, label: "Anuncios" },
+  { to: "/vehicle-types" as const, label: "Tipos de vehículo" },
   { to: "/categories" as const, label: "Categorías" },
   { to: "/features" as const, label: "Características" },
   { to: "/cuotas" as const, label: "Cuotas" },
   { to: "/tractions" as const, label: "Tracciones" },
-  { to: "/vehicle-types" as const, label: "Tipos de vehículo" },
   { to: "/colors" as const, label: "Colores" },
   { to: "/dgt-labels" as const, label: "Etiquetas DGT" },
   { to: "/warranty-types" as const, label: "Tipos de garantía" },

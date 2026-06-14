@@ -4,6 +4,15 @@ import type { DynamicTableColumn } from "@/components/dynamic-table/types";
 export const vehicleTypesColumns: DynamicTableColumn[] = [
   defaultColumn,
   {
+    header: "Imagen",
+    accessorKey: "image_url",
+    type: "image",
+    sortable: false,
+    bucketName: "files",
+    image_upload_path: "vehicle-types",
+    modifiable: true,
+  },
+  {
     header: "Nombre",
     accessorKey: "name",
     type: "text",
@@ -17,15 +26,7 @@ export const vehicleTypesColumns: DynamicTableColumn[] = [
     sortable: true,
     modifiable: false,
   },
-  {
-    header: "Imagen",
-    accessorKey: "image_url",
-    type: "image",
-    sortable: false,
-    bucketName: "files",
-    image_upload_path: "vehicle-types",
-    modifiable: true,
-  },
+
   {
     header: "Creado",
     accessorKey: "created_at",

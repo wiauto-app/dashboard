@@ -30,7 +30,7 @@ export const ImageInput = ({
   bucketName,
   path,
   referenceId,
-  accept = "image/png,image/jpeg,image/jpg,image/webp",
+  accept = "image/png,image/jpeg,image/jpg,image/webp,image/avif",
 }: ImageInputProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -98,7 +98,7 @@ export const ImageInput = ({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium">{label}</label>
+        {/* <label className="text-sm font-medium">{label}</label> */}
 
         <p className="text-muted-foreground text-sm">{description}</p>
       </div>
