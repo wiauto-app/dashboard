@@ -1,6 +1,5 @@
 import { Controller, useFormContext } from "react-hook-form";
 import type { VehiclePriceHistoryItem, VehicleSchema } from "../types/vehicles.types";
-import { ControllerInput } from "@/components/ui/controllerInput";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { PricingSuggestion } from "./pricingSuggestion";
@@ -51,7 +50,6 @@ export const PricingDescForm = ({
           isEditMode={isEditMode}
         />
       </div>
-      <ControllerInput name="title" control={form.control} label="Título" />
       <Controller
         name="description"
         control={form.control}

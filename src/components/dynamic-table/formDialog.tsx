@@ -14,9 +14,11 @@ import type { FormSize } from "@/types/form.types";
 export const FormDialog = ({
   form,
   size,
+  hideCreateButton = false,
 }: {
   form: React.ReactNode;
   size?: FormSize;
+  hideCreateButton?: boolean;
 }) => {
   const isOpen = useFormDialogStore((state) => state.isOpen);
   const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
@@ -31,12 +33,14 @@ export const FormDialog = ({
         }
       }}
     >
-      <DialogTrigger>
-        <Button type="button">
-          <PlusIcon />
-          Agregar
-        </Button>
-      </DialogTrigger>
+      {!hideCreateButton ? (
+        <DialogTrigger>
+          <Button type="button">
+            <PlusIcon />
+            Agregar
+          </Button>
+        </DialogTrigger>
+      ) : null}
       <DialogContent
         className={cn(
           "md:max-w-2xl max-w-full",

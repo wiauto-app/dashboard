@@ -82,10 +82,6 @@ export const vehicleSchema = z.object({
   videos: optional_vehicle_videos_array,
   // --- Anuncio ---
   vehicle_type_id: z.uuid({ error: "Selecciona un tipo de vehículo." }),
-  title: z
-    .string()
-    .min(1, { error: "El título es obligatorio." })
-    .min(5, { error: "El título debe tener al menos 5 caracteres." }),
   description: z
     .string()
     .min(1, { error: "La descripción es obligatoria." })

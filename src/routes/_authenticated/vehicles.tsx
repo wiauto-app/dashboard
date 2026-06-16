@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useMemo } from 'react';
 import { DynamicTable } from '@/components/dynamic-table/dynamic-table';
 import { vehiclesSchema } from '@/components/vehicles/schemas/vehicles-params.schema';
 import type { AdminVehicleListItem, VehiclesParams } from '@/components/vehicles/types/vehicles.types';
@@ -10,6 +11,9 @@ import { VehicleForm } from '@/components/vehicles/forms/vehicleForm';
 import { vehicleActions } from '@/components/vehicles/actions/vehicleActions';
 import { useInvalidateData } from '@/hooks/useInvalidateData';
 import { useSelectedIdStore } from '@/stores/useSelectedIdStore';
+import { getVehicleDisplayName } from '@/components/vehicles/utils/getVehicleDisplayName';
+
+type AdminVehicleTableRow = AdminVehicleListItem & { display_name: string };
 
 export const Route = createFileRoute('/_authenticated/vehicles')({
   component: RouteComponent,
@@ -25,12 +29,20 @@ function RouteComponent() {
   const response = Route.useLoaderData() as PaginatedResult<AdminVehicleListItem>;
   const invalidateData = useInvalidateData("/_authenticated/vehicles");
   const selectedId = useSelectedIdStore((state) => state.selectedId);
+  const table_data = useMemo<AdminVehicleTableRow[]>(
+    () =>
+      (response?.data ?? []).map((vehicle) => ({
+        ...vehicle,
+        display_name: getVehicleDisplayName(vehicle),
+      })),
+    [response?.data],
+  );
 
   return (
     <DynamicTable
       table_id="vehicles"
       columns={vehiclesColumns}
-      data={response?.data ?? []}
+      data={table_data}
       title="Anuncios"
       route={Route}
       total={response?.total ?? 0}

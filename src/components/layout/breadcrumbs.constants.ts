@@ -47,6 +47,16 @@ const reports_admin_trail = (
   href: string,
 ): BreadcrumbItem[] => [home_item, reports_admin_parent, { label, href }];
 
+const locations_admin_parent: BreadcrumbItem = {
+  label: "Ubicaciones",
+  href: "/provinces",
+};
+
+const locations_admin_trail = (
+  label: string,
+  href: string,
+): BreadcrumbItem[] => [home_item, locations_admin_parent, { label, href }];
+
 export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/": [{ label: "Dashboard", icon: HomeIcon, href: "/" }],
   "/users": with_home("Usuarios", "/users"),
@@ -75,5 +85,8 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
     "Categorías de denuncia",
     "/report-categories",
   ),
+  "/provinces": locations_admin_trail("Provincias", "/provinces"),
+  "/communities": locations_admin_trail("Comunidades", "/communities"),
+  "/municipalities": locations_admin_trail("Municipios", "/municipalities"),
   "/profile/config": with_home("Configuración", "/profile/config"),
 };

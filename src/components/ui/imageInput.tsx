@@ -24,7 +24,7 @@ export const ImageInput = ({
   value,
   onChange,
 
-  label = "Imagen",
+  label: _label = "Imagen",
   description = "PNG, JPG o WEBP",
 
   bucketName,

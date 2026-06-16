@@ -47,6 +47,7 @@ export type DynamicTableProps<TData extends object = object> = {
   route: AnyRoute;
   form_size?: FormSize;
   virtualization?: DynamicTableVirtualization;
+  hideCreateButton?: boolean;
 };
 
 export function DynamicTable<TData extends object>({
@@ -62,6 +63,7 @@ export function DynamicTable<TData extends object>({
   actions,
   form_size = "md",
   virtualization,
+  hideCreateButton = false,
 }: DynamicTableProps<TData>) {
   const [row_selection, set_row_selection] = useState<RowSelectionState>({});
   const setSelectedId = useSelectedIdStore((state) => state.setSelectedId);
@@ -169,6 +171,7 @@ export function DynamicTable<TData extends object>({
       form={form}
       table_toolbar={table_toolbar}
       form_size={form_size}
+      hideCreateButton={hideCreateButton}
     >
       {virtualization_config.enabled ? (
         <VirtualizedTableContainer

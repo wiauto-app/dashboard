@@ -17,10 +17,11 @@ export const vehiclesColumns: DynamicTableColumn[] = [
     modifiable: false,
   },
   {
-    header: "Título",
-    accessorKey: "title",
+    header: "Nombre",
+    accessorKey: "display_name",
     type: "text",
-    sortable: true,
+    sortable: false,
+    modifiable: false,
   },
   {
     header: "Categoría",

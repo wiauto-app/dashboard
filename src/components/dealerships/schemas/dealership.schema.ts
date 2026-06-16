@@ -49,6 +49,7 @@ const dealership_fields_schema = z.object({
   address: z.string().min(1, { message: "La dirección es obligatoria" }),
   lat: z.coerce.number().optional(),
   lng: z.coerce.number().optional(),
+  is_featured: z.boolean().optional(),
   members: z
     .array(dealershipMemberSchema)
     .min(1, { message: "Debe haber al menos un miembro" }),

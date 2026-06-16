@@ -18,3 +18,6 @@ export const V1_CATALOG_MODELS = "/v1/catalog/models";
 export const V1_CATALOG_BODY_TYPES = "/v1/catalog/body-types";
 export const V1_CATALOG_FUEL_TYPES = "/v1/catalog/fuel-types";
 export const V1_CATALOG_YEARS = "/v1/catalog/years";
+export const V1_PROVINCES = "/v1/provinces";
+export const V1_COMMUNITIES = "/v1/communities";
+export const V1_MUNICIPALITIES = "/v1/municipalities";

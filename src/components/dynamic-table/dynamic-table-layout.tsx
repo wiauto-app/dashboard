@@ -13,6 +13,7 @@ export const DynamicTableLayout = ({
   table_toolbar,
   path,
   form_size = "md",
+  hideCreateButton = false,
 }: {
   children: React.ReactNode;
   title: string;
@@ -22,6 +23,7 @@ export const DynamicTableLayout = ({
   table_toolbar?: React.ReactNode;
   path: string;
   form_size?: FormSize;
+  hideCreateButton?: boolean;
 }) => (
   <Card className="border-none shadow-none">
     <CardHeader className="flex flex-row items-center justify-between">
@@ -29,7 +31,13 @@ export const DynamicTableLayout = ({
       <div className="flex flex-row flex-wrap items-center gap-2">
         {table_toolbar}
         {filters && <FilterPopover filters={filters} />}
-        {form && <FormDialog size={form_size} form={form} />}
+        {form && (
+          <FormDialog
+            size={form_size}
+            form={form}
+            hideCreateButton={hideCreateButton}
+          />
+        )}
       </div>
     </CardHeader>
     {children}

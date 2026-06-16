@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import type z from "zod";
 
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { ImageInput } from "@/components/ui/imageInput";
 import { Input } from "@/components/ui/input";
@@ -55,6 +56,7 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       address: "",
       lat: undefined,
       lng: undefined,
+      is_featured: false,
       members: [],
     },
   });
@@ -85,6 +87,7 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       address: dealership.address,
       lat: dealership.lat,
       lng: dealership.lng,
+      is_featured: dealership.is_featured,
       members: (dealership.members ?? []).map((member) => ({
         profile_id: member.profile_id,
         role: member.role,
@@ -114,6 +117,7 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     address: formData.address,
     lat: formData.lat ?? null,
     lng: formData.lng ?? null,
+    is_featured: formData.is_featured ?? false,
     members: formData.members,
   });
 
@@ -293,6 +297,34 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 )}
               />
             </div>
+
+            <Controller
+              name="is_featured"
+              control={form.control}
+              render={({ field }) => (
+                <Field className="rounded-lg border p-4">
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id="is_featured"
+                      checked={field.value ?? false}
+                      onCheckedChange={(checked) =>
+                        field.onChange(checked === true)
+                      }
+                      aria-label="Marcar concesionario como destacado"
+                    />
+                    <div>
+                      <FieldLabel htmlFor="is_featured" className="m-0">
+                        Destacado
+                      </FieldLabel>
+                      <p className="text-muted-foreground text-sm">
+                        Aparece primero en listados y en la sección de
+                        concesionarios destacados del home.
+                      </p>
+                    </div>
+                  </div>
+                </Field>
+              )}
+            />
 
             <Controller
               name="address"

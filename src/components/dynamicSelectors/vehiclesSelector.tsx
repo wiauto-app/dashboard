@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { vehiclesService } from "@/components/vehicles/services/vehiclesService";
+import { getVehicleDisplayName } from "@/components/vehicles/utils/getVehicleDisplayName";
 import type {
   AdminVehicleDetail,
   AdminVehicleListItem,
@@ -13,15 +14,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 const get_vehicle_label = (
-  vehicle?: Pick<AdminVehicleListItem | AdminVehicleDetail, "id" | "title" | "license_plate"> | null,
-) => vehicle?.title?.trim() || vehicle?.license_plate?.trim() || vehicle?.id || "";
+  vehicle?: AdminVehicleListItem | AdminVehicleDetail | null,
+) => getVehicleDisplayName(vehicle, { fallback: "" });
 
 export const VehiclesSelector = ({
   value,
   onValueChange,
   ariaInvalid,
   disabled = false,
-  placeholder = "Buscar anuncio por título...",
+  placeholder = "Buscar anuncio por nombre o matrícula...",
 }: {
   value?: string;
   onValueChange: (vehicle_id: string | undefined) => void;

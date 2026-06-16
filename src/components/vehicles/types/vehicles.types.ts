@@ -32,10 +32,26 @@ export interface VehicleListItemPublisher {
   avatar_url: string;
 }
 
+export interface VehicleVersionSummary {
+  make_name: string;
+  model_name: string;
+  version_name: string;
+}
+
+export interface AdminVehicleVersionRef {
+  id: number;
+  name: string;
+  make?: { name: string } | null;
+  model?: { name: string } | null;
+}
+
+/** Alias para respuestas admin con relación `version` cargada. */
+export type AdminVehicleVersion = AdminVehicleVersionRef;
+
 /** Fila del listado admin (`GET /v1/admin/vehicles`). */
 export interface AdminVehicleListItem {
   id: string;
-  title: string;
+  version_summary: VehicleVersionSummary;
   price: number;
   mileage: number;
   lat: number;
@@ -94,7 +110,6 @@ export interface AdminVehicleDetail {
   vin_code?: string | null;
   vehicle_type_id: string | null;
   category_id: string | null;
-  title: string;
   description: string;
   price: number;
   vehicle_prices: VehiclePriceHistoryItem[];
@@ -103,6 +118,7 @@ export interface AdminVehicleDetail {
   lat: number;
   lng: number;
   version_id: number;
+  version: AdminVehicleVersion;
   version_catalog: AdminVehicleVersionCatalog;
   traction_id: string;
   transmission_type: "manual" | "automatic";
@@ -128,7 +144,6 @@ export interface AdminVehicleDetail {
 /** Detalle completo del vehículo (creación / edición). */
 export interface Vehicle {
   id: string;
-  title: string;
   description: string;
   price: number;
   mileage: number;
@@ -181,7 +196,6 @@ export type UpdateVehicleSchema = z.infer<typeof updateVehicleSchema>;
 export const createVehicleDefaultValues: VehicleSchema = {
   vin_code: undefined,
   vehicle_type_id: "",
-  title: "",
   description: "",
   price: 0,
   vehicle_price_id: undefined,

@@ -26,6 +26,7 @@ import {
 } from "../constants/vehicle-status.constants";
 import { vehiclesService } from "../services/vehiclesService";
 import type { AdminVehicleListItem } from "../types/vehicles.types";
+import { getVehicleDisplayName } from "../utils/getVehicleDisplayName";
 import { IconButton } from "@/components/ui/iconButton";
 
 export const VehicleStatusMenu = ({
@@ -128,7 +129,7 @@ export const VehicleStatusMenu = ({
             <DialogTitle>Cambiar estado del anuncio</DialogTitle>
             <DialogDescription>
               {pending_status
-                ? `El anuncio «${row.title}» pasará a «${get_vehicle_status_label(pending_status)}». Puedes incluir un mensaje opcional para el publicador.`
+                ? `El anuncio «${getVehicleDisplayName(row)}» pasará a «${get_vehicle_status_label(pending_status)}». Puedes incluir un mensaje opcional para el publicador.`
                 : "Confirma el cambio de estado."}
             </DialogDescription>
           </DialogHeader>

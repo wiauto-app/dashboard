@@ -24,13 +24,16 @@ import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_aut
 import { Route as AuthenticatedRoleRouteImport } from './routes/_authenticated/role'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedReportCategoriesRouteImport } from './routes/_authenticated/report-categories'
+import { Route as AuthenticatedProvincesRouteImport } from './routes/_authenticated/provinces'
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
+import { Route as AuthenticatedMunicipalitiesRouteImport } from './routes/_authenticated/municipalities'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
 import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
 import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
 import { Route as AuthenticatedCuotasRouteImport } from './routes/_authenticated/cuotas'
+import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
 import { Route as AuthenticatedColorsRouteImport } from './routes/_authenticated/colors'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedCatalogServicesRouteImport } from './routes/_authenticated/catalog-services'
@@ -115,10 +118,21 @@ const AuthenticatedReportCategoriesRoute =
     path: '/report-categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProvincesRoute = AuthenticatedProvincesRouteImport.update({
+  id: '/provinces',
+  path: '/provinces',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPermissionsRoute =
   AuthenticatedPermissionsRouteImport.update({
     id: '/permissions',
     path: '/permissions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMunicipalitiesRoute =
+  AuthenticatedMunicipalitiesRouteImport.update({
+    id: '/municipalities',
+    path: '/municipalities',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
@@ -151,6 +165,12 @@ const AuthenticatedCuotasRoute = AuthenticatedCuotasRouteImport.update({
   path: '/cuotas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCommunitiesRoute =
+  AuthenticatedCommunitiesRouteImport.update({
+    id: '/communities',
+    path: '/communities',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedColorsRoute = AuthenticatedColorsRouteImport.update({
   id: '/colors',
   path: '/colors',
@@ -185,13 +205,16 @@ export interface FileRoutesByFullPath {
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/colors': typeof AuthenticatedColorsRoute
+  '/communities': typeof AuthenticatedCommunitiesRoute
   '/cuotas': typeof AuthenticatedCuotasRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
+  '/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
+  '/provinces': typeof AuthenticatedProvincesRoute
   '/report-categories': typeof AuthenticatedReportCategoriesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
@@ -212,13 +235,16 @@ export interface FileRoutesByTo {
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/colors': typeof AuthenticatedColorsRoute
+  '/communities': typeof AuthenticatedCommunitiesRoute
   '/cuotas': typeof AuthenticatedCuotasRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
+  '/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
+  '/provinces': typeof AuthenticatedProvincesRoute
   '/report-categories': typeof AuthenticatedReportCategoriesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
@@ -242,13 +268,16 @@ export interface FileRoutesById {
   '/_authenticated/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/colors': typeof AuthenticatedColorsRoute
+  '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/cuotas': typeof AuthenticatedCuotasRoute
   '/_authenticated/dealership': typeof AuthenticatedDealershipRoute
   '/_authenticated/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
+  '/_authenticated/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
+  '/_authenticated/provinces': typeof AuthenticatedProvincesRoute
   '/_authenticated/report-categories': typeof AuthenticatedReportCategoriesRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/role': typeof AuthenticatedRoleRoute
@@ -273,13 +302,16 @@ export interface FileRouteTypes {
     | '/catalog-services'
     | '/categories'
     | '/colors'
+    | '/communities'
     | '/cuotas'
     | '/dealership'
     | '/dgt-labels'
     | '/features'
     | '/messages'
     | '/moderation'
+    | '/municipalities'
     | '/permissions'
+    | '/provinces'
     | '/report-categories'
     | '/reports'
     | '/role'
@@ -300,13 +332,16 @@ export interface FileRouteTypes {
     | '/catalog-services'
     | '/categories'
     | '/colors'
+    | '/communities'
     | '/cuotas'
     | '/dealership'
     | '/dgt-labels'
     | '/features'
     | '/messages'
     | '/moderation'
+    | '/municipalities'
     | '/permissions'
+    | '/provinces'
     | '/report-categories'
     | '/reports'
     | '/role'
@@ -329,13 +364,16 @@ export interface FileRouteTypes {
     | '/_authenticated/catalog-services'
     | '/_authenticated/categories'
     | '/_authenticated/colors'
+    | '/_authenticated/communities'
     | '/_authenticated/cuotas'
     | '/_authenticated/dealership'
     | '/_authenticated/dgt-labels'
     | '/_authenticated/features'
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
+    | '/_authenticated/municipalities'
     | '/_authenticated/permissions'
+    | '/_authenticated/provinces'
     | '/_authenticated/report-categories'
     | '/_authenticated/reports'
     | '/_authenticated/role'
@@ -467,11 +505,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReportCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/provinces': {
+      id: '/_authenticated/provinces'
+      path: '/provinces'
+      fullPath: '/provinces'
+      preLoaderRoute: typeof AuthenticatedProvincesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/permissions': {
       id: '/_authenticated/permissions'
       path: '/permissions'
       fullPath: '/permissions'
       preLoaderRoute: typeof AuthenticatedPermissionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/municipalities': {
+      id: '/_authenticated/municipalities'
+      path: '/municipalities'
+      fullPath: '/municipalities'
+      preLoaderRoute: typeof AuthenticatedMunicipalitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/moderation': {
@@ -514,6 +566,13 @@ declare module '@tanstack/react-router' {
       path: '/cuotas'
       fullPath: '/cuotas'
       preLoaderRoute: typeof AuthenticatedCuotasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/communities': {
+      id: '/_authenticated/communities'
+      path: '/communities'
+      fullPath: '/communities'
+      preLoaderRoute: typeof AuthenticatedCommunitiesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/colors': {
@@ -559,13 +618,16 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCatalogServicesRoute: typeof AuthenticatedCatalogServicesRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedColorsRoute: typeof AuthenticatedColorsRoute
+  AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedCuotasRoute: typeof AuthenticatedCuotasRoute
   AuthenticatedDealershipRoute: typeof AuthenticatedDealershipRoute
   AuthenticatedDgtLabelsRoute: typeof AuthenticatedDgtLabelsRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
+  AuthenticatedMunicipalitiesRoute: typeof AuthenticatedMunicipalitiesRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
+  AuthenticatedProvincesRoute: typeof AuthenticatedProvincesRoute
   AuthenticatedReportCategoriesRoute: typeof AuthenticatedReportCategoriesRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRoleRoute: typeof AuthenticatedRoleRoute
@@ -585,13 +647,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCatalogServicesRoute: AuthenticatedCatalogServicesRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedColorsRoute: AuthenticatedColorsRoute,
+  AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedCuotasRoute: AuthenticatedCuotasRoute,
   AuthenticatedDealershipRoute: AuthenticatedDealershipRoute,
   AuthenticatedDgtLabelsRoute: AuthenticatedDgtLabelsRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
+  AuthenticatedMunicipalitiesRoute: AuthenticatedMunicipalitiesRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
+  AuthenticatedProvincesRoute: AuthenticatedProvincesRoute,
   AuthenticatedReportCategoriesRoute: AuthenticatedReportCategoriesRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRoleRoute: AuthenticatedRoleRoute,

@@ -14,6 +14,19 @@ export const dealershipColumns: DynamicTableColumn[] = [
     sortable: true,
   },
   {
+    accessorKey: "is_featured",
+    header: "Destacado",
+    type: "boolean",
+    sortable: true,
+  },
+  {
+    accessorKey: "rating",
+    header: "Valoración",
+    type: "number",
+    sortable: true,
+    modifiable: false,
+  },
+  {
     accessorKey: "avatar_url",
     header: "Avatar",
     type: "image",
