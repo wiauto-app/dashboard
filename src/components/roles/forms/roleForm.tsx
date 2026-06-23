@@ -21,17 +21,29 @@ import { useQuery } from "@tanstack/react-query";
 
 import { permissionService } from "@/components/permissions/services/permissionService";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { PaginationParams } from "@/types/general.types";
 import { rolesService } from "../services/rolesService";
 import { toast } from "sonner";
 import { rolesPermissionsService } from "../services/roles-permissionsService";
+import { useFormDialogStore } from "@/stores/useFormDialogStore";
+import { Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
-export const RoleForm = () => {
+type RoleFormProps = {
+  onSuccess?: () => void;
+};
+
+export const RoleForm = ({ onSuccess }: RoleFormProps) => {
   const selectedId = useSelectedIdStore((state) => state.selectedId);
 
   const setSelectedId = useSelectedIdStore((state) => state.setSelectedId);
+  const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
+  const queryClient = useQueryClient();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isSubmitLockedRef = useRef(false);
 
   const [paginationParams] = useState<PaginationParams>({
     page: 1,
@@ -72,23 +84,33 @@ export const RoleForm = () => {
       name: "",
       is_admin: false,
       is_developer: false,
-      permissions: [],
+      permission_ids: [],
     },
   });
 
+
   useEffect(() => {
+    if (!selectedId) {
+      form.reset({
+        name: "",
+        is_admin: false,
+        is_developer: false,
+        permission_ids: [],
+      });
+      return;
+    }
+
     if (roleResponse) {
       form.reset({
         name: roleResponse.data.name,
         is_admin: roleResponse.data.is_admin,
         is_developer: roleResponse.data.is_developer,
-        permissions: roleResponse.data.roles_permissions.map((rolePermission) => ({
-          role_id: rolePermission.role_id,
-          permission_id: rolePermission.permission_id,
-        })),
+        permission_ids: roleResponse.data.roles_permissions.map(
+          (rolePermission) => rolePermission.permission_id,
+        ),
       });
     }
-  }, [roleResponse]);
+  }, [selectedId, roleResponse, form]);
 
   /*
    |--------------------------------------------------------------------------
@@ -120,30 +142,17 @@ export const RoleForm = () => {
    */
 
   const togglePermission = (permissionId: string) => {
-    const currentPermissions = form.getValues("permissions") ?? [];
+    const currentPermissionIds = form.getValues("permission_ids") ?? [];
 
-    const exists = currentPermissions.some(
-      (permission) => permission.permission_id === permissionId,
-    );
-
-    if (exists) {
+    if (currentPermissionIds.includes(permissionId)) {
       form.setValue(
-        "permissions",
-        currentPermissions.filter(
-          (permission) => permission.permission_id !== permissionId,
-        ),
+        "permission_ids",
+        currentPermissionIds.filter((id) => id !== permissionId),
       );
-
       return;
     }
 
-    form.setValue("permissions", [
-      ...currentPermissions,
-      {
-        role_id: selectedId ?? "",
-        permission_id: permissionId,
-      },
-    ]);
+    form.setValue("permission_ids", [...currentPermissionIds, permissionId]);
   };
 
   /*
@@ -152,53 +161,95 @@ export const RoleForm = () => {
    |--------------------------------------------------------------------------
    */
 
+  const releaseSubmitLock = () => {
+    isSubmitLockedRef.current = false;
+    setIsSubmitting(false);
+  };
+
+  const handleCloseForm = () => {
+    setSelectedId(null);
+    setIsOpen(false);
+    queryClient.invalidateQueries({ queryKey: ["role"] });
+    queryClient.invalidateQueries({ queryKey: ["selectedData"] });
+  };
+
   const onSubmit = async (data: CreateRole | UpdateRole) => {
-    if (selectedId) {
-      const response = await rolesService.update(selectedId, {
-        name: data.name,
-        is_admin: data.is_admin ?? false,
-        is_developer: data.is_developer ?? false,
-        is_default: false,
-      });
-      if (response.ok) {
-        const permissionsResponse =
-          await rolesPermissionsService.syncPermissions({
-            role_id: selectedId,
-            permission_ids:
-              data.permissions?.map((permission) => permission.permission_id) ??
-              [],
-          });
-        if (permissionsResponse.ok) {
-          toast.success("Permisos actualizados correctamente");
-        } else {
-          toast.error("Error al actualizar los permisos");
+    if (isSubmitLockedRef.current) {
+      return;
+    }
+
+    isSubmitLockedRef.current = true;
+    setIsSubmitting(true);
+
+    const permission_ids = data.permission_ids ?? [];
+    const rolePayload = {
+      name: data.name ?? "",
+      is_admin: data.is_admin ?? false,
+      is_developer: data.is_developer ?? false,
+      is_default: false,
+    };
+
+    try {
+      if (selectedId) {
+        const response = await rolesService.update(selectedId, rolePayload);
+
+        if (!response.ok) {
+          toast.error(response.message || "No se pudo actualizar el rol");
+          return;
         }
-      } else {
-        toast.error("Error al actualizar el rol");
-      }
-    } else {
-      const response = await rolesService.create({
-        name: data.name ?? "",
-        is_admin: data.is_admin ?? false,
-        is_developer: data.is_developer ?? false,
-        is_default: false,
-      });
-      if (response.ok) {
-        const permissionsResponse =
-          await rolesPermissionsService.syncPermissions({
-            role_id: response.data.id,
-            permission_ids:
-              data.permissions?.map((permission) => permission.permission_id) ??
-              [],
-          });
-        if (permissionsResponse.ok) {
-          toast.success("Permisos creados correctamente");
-        } else {
-          toast.error("Error al crear los permisos");
+
+        const syncResponse = await rolesPermissionsService.syncPermissions({
+          role_id: selectedId,
+          permission_ids,
+        });
+
+        if (!syncResponse.ok) {
+          toast.error(
+            syncResponse.message ||
+              "El rol se actualizó, pero no se pudieron asignar los permisos",
+          );
+          onSuccess?.();
+          return;
         }
-      } else {
-        toast.error("Error al crear el rol");
+
+        toast.success("Rol actualizado correctamente");
+        handleCloseForm();
+        onSuccess?.();
+        return;
       }
+
+      const response = await rolesService.create(rolePayload);
+
+      if (!response.ok) {
+        toast.error(response.message || "No se pudo crear el rol");
+        return;
+      }
+
+      const syncResponse = await rolesPermissionsService.syncPermissions({
+        role_id: response.data.id,
+        permission_ids,
+      });
+
+      if (!syncResponse.ok) {
+        toast.error(
+          syncResponse.message ||
+            "El rol se creó, pero no se pudieron asignar los permisos",
+        );
+        onSuccess?.();
+        return;
+      }
+
+      toast.success("Rol creado correctamente");
+      form.reset({
+        name: "",
+        is_admin: false,
+        is_developer: false,
+        permission_ids: [],
+      });
+      handleCloseForm();
+      onSuccess?.();
+    } finally {
+      releaseSubmitLock();
     }
   };
 
@@ -313,11 +364,9 @@ export const RoleForm = () => {
 
                 <div className="grid gap-3 p-4 md:grid-cols-2">
                   {modulePermissions.map((permission) => {
-                    const selectedPermissions = form.watch("permissions") ?? [];
+                    const selectedPermissionIds = form.watch("permission_ids") ?? [];
 
-                    const checked = selectedPermissions.some(
-                      (current) => current.permission_id === permission.id,
-                    );
+                    const checked = selectedPermissionIds.includes(permission.id);
 
                     return (
                       <button
@@ -355,13 +404,23 @@ export const RoleForm = () => {
         <Button
           type="button"
           variant="outline"
-          onClick={() => setSelectedId(null)}
+          disabled={isSubmitting}
+          onClick={handleCloseForm}
         >
           Cancelar
         </Button>
 
-        <Button type="submit">
-          {selectedId ? "Actualizar rol" : "Crear rol"}
+        <Button type="submit" disabled={isSubmitting} className="gap-2">
+          {isSubmitting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Guardando...
+            </>
+          ) : selectedId ? (
+            "Actualizar rol"
+          ) : (
+            "Crear rol"
+          )}
         </Button>
       </div>
     </form>

@@ -21,10 +21,12 @@ import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTractionsRouteImport } from './routes/_authenticated/tractions'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
 import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_authenticated/ticket-categories'
+import { Route as AuthenticatedSubscriptionPlansRouteImport } from './routes/_authenticated/subscription-plans'
 import { Route as AuthenticatedRoleRouteImport } from './routes/_authenticated/role'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
 import { Route as AuthenticatedReportCategoriesRouteImport } from './routes/_authenticated/report-categories'
 import { Route as AuthenticatedProvincesRouteImport } from './routes/_authenticated/provinces'
+import { Route as AuthenticatedPlanLeadRequestsRouteImport } from './routes/_authenticated/plan-lead-requests'
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
 import { Route as AuthenticatedMunicipalitiesRouteImport } from './routes/_authenticated/municipalities'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
@@ -102,6 +104,12 @@ const AuthenticatedTicketCategoriesRoute =
     path: '/ticket-categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSubscriptionPlansRoute =
+  AuthenticatedSubscriptionPlansRouteImport.update({
+    id: '/subscription-plans',
+    path: '/subscription-plans',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedRoleRoute = AuthenticatedRoleRouteImport.update({
   id: '/role',
   path: '/role',
@@ -123,6 +131,12 @@ const AuthenticatedProvincesRoute = AuthenticatedProvincesRouteImport.update({
   path: '/provinces',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlanLeadRequestsRoute =
+  AuthenticatedPlanLeadRequestsRouteImport.update({
+    id: '/plan-lead-requests',
+    path: '/plan-lead-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPermissionsRoute =
   AuthenticatedPermissionsRouteImport.update({
     id: '/permissions',
@@ -214,10 +228,12 @@ export interface FileRoutesByFullPath {
   '/moderation': typeof AuthenticatedModerationRoute
   '/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
+  '/plan-lead-requests': typeof AuthenticatedPlanLeadRequestsRoute
   '/provinces': typeof AuthenticatedProvincesRoute
   '/report-categories': typeof AuthenticatedReportCategoriesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
+  '/subscription-plans': typeof AuthenticatedSubscriptionPlansRoute
   '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/tractions': typeof AuthenticatedTractionsRoute
@@ -244,10 +260,12 @@ export interface FileRoutesByTo {
   '/moderation': typeof AuthenticatedModerationRoute
   '/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
+  '/plan-lead-requests': typeof AuthenticatedPlanLeadRequestsRoute
   '/provinces': typeof AuthenticatedProvincesRoute
   '/report-categories': typeof AuthenticatedReportCategoriesRoute
   '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
+  '/subscription-plans': typeof AuthenticatedSubscriptionPlansRoute
   '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/tractions': typeof AuthenticatedTractionsRoute
@@ -277,10 +295,12 @@ export interface FileRoutesById {
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
+  '/_authenticated/plan-lead-requests': typeof AuthenticatedPlanLeadRequestsRoute
   '/_authenticated/provinces': typeof AuthenticatedProvincesRoute
   '/_authenticated/report-categories': typeof AuthenticatedReportCategoriesRoute
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/role': typeof AuthenticatedRoleRoute
+  '/_authenticated/subscription-plans': typeof AuthenticatedSubscriptionPlansRoute
   '/_authenticated/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/tractions': typeof AuthenticatedTractionsRoute
@@ -311,10 +331,12 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/municipalities'
     | '/permissions'
+    | '/plan-lead-requests'
     | '/provinces'
     | '/report-categories'
     | '/reports'
     | '/role'
+    | '/subscription-plans'
     | '/ticket-categories'
     | '/tickets'
     | '/tractions'
@@ -341,10 +363,12 @@ export interface FileRouteTypes {
     | '/moderation'
     | '/municipalities'
     | '/permissions'
+    | '/plan-lead-requests'
     | '/provinces'
     | '/report-categories'
     | '/reports'
     | '/role'
+    | '/subscription-plans'
     | '/ticket-categories'
     | '/tickets'
     | '/tractions'
@@ -373,10 +397,12 @@ export interface FileRouteTypes {
     | '/_authenticated/moderation'
     | '/_authenticated/municipalities'
     | '/_authenticated/permissions'
+    | '/_authenticated/plan-lead-requests'
     | '/_authenticated/provinces'
     | '/_authenticated/report-categories'
     | '/_authenticated/reports'
     | '/_authenticated/role'
+    | '/_authenticated/subscription-plans'
     | '/_authenticated/ticket-categories'
     | '/_authenticated/tickets'
     | '/_authenticated/tractions'
@@ -484,6 +510,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTicketCategoriesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/subscription-plans': {
+      id: '/_authenticated/subscription-plans'
+      path: '/subscription-plans'
+      fullPath: '/subscription-plans'
+      preLoaderRoute: typeof AuthenticatedSubscriptionPlansRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/role': {
       id: '/_authenticated/role'
       path: '/role'
@@ -510,6 +543,13 @@ declare module '@tanstack/react-router' {
       path: '/provinces'
       fullPath: '/provinces'
       preLoaderRoute: typeof AuthenticatedProvincesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/plan-lead-requests': {
+      id: '/_authenticated/plan-lead-requests'
+      path: '/plan-lead-requests'
+      fullPath: '/plan-lead-requests'
+      preLoaderRoute: typeof AuthenticatedPlanLeadRequestsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/permissions': {
@@ -627,10 +667,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedMunicipalitiesRoute: typeof AuthenticatedMunicipalitiesRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
+  AuthenticatedPlanLeadRequestsRoute: typeof AuthenticatedPlanLeadRequestsRoute
   AuthenticatedProvincesRoute: typeof AuthenticatedProvincesRoute
   AuthenticatedReportCategoriesRoute: typeof AuthenticatedReportCategoriesRoute
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRoleRoute: typeof AuthenticatedRoleRoute
+  AuthenticatedSubscriptionPlansRoute: typeof AuthenticatedSubscriptionPlansRoute
   AuthenticatedTicketCategoriesRoute: typeof AuthenticatedTicketCategoriesRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedTractionsRoute: typeof AuthenticatedTractionsRoute
@@ -656,10 +698,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedMunicipalitiesRoute: AuthenticatedMunicipalitiesRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
+  AuthenticatedPlanLeadRequestsRoute: AuthenticatedPlanLeadRequestsRoute,
   AuthenticatedProvincesRoute: AuthenticatedProvincesRoute,
   AuthenticatedReportCategoriesRoute: AuthenticatedReportCategoriesRoute,
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRoleRoute: AuthenticatedRoleRoute,
+  AuthenticatedSubscriptionPlansRoute: AuthenticatedSubscriptionPlansRoute,
   AuthenticatedTicketCategoriesRoute: AuthenticatedTicketCategoriesRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedTractionsRoute: AuthenticatedTractionsRoute,

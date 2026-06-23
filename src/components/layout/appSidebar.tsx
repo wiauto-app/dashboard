@@ -50,6 +50,8 @@ const rest_nav_items = [
   { to: "/users" as const, label: "Usuarios", icon: Users },
   { to: "/messages" as const, label: "Mensajes", icon: MessageCircle },
   { to: "/permissions" as const, label: "Permisos", icon: ShieldCheck },
+  { to: "/subscription-plans" as const, label: "Planes de suscripción", icon: ShieldCheck },
+  { to: "/plan-lead-requests" as const, label: "Solicitudes de planes", icon: ShieldCheck },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
   { to: "/role" as const, label: "Roles", icon: UserKey },
   { to: "/moderation" as const, label: "Moderación", icon: ShieldCheck },

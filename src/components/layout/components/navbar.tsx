@@ -8,6 +8,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export const Navbar = () => {
   const { location } = useRouterState()
+  return null
   return (
     <header className="flex items-center justify-between p-4 lg:p-8">
       <div className="flex items-center gap-2">

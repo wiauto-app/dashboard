@@ -32,7 +32,7 @@ function RouteComponent() {
       total={response.total}
       route={Route}
       form={
-        <RoleForm />
+        <RoleForm onSuccess={invalidateData} />
         // <DefaultForm
         //   columns={rolesColumns}
         //   findOneService={async (id) => {
