@@ -26,6 +26,11 @@ export type PlanFeature = {
   sort_order?: number;
 };
 
+export type PlanEffectConfig = {
+  type?: "assistant_credits" | "feature_vehicle";
+  credits?: number;
+};
+
 export type SubscriptionPlan = {
   id: string;
   slug: string;
@@ -38,13 +43,18 @@ export type SubscriptionPlan = {
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
+  effect_config?: PlanEffectConfig;
   prices?: PlanPrice[];
   features?: PlanFeature[];
 };
 
-export type CreateSubscriptionPlanDto = Omit<SubscriptionPlan, "id" | "stripe_product_id"> & {
+export type CreateSubscriptionPlanDto = Omit<
+  SubscriptionPlan,
+  "id" | "stripe_product_id"
+> & {
   prices?: PlanPrice[];
   features?: PlanFeature[];
+  effect_config?: PlanEffectConfig;
 };
 
 export type UpdateSubscriptionPlanDto = Partial<CreateSubscriptionPlanDto> & {

@@ -16,7 +16,7 @@ import {
 type VirtualizedTableRowProps<TData> = {
   row: Row<TData>;
   row_virtualizer: Virtualizer<HTMLDivElement, HTMLTableRowElement>;
-  column_virtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  virtual_columns: VirtualItem[];
   virtual_row: VirtualItem;
   virtual_padding_left?: number;
   virtual_padding_right?: number;
@@ -30,7 +30,7 @@ type VirtualizedTableRowProps<TData> = {
 export const VirtualizedTableRow = <TData,>({
   row,
   row_virtualizer,
-  column_virtualizer,
+  virtual_columns,
   virtual_row,
   virtual_padding_left,
   virtual_padding_right,
@@ -42,7 +42,6 @@ export const VirtualizedTableRow = <TData,>({
 }: VirtualizedTableRowProps<TData>) => {
   const visible_cells = row.getVisibleCells();
   const virtualizable_cells = get_virtualizable_cells(visible_cells);
-  const virtual_columns = column_virtualizer.getVirtualItems();
   const select_cell = visible_cells.find(
     (cell) => cell.column.id === SELECT_COLUMN_ID,
   );
@@ -52,7 +51,7 @@ export const VirtualizedTableRow = <TData,>({
       data-index={virtual_row.index}
       ref={(node) => row_virtualizer.measureElement(node)}
       data-state={row.getIsSelected() ? "selected" : undefined}
-      className={cn(virtual_table_row_class, "absolute flex w-full min-w-max")}
+      className={cn(virtual_table_row_class, "absolute flex w-full")}
       style={{
         transform: `translateY(${virtual_row.start}px)`,
       }}

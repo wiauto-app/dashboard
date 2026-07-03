@@ -1,0 +1,40 @@
+---
+description: Preferir interface sobre type en TypeScript
+alwaysApply: true
+---
+
+# Preferir `interface` sobre `type`
+
+Usar **`interface`** para definir la forma de objetos, props de componentes, formularios, respuestas de API y contratos entre capas.
+
+## Reglas
+
+1. **Objetos y contratos** → `interface`
+2. **Unions, primitivos, tuplas, mapped/conditional types** → `type` (cuando `interface` no aplique)
+3. **Extender** → `interface` con `extends`; evitar intersection types (`A & B`) si se puede modelar con herencia
+4. **Props de React** → siempre `interface`
+
+## Ejemplos
+
+```typescript
+// ✅ BIEN
+interface SubscriptionPlanFormProps {
+  planId?: string;
+  onSuccess: () => void;
+}
+
+// ✅ BIEN — type cuando interface no encaja
+type PlanStatus = "active" | "archived";
+
+// ❌ EVITAR — objeto definido con type
+type SubscriptionPlanFormProps = {
+  planId?: string;
+  onSuccess: () => void;
+};
+```
+
+## Excepciones válidas para `type`
+
+- Uniones y literales
+- `Pick`, `Omit`, `Partial`, `Record`, tipos condicionales
+- Funciones como alias: `type Handler = (id: string) => void`

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import type { Table } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -11,6 +11,7 @@ import {
 import { get_virtualizable_headers } from "./virtualizedTableParts";
 import { VirtualizedTableBody } from "./virtualizedTableBody";
 import { VirtualizedTableHead } from "./virtualizedTableHead";
+import { resolve_virtual_column_slice } from "./resolveVirtualColumnSlice";
 
 type VirtualizedTableContainerProps<TData extends object> = {
   table: Table<TData>;
@@ -53,17 +54,12 @@ export const VirtualizedTableContainer = <TData extends object>({
     overscan: COLUMN_OVERSCAN,
   });
 
-  const virtual_columns = column_virtualizer.getVirtualItems();
+  useLayoutEffect(() => {
+    column_virtualizer.measure();
+  }, [column_virtualizer, virtualizable_headers.length]);
 
-  let virtual_padding_left: number | undefined;
-  let virtual_padding_right: number | undefined;
-
-  if (virtual_columns.length > 0) {
-    virtual_padding_left = virtual_columns[0]?.start ?? 0;
-    virtual_padding_right =
-      column_virtualizer.getTotalSize() -
-      (virtual_columns[virtual_columns.length - 1]?.end ?? 0);
-  }
+  const { virtual_columns, virtual_padding_left, virtual_padding_right } =
+    resolve_virtual_column_slice(column_virtualizer, virtualizable_headers.length);
 
   const column_count_with_actions =
     table.getVisibleLeafColumns().length + (show_actions_column ? 1 : 0);
@@ -74,11 +70,11 @@ export const VirtualizedTableContainer = <TData extends object>({
       className="relative w-full overflow-auto rounded-md border text-sm"
       style={{ height }}
     >
-      <table className="grid w-full min-w-max caption-bottom">
+      <table className="grid w-full caption-bottom">
         <VirtualizedTableHead
           table={table}
           path={route.fullPath}
-          column_virtualizer={column_virtualizer}
+          virtual_columns={virtual_columns}
           virtual_padding_left={virtual_padding_left}
           virtual_padding_right={virtual_padding_right}
           has_select_column={has_select_column}
@@ -87,7 +83,7 @@ export const VirtualizedTableContainer = <TData extends object>({
         <VirtualizedTableBody
           table={table}
           table_container_ref={table_container_ref}
-          column_virtualizer={column_virtualizer}
+          virtual_columns={virtual_columns}
           virtual_padding_left={virtual_padding_left}
           virtual_padding_right={virtual_padding_right}
           has_select_column={has_select_column}

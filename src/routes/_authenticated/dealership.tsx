@@ -27,6 +27,7 @@ function RouteComponent() {
 
   return (
     <DynamicTable
+      table_id="dealerships"
       columns={dealershipColumns}
       data={response.data}
       form_size='5xl'

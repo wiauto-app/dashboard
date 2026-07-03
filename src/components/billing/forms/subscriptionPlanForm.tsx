@@ -19,6 +19,10 @@ import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { billingPlansService, type SubscriptionPlan } from "../services/billingPlansService";
 
+const centsToEuros = (amount_cents: number) => amount_cents / 100;
+
+const eurosToCents = (amount_euros: number) => Math.round(amount_euros * 100);
+
 type PlanFormValues = {
   slug: string;
   name: string;
@@ -29,9 +33,11 @@ type PlanFormValues = {
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
+  effect_type: "none" | "assistant_credits" | "feature_vehicle";
+  effect_credits: number;
   prices: Array<{
     interval: "month" | "year" | "one_time";
-    amount_cents: number;
+    amount_euros: number;
     currency: string;
     is_active: boolean;
   }>;
@@ -53,7 +59,9 @@ const default_values: PlanFormValues = {
   is_active: true,
   is_featured: false,
   sort_order: 0,
-  prices: [{ interval: "month", amount_cents: 0, currency: "eur", is_active: true }],
+  effect_type: "none",
+  effect_credits: 100,
+  prices: [{ interval: "month", amount_euros: 0, currency: "eur", is_active: true }],
   features: [{ label: "", description: "", included: true, sort_order: 0 }],
 };
 
@@ -89,11 +97,13 @@ export const SubscriptionPlanForm = () => {
       is_active: plan.is_active,
       is_featured: plan.is_featured,
       sort_order: plan.sort_order,
+      effect_type: plan.effect_config?.type ?? "none",
+      effect_credits: plan.effect_config?.credits ?? 100,
       prices:
         plan.prices?.length
           ? plan.prices.map((price) => ({
               interval: price.interval,
-              amount_cents: price.amount_cents,
+              amount_euros: centsToEuros(price.amount_cents),
               currency: price.currency ?? "eur",
               is_active: price.is_active ?? true,
             }))
@@ -111,12 +121,32 @@ export const SubscriptionPlanForm = () => {
   }, [plan_response, form, selected_id]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
+    const { effect_type, effect_credits, ...rest } = values;
+
+    const effect_config =
+      rest.billing_type === "one_time" && effect_type !== "none"
+        ? effect_type === "assistant_credits"
+          ? {
+              type: "assistant_credits" as const,
+              credits: effect_credits,
+            }
+          : { type: "feature_vehicle" as const }
+        : {};
+
     const payload = {
-      ...values,
-      description: values.description || null,
-      role_id: values.role_id || null,
-      prices: values.prices.filter((price) => price.amount_cents > 0),
-      features: values.features.filter((feature) => feature.label.trim()),
+      ...rest,
+      description: rest.description || null,
+      role_id: rest.role_id || null,
+      effect_config,
+      prices: rest.prices
+        .filter((price) => price.amount_euros > 0)
+        .map((price) => ({
+          interval: price.interval,
+          amount_cents: eurosToCents(price.amount_euros),
+          currency: price.currency || "eur",
+          is_active: price.is_active,
+        })),
+      features: rest.features.filter((feature) => feature.label.trim()),
     };
 
     const response = selected_id
@@ -227,6 +257,40 @@ export const SubscriptionPlanForm = () => {
         </div>
       </div>
 
+      {form.watch("billing_type") === "one_time" ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
+          <Field>
+            <FieldLabel>Tipo de efecto</FieldLabel>
+            <Controller
+              control={form.control}
+              name="effect_type"
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Tipo de efecto" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Ninguno</SelectItem>
+                    <SelectItem value="assistant_credits">Consultas del asistente</SelectItem>
+                    <SelectItem value="feature_vehicle">Destacar vehículo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </Field>
+          {form.watch("effect_type") === "assistant_credits" ? (
+            <Field>
+              <FieldLabel>Consultas incluidas</FieldLabel>
+              <Input
+                type="number"
+                min={1}
+                {...form.register("effect_credits", { valueAsNumber: true, min: 1 })}
+              />
+            </Field>
+          ) : null}
+        </div>
+      ) : null}
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Precios</h3>
@@ -236,7 +300,7 @@ export const SubscriptionPlanForm = () => {
             onClick={() =>
               prices_field.append({
                 interval: "month",
-                amount_cents: 0,
+                amount_euros: 0,
                 currency: "eur",
                 is_active: true,
               })
@@ -246,30 +310,44 @@ export const SubscriptionPlanForm = () => {
           </Button>
         </div>
         {prices_field.fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-2">
-            <Controller
-              control={form.control}
-              name={`prices.${index}.interval`}
-              render={({ field: price_field }) => (
-                <Select value={price_field.value} onValueChange={price_field.onChange}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="month">Mensual</SelectItem>
-                    <SelectItem value="year">Anual</SelectItem>
-                    <SelectItem value="one_time">Único</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <Input
-              type="number"
-              placeholder="Centavos"
-              {...form.register(`prices.${index}.amount_cents`, { valueAsNumber: true })}
-            />
-            <Input placeholder="Moneda" {...form.register(`prices.${index}.currency`)} />
-            <Button type="button" variant="ghost" onClick={() => prices_field.remove(index)}>
-              Quitar
-            </Button>
+          <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2">
+            <Field>
+              <FieldLabel>Intervalo</FieldLabel>
+              <Controller
+                control={form.control}
+                name={`prices.${index}.interval`}
+                render={({ field: price_field }) => (
+                  <Select value={price_field.value} onValueChange={price_field.onChange}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="month">Mensual</SelectItem>
+                      <SelectItem value="year">Anual</SelectItem>
+                      <SelectItem value="one_time">Único</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+            </Field>
+            <Field>
+              <FieldLabel>Precio (€)</FieldLabel>
+              <Input
+                type="number"
+                min={0}
+                step={0.01}
+                placeholder="9,99"
+                {...form.register(`prices.${index}.amount_euros`, {
+                  valueAsNumber: true,
+                  min: 0,
+                })}
+              />
+            </Field>
+            <div className="flex items-end">
+              <Button type="button" variant="ghost" onClick={() => prices_field.remove(index)}>
+                Quitar
+              </Button>
+            </div>
           </div>
         ))}
       </div>

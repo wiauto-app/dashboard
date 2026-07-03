@@ -37,6 +37,8 @@ export const mapAdminVehicleDetailToFormValues = (
       phone_code: detail.phone_code,
       phone: detail.phone,
     },
+    show_phone: detail.show_phone ?? true,
+    has_whatsapp: detail.has_whatsapp ?? false,
     email: detail.email,
     color_id: detail.color_id ?? undefined,
     dgt_label_id: detail.dgt_label_id ?? undefined,

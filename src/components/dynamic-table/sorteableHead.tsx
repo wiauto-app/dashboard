@@ -24,21 +24,29 @@ export const SorteableHead = ({
     handleChange(ORDER_BY_KEY, column);
   };
 
+  const is_active_column = values[ORDER_BY_KEY] === header.column.id;
+  const sort_direction = values[ORDER_DIRECTION_KEY];
+
   return (
     <button
+      type="button"
       onClick={() => handleSort(header.column.id)}
       className="flex items-center gap-1 cursor-pointer"
+      aria-label={
+        is_active_column
+          ? `Ordenar por ${header.column.id}, actualmente ${sort_direction === "DESC" ? "descendente" : "ascendente"}`
+          : `Ordenar por ${header.column.id}`
+      }
     >
       {header.isPlaceholder
         ? null
         : flexRender(header.column.columnDef.header, header.getContext())}
-      {values[ORDER_DIRECTION_KEY] === "DESC" &&
-      values[ORDER_BY_KEY] === header.column.id ? (
-        <ArrowUp className="size-4" />
-
-      ) : (
-        <ArrowDown className="size-4" />
-      )}
+      {is_active_column && sort_direction === "DESC" ? (
+        <ArrowUp className="size-4" aria-hidden />
+      ) : null}
+      {is_active_column && sort_direction === "ASC" ? (
+        <ArrowDown className="size-4" aria-hidden />
+      ) : null}
     </button>
   );
 };

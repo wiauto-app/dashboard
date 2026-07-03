@@ -1,5 +1,5 @@
 import { type HeaderGroup, type Table } from "@tanstack/react-table";
-import type { Virtualizer } from "@tanstack/react-virtual";
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 import { cn } from "@/lib/utils";
 import {
@@ -15,7 +15,7 @@ import { SELECT_COLUMN_ID } from "./constants";
 type VirtualizedTableHeadProps<TData> = {
   table: Table<TData>;
   path: string;
-  column_virtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  virtual_columns: VirtualItem[];
   virtual_padding_left?: number;
   virtual_padding_right?: number;
   has_select_column: boolean;
@@ -25,14 +25,12 @@ type VirtualizedTableHeadProps<TData> = {
 export const VirtualizedTableHead = <TData,>({
   table,
   path,
-  column_virtualizer,
+  virtual_columns,
   virtual_padding_left,
   virtual_padding_right,
   has_select_column,
   show_actions_column,
 }: VirtualizedTableHeadProps<TData>) => {
-  const virtual_columns = column_virtualizer.getVirtualItems();
-
   return (
     <thead className="sticky top-0 z-30 grid border-y bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       {table.getHeaderGroups().map((header_group) => (
@@ -54,9 +52,7 @@ export const VirtualizedTableHead = <TData,>({
 type VirtualizedTableHeadRowProps<TData> = {
   header_group: HeaderGroup<TData>;
   path: string;
-  virtual_columns: ReturnType<
-    Virtualizer<HTMLDivElement, HTMLTableCellElement>["getVirtualItems"]
-  >;
+  virtual_columns: VirtualItem[];
   virtual_padding_left?: number;
   virtual_padding_right?: number;
   has_select_column: boolean;
@@ -78,7 +74,7 @@ const VirtualizedTableHeadRow = <TData,>({
   );
 
   return (
-    <tr className={cn(virtual_table_row_class, "flex w-full min-w-max")}>
+    <tr className={cn(virtual_table_row_class, "flex w-full")}>
       {has_select_column && select_header ? (
         <VirtualizedSelectCell header_or_cell={select_header} as="th" />
       ) : null}

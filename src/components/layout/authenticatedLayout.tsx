@@ -54,7 +54,7 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
       >
         <div className="@container/main flex flex-1 flex-col gap-2 bg-background rounded-3xl">
           <Navbar />
-          <main className=" p-4 lg:p-8 lg:pt-0">{children}</main>
+          <main className=" p-4 lg:p-8 lg:py-10">{children}</main>
         </div>
       </div>
     </ChatSocketProvider>

@@ -14,8 +14,7 @@ export const subscriptionPlanActions = (
     component: (
       <Button
         type="button"
-        variant="ghost"
-        className="w-full justify-start"
+        className="w-fit"
         onClick={async () => {
           const response = await billingPlansService.syncStripe(row.id);
           if (!response.ok) {

@@ -139,6 +139,8 @@ export const vehicleSchema = z.object({
     error: "Selecciona el tipo de publicador.",
   }),
   phone: phoneSchema,
+  show_phone: z.boolean().default(true),
+  has_whatsapp: z.boolean().default(false),
   email: z.email({ error: "Introduce un correo electrónico válido." }),
 
   // --- Relaciones opcionales (IDs) ---

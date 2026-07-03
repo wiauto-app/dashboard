@@ -1,5 +1,5 @@
 import type { Row, Table } from "@tanstack/react-table";
-import { useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
+import { useVirtualizer, type VirtualItem } from "@tanstack/react-virtual";
 
 import { cn } from "@/lib/utils";
 import type { DynamicTableAction } from "../types";
@@ -14,7 +14,7 @@ const is_firefox =
 type VirtualizedTableBodyProps<TData> = {
   table: Table<TData>;
   table_container_ref: React.RefObject<HTMLDivElement | null>;
-  column_virtualizer: Virtualizer<HTMLDivElement, HTMLTableCellElement>;
+  virtual_columns: VirtualItem[];
   virtual_padding_left?: number;
   virtual_padding_right?: number;
   has_select_column: boolean;
@@ -28,7 +28,7 @@ type VirtualizedTableBodyProps<TData> = {
 export const VirtualizedTableBody = <TData,>({
   table,
   table_container_ref,
-  column_virtualizer,
+  virtual_columns,
   virtual_padding_left,
   virtual_padding_right,
   has_select_column,
@@ -83,7 +83,7 @@ export const VirtualizedTableBody = <TData,>({
             key={row.id}
             row={row}
             row_virtualizer={row_virtualizer}
-            column_virtualizer={column_virtualizer}
+            virtual_columns={virtual_columns}
             virtual_row={virtual_row}
             virtual_padding_left={virtual_padding_left}
             virtual_padding_right={virtual_padding_right}
