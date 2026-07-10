@@ -28,6 +28,8 @@ export interface CatalogMakeItem {
   id: number;
   name: string;
   slug: string;
+  image_url?: string | null;
+  created_at?: string;
 }
 
 export interface CatalogVersionItem {

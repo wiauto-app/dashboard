@@ -31,6 +31,7 @@ import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenti
 import { Route as AuthenticatedMunicipalitiesRouteImport } from './routes/_authenticated/municipalities'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedMarcasRouteImport } from './routes/_authenticated/marcas'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
 import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
 import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
@@ -159,6 +160,11 @@ const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   path: '/messages',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMarcasRoute = AuthenticatedMarcasRouteImport.update({
+  id: '/marcas',
+  path: '/marcas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
   id: '/features',
   path: '/features',
@@ -224,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/municipalities': typeof AuthenticatedMunicipalitiesRoute
@@ -256,6 +263,7 @@ export interface FileRoutesByTo {
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/municipalities': typeof AuthenticatedMunicipalitiesRoute
@@ -291,6 +299,7 @@ export interface FileRoutesById {
   '/_authenticated/dealership': typeof AuthenticatedDealershipRoute
   '/_authenticated/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
+  '/_authenticated/marcas': typeof AuthenticatedMarcasRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/municipalities': typeof AuthenticatedMunicipalitiesRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/dealership'
     | '/dgt-labels'
     | '/features'
+    | '/marcas'
     | '/messages'
     | '/moderation'
     | '/municipalities'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/dealership'
     | '/dgt-labels'
     | '/features'
+    | '/marcas'
     | '/messages'
     | '/moderation'
     | '/municipalities'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dealership'
     | '/_authenticated/dgt-labels'
     | '/_authenticated/features'
+    | '/_authenticated/marcas'
     | '/_authenticated/messages'
     | '/_authenticated/moderation'
     | '/_authenticated/municipalities'
@@ -580,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMessagesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/marcas': {
+      id: '/_authenticated/marcas'
+      path: '/marcas'
+      fullPath: '/marcas'
+      preLoaderRoute: typeof AuthenticatedMarcasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/features': {
       id: '/_authenticated/features'
       path: '/features'
@@ -663,6 +682,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDealershipRoute: typeof AuthenticatedDealershipRoute
   AuthenticatedDgtLabelsRoute: typeof AuthenticatedDgtLabelsRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
+  AuthenticatedMarcasRoute: typeof AuthenticatedMarcasRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedMunicipalitiesRoute: typeof AuthenticatedMunicipalitiesRoute
@@ -694,6 +714,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDealershipRoute: AuthenticatedDealershipRoute,
   AuthenticatedDgtLabelsRoute: AuthenticatedDgtLabelsRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
+  AuthenticatedMarcasRoute: AuthenticatedMarcasRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedMunicipalitiesRoute: AuthenticatedMunicipalitiesRoute,

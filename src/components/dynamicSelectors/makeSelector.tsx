@@ -41,7 +41,8 @@ export const MakeSelector = ({
         emptyText="No se encontraron marcas"
         searchFn={searchMakes}
         resolveOption={async (make_id) => {
-          const make = await makesService.findOne(Number(make_id));
+          const response = await makesService.findOne(make_id);
+          const make = response.data;
           return { label: make.name, value: String(make.id) };
         }}
         onChange={(next_value) => onChange?.(next_value)}

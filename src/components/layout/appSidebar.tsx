@@ -69,6 +69,7 @@ const vehicle_admin_children = [
   { to: "/dgt-labels" as const, label: "Etiquetas DGT" },
   { to: "/warranty-types" as const, label: "Tipos de garantía" },
   { to: "/catalog-services" as const, label: "Servicios" },
+  { to: "/marcas" as const, label: "Marcas" },
 ] as const;
 
 const support_admin_children = [

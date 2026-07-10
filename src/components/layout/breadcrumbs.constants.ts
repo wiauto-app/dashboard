@@ -75,6 +75,7 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/dgt-labels": vehicle_admin_trail("Etiquetas DGT", "/dgt-labels"),
   "/warranty-types": vehicle_admin_trail("Tipos de garantía", "/warranty-types"),
   "/catalog-services": vehicle_admin_trail("Servicios", "/catalog-services"),
+  "/marcas": vehicle_admin_trail("Marcas", "/marcas"),
   "/tickets": support_admin_trail("Tickets", "/tickets"),
   "/ticket-categories": support_admin_trail(
     "Categorías de ticket",
