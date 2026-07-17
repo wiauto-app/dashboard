@@ -1,7 +1,10 @@
+import type { AuthProvider } from "./account.types";
+
 export interface AuthUser {
   id: string;
   email: string;
-  provider: string;
+  providers: AuthProvider[];
+  has_password: boolean;
   last_sign_in: string;
   created_at: string;
   name: string;

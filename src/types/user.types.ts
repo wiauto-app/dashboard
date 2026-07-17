@@ -1,9 +1,12 @@
 import type { suspendUserSchema } from "@/validations/resources/suspend-user.schema";
+import type { AuthProvider } from "@/types/account.types";
 import { z } from "zod";
 
 export interface User {
   id: string;
   email: string;
+  providers: AuthProvider[];
+  has_password: boolean;
   last_sign_in: Date;
   is_email_verified: boolean;
   two_factor_enabled: boolean;

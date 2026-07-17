@@ -1,15 +1,13 @@
 import { AuthContext } from "@/context/authContext";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authService } from "@/services/authServices/AuthService";
-import { useNavigate } from "@tanstack/react-router";
 import type { AuthUser } from "@/types/auth.types";
 import { isPasswordRecoveryRoute } from "@/lib/publicAuthRoutes";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const navigate = useNavigate();
   const [user, setUser] = useState<AuthUser | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [isLoginOut, setIsLoginOut] = useState(false);
   useEffect(() => {
     let cancelled = false;
 
@@ -71,10 +69,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const logout = useCallback(async () => {
-    await authService.logout();
-    setUser(undefined);
-    navigate({ to: "/signIn/" });
-  }, [navigate]);
+    try {
+      setIsLoginOut(true);
+      await authService.logout();
+      setUser(undefined);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoginOut(false);
+    }
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -83,8 +87,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       isAuthenticated: Boolean(user?.id),
       refreshUser,
       logout,
+      isLoginOut,
     }),
-    [user, isLoading, refreshUser, logout],
+    [user, isLoading, refreshUser, logout, isLoginOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

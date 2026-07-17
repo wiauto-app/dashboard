@@ -15,18 +15,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { accountService } from "@/services/account/accountService";
-import type { AccountSettings } from "@/types/account.types";
+import type {
+  AccountSettings,
+  AuthProvider,
+} from "@/types/account.types";
 import {
   updateEmailSchema,
   type UpdateEmailSchema,
 } from "@/validations/account/updateEmail.schema";
 
-type EmailSettingsSectionProps = {
+interface EmailSettingsSectionProps {
   account: AccountSettings;
   onUpdated: () => Promise<void>;
-};
+}
 
-const providerLabel: Record<string, string> = {
+const providerLabel: Record<AuthProvider, string> = {
+  local: "Email y contraseña",
   google: "Google",
   apple: "Apple",
 };
@@ -35,7 +39,10 @@ export const EmailSettingsSection = ({
   account,
   onUpdated,
 }: EmailSettingsSectionProps) => {
-  const isLocal = account.provider === "local";
+  const hasPassword = account.has_password;
+  const linkedProviders = account.providers.filter(
+    (provider) => provider !== "local",
+  );
 
   const form = useForm<UpdateEmailSchema>({
     resolver: standardSchemaResolver(updateEmailSchema),
@@ -73,23 +80,39 @@ export const EmailSettingsSection = ({
       <CardHeader>
         <CardTitle>Cuenta</CardTitle>
         <CardDescription>
-          {isLocal
+          {hasPassword
             ? "Correo de acceso y estado de verificación."
-            : "Tu cuenta está vinculada a un proveedor externo."}
+            : "Tu cuenta está vinculada a proveedores externos."}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-4">
-        {!isLocal && (
+        {account.providers.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="secondary">
-              Inicio de sesión con {providerLabel[account.provider] ?? account.provider}
-            </Badge>
-            <span className="text-sm text-muted-foreground">{account.email}</span>
+            {account.providers.map((provider) => (
+              <Badge key={provider} variant="secondary">
+                {providerLabel[provider] ?? provider}
+              </Badge>
+            ))}
+            {!hasPassword && (
+              <span className="text-sm text-muted-foreground">
+                {account.email}
+              </span>
+            )}
           </div>
         )}
 
-        {isLocal && (
+        {linkedProviders.length > 0 && hasPassword && (
+          <p className="text-muted-foreground text-xs">
+            También puedes iniciar sesión con{" "}
+            {linkedProviders
+              .map((provider) => providerLabel[provider] ?? provider)
+              .join(" o ")}
+            .
+          </p>
+        )}
+
+        {hasPassword && (
           <>
             <div className="flex flex-wrap items-center gap-2">
               {account.is_email_verified ? (
@@ -142,7 +165,6 @@ export const EmailSettingsSection = ({
           </>
         )}
       </CardContent>
-
     </Card>
   );
 };

@@ -11,12 +11,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import { SignInFormContent } from "./signInFormContent";
 
-export type SignInDialogProps = {
+interface SignInDialogProps {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   trigger?: React.ReactNode;
   onSuccess?: () => void | Promise<void>;
-};
+}
 
 export const SignInDialog = ({
   open,

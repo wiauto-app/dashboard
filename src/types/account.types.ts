@@ -3,7 +3,8 @@ export type AuthProvider = "local" | "google" | "apple";
 export interface AccountSettings {
   id: string;
   email: string;
-  provider: AuthProvider;
+  providers: AuthProvider[];
+  has_password: boolean;
   name: string;
   last_name: string | null;
   avatar_url: string | null;

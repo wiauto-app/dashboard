@@ -28,9 +28,10 @@ export const usersColumns: DynamicTableColumn[] = [
     sortable: false,
   },
   {
-    header: "Proveedor",
-    accessorKey: "user.provider",
-    type: "text",
+    header: "Proveedores",
+    accessorKey: "user.providers",
+    type: "array",
+    showArrayItems: true,
     sortable: false,
   },
   {

@@ -64,7 +64,7 @@ function ProfileConfigPage() {
     );
   }
 
-  const isLocal = account.provider === "local";
+  const hasPassword = account.has_password;
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 pb-8">
@@ -79,7 +79,7 @@ function ProfileConfigPage() {
 
       <ProfileSettingsSection account={account} onUpdated={handleUpdated} />
       <EmailSettingsSection account={account} onUpdated={handleUpdated} />
-      {isLocal && <PasswordSettingsSection />}
+      {hasPassword && <PasswordSettingsSection />}
       <TwoFactorSettingsSection account={account} onUpdated={handleUpdated} />
       <AccountInfoSection account={account} />
     </div>

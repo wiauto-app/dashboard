@@ -1,6 +1,6 @@
 import loginImage from "@/assets/login-image.webp";
 import { BrandIcon } from "@/assets/brandIcon";
-import { SignInForm } from "@/components/auth/signInForm";
+import { SignInFormContent } from "@/components/auth/signInFormContent";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
@@ -18,7 +18,7 @@ export const Route = createFileRoute("/signIn/")({
 });
 
 function RouteComponent() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, refreshUser } = useAuth();
   const navigate = useNavigate();
   const { password_reset } = Route.useSearch();
   const has_shown_reset_toast = useRef(false);
@@ -39,6 +39,11 @@ function RouteComponent() {
     }
     void navigate({ to: "/", replace: true });
   }, [isAuthenticated, isLoading, navigate]);
+
+  const handleSuccess = async () => {
+    await refreshUser();
+    void navigate({ to: "/" });
+  };
 
   return (
     <div className="flex min-h-svh items-center justify-center bg-muted/30 p-4 sm:p-6 w-full">
@@ -63,7 +68,7 @@ function RouteComponent() {
           </section>
 
           <section className="flex flex-col justify-center bg-card px-8 py-10 sm:px-12 sm:py-14">
-            <SignInForm />
+            <SignInFormContent onSuccess={handleSuccess} />
           </section>
         </div>
       </Card>

@@ -20,13 +20,13 @@ const inputWithIconClassName = "h-11 pl-10 text-base md:text-sm";
 
 type SignInStep = "credentials" | "two_factor";
 
-export type SignInFormContentProps = {
+interface SignInFormContentProps {
   onSuccess: () => void | Promise<void>;
   onGoToRecovery?: () => void;
   showTitle?: boolean;
   className?: string;
   socialLoginSlot?: React.ReactNode;
-};
+}
 
 export const SignInFormContent = ({
   onSuccess,
@@ -86,6 +86,8 @@ export const SignInFormContent = ({
         set_step("two_factor");
         return;
       }
+
+      
 
       await onSuccess();
     } catch (error) {
