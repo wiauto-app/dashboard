@@ -34,9 +34,10 @@ export const authService = {
     return apiPost<{ token: string }>("/auth/admin/refresh", {});
   },
 
-  async requestAdminPasswordRecovery(email: string) {
+  async requestAdminPasswordRecovery(email: string, redirect_url: string) {
     return apiPost<{ message: string }>("/auth/admin/password-recovery/request", {
       email,
+      redirect_url,
     });
   },
 

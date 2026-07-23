@@ -34,7 +34,11 @@ function RouteComponent() {
   const is_submitting = form.formState.isSubmitting;
 
   const handleSubmit = async ({ email }: RecoverPasswordSchema) => {
-    const response = await authService.requestAdminPasswordRecovery(email.trim());
+    const redirect_url = `${window.location.origin}/auth/reset-password`;
+    const response = await authService.requestAdminPasswordRecovery(
+      email.trim(),
+      redirect_url,
+    );
     if (!response.ok) {
       toast.error(response.message || "No se pudo enviar la solicitud");
       return;
