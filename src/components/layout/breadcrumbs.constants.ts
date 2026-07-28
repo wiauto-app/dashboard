@@ -90,4 +90,11 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/communities": locations_admin_trail("Comunidades", "/communities"),
   "/municipalities": locations_admin_trail("Municipios", "/municipalities"),
   "/profile/config": with_home("Configuración", "/profile/config"),
+  "/tasaciones": with_home("Tasaciones", "/tasaciones"),
+  "/plan-lead-requests": with_home(
+    "Solicitudes de planes",
+    "/plan-lead-requests",
+  ),
+  "/subscription-plans": with_home("Planes", "/subscription-plans"),
+  "/messages": with_home("Mensajes", "/messages"),
 };

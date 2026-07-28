@@ -21,6 +21,7 @@ import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedTractionsRouteImport } from './routes/_authenticated/tractions'
 import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
 import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_authenticated/ticket-categories'
+import { Route as AuthenticatedTasacionesRouteImport } from './routes/_authenticated/tasaciones'
 import { Route as AuthenticatedSubscriptionPlansRouteImport } from './routes/_authenticated/subscription-plans'
 import { Route as AuthenticatedRoleRouteImport } from './routes/_authenticated/role'
 import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
@@ -105,6 +106,11 @@ const AuthenticatedTicketCategoriesRoute =
     path: '/ticket-categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTasacionesRoute = AuthenticatedTasacionesRouteImport.update({
+  id: '/tasaciones',
+  path: '/tasaciones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedSubscriptionPlansRoute =
   AuthenticatedSubscriptionPlansRouteImport.update({
     id: '/subscription-plans',
@@ -241,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
   '/subscription-plans': typeof AuthenticatedSubscriptionPlansRoute
+  '/tasaciones': typeof AuthenticatedTasacionesRoute
   '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/tractions': typeof AuthenticatedTractionsRoute
@@ -274,6 +281,7 @@ export interface FileRoutesByTo {
   '/reports': typeof AuthenticatedReportsRoute
   '/role': typeof AuthenticatedRoleRoute
   '/subscription-plans': typeof AuthenticatedSubscriptionPlansRoute
+  '/tasaciones': typeof AuthenticatedTasacionesRoute
   '/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/tickets': typeof AuthenticatedTicketsRoute
   '/tractions': typeof AuthenticatedTractionsRoute
@@ -310,6 +318,7 @@ export interface FileRoutesById {
   '/_authenticated/reports': typeof AuthenticatedReportsRoute
   '/_authenticated/role': typeof AuthenticatedRoleRoute
   '/_authenticated/subscription-plans': typeof AuthenticatedSubscriptionPlansRoute
+  '/_authenticated/tasaciones': typeof AuthenticatedTasacionesRoute
   '/_authenticated/ticket-categories': typeof AuthenticatedTicketCategoriesRoute
   '/_authenticated/tickets': typeof AuthenticatedTicketsRoute
   '/_authenticated/tractions': typeof AuthenticatedTractionsRoute
@@ -347,6 +356,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/role'
     | '/subscription-plans'
+    | '/tasaciones'
     | '/ticket-categories'
     | '/tickets'
     | '/tractions'
@@ -380,6 +390,7 @@ export interface FileRouteTypes {
     | '/reports'
     | '/role'
     | '/subscription-plans'
+    | '/tasaciones'
     | '/ticket-categories'
     | '/tickets'
     | '/tractions'
@@ -415,6 +426,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reports'
     | '/_authenticated/role'
     | '/_authenticated/subscription-plans'
+    | '/_authenticated/tasaciones'
     | '/_authenticated/ticket-categories'
     | '/_authenticated/tickets'
     | '/_authenticated/tractions'
@@ -520,6 +532,13 @@ declare module '@tanstack/react-router' {
       path: '/ticket-categories'
       fullPath: '/ticket-categories'
       preLoaderRoute: typeof AuthenticatedTicketCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tasaciones': {
+      id: '/_authenticated/tasaciones'
+      path: '/tasaciones'
+      fullPath: '/tasaciones'
+      preLoaderRoute: typeof AuthenticatedTasacionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/subscription-plans': {
@@ -693,6 +712,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedReportsRoute: typeof AuthenticatedReportsRoute
   AuthenticatedRoleRoute: typeof AuthenticatedRoleRoute
   AuthenticatedSubscriptionPlansRoute: typeof AuthenticatedSubscriptionPlansRoute
+  AuthenticatedTasacionesRoute: typeof AuthenticatedTasacionesRoute
   AuthenticatedTicketCategoriesRoute: typeof AuthenticatedTicketCategoriesRoute
   AuthenticatedTicketsRoute: typeof AuthenticatedTicketsRoute
   AuthenticatedTractionsRoute: typeof AuthenticatedTractionsRoute
@@ -725,6 +745,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReportsRoute: AuthenticatedReportsRoute,
   AuthenticatedRoleRoute: AuthenticatedRoleRoute,
   AuthenticatedSubscriptionPlansRoute: AuthenticatedSubscriptionPlansRoute,
+  AuthenticatedTasacionesRoute: AuthenticatedTasacionesRoute,
   AuthenticatedTicketCategoriesRoute: AuthenticatedTicketCategoriesRoute,
   AuthenticatedTicketsRoute: AuthenticatedTicketsRoute,
   AuthenticatedTractionsRoute: AuthenticatedTractionsRoute,

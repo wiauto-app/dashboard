@@ -18,6 +18,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
+  Calculator,
   Car,
   ChevronDown,
   ChevronLeft,
@@ -53,6 +54,7 @@ const rest_nav_items = [
   { to: "/role" as const, label: "Roles", icon: UserKey },
   { to: "/subscription-plans" as const, label: "Planes de suscripción", icon: ShieldCheck },
   { to: "/plan-lead-requests" as const, label: "Solicitudes de planes", icon: ShieldCheck },
+  { to: "/tasaciones" as const, label: "Tasaciones", icon: Calculator },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
   // { to: "/moderation" as const, label: "Moderación", icon: ShieldCheck },
   { to: "/about" as const, label: "Acerca", icon: Info },
