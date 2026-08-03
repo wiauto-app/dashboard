@@ -45,7 +45,6 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     resolver: standardSchemaResolver(formSchema),
     defaultValues: {
       name: "",
-      slug: "",
       avatar_url: "",
       banner_url: "",
       description: "",
@@ -76,7 +75,6 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
     form.reset({
       name: dealership.name,
-      slug: dealership.slug,
       avatar_url: dealership.avatar_url ?? "",
       banner_url: dealership.banner_url ?? "",
       description: dealership.description,
@@ -104,7 +102,6 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
   const buildPayload = (formData: FormSchema) => ({
     name: formData.name,
-    slug: formData.slug,
     avatar_url: formData.avatar_url?.trim() ? formData.avatar_url.trim() : null,
     banner_url: formData.banner_url?.trim() ? formData.banner_url.trim() : null,
     description: formData.description,
@@ -181,32 +178,12 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 name="name"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
+                  <Field data-invalid={fieldState.invalid} className="md:col-span-2">
                     <FieldLabel htmlFor="name">Nombre</FieldLabel>
                     <Input
                       id="name"
                       type="text"
                       placeholder="Nombre del concesionario"
-                      aria-invalid={fieldState.invalid}
-                      {...field}
-                    />
-                    {fieldState.error ? (
-                      <FieldError errors={[fieldState.error]} />
-                    ) : null}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="slug"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="slug">Slug</FieldLabel>
-                    <Input
-                      id="slug"
-                      type="text"
-                      placeholder="slug-del-concesionario"
                       aria-invalid={fieldState.invalid}
                       {...field}
                     />

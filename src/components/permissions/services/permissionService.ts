@@ -1,5 +1,9 @@
 import { apiDelete, apiGet, apiPatch, apiPost, type apiResponse } from "@/services/api"
-import type { Permission, PermissionParams } from "../types/permission.type"
+import type {
+  Permission,
+  PermissionCatalogItem,
+  PermissionParams,
+} from "../types/permission.type"
 import { V1_PERMISSIONS } from "./route.constants"
 import type { PaginatedResult } from "@/types/general.types"
 import { objectToQueryString } from "@/lib/utils"
@@ -17,6 +21,12 @@ export interface UpdatePermissionDto {
 }
 
 export const permissionService = {
+  async getCatalog(): Promise<PermissionCatalogItem[]> {
+    const response = await apiGet<PermissionCatalogItem[]>(
+      `${V1_PERMISSIONS}/catalog`,
+    );
+    return response.data ?? [];
+  },
   async findAll(filter?: PermissionParams): Promise<PaginatedResult<Permission>> {
     const queryString = objectToQueryString(filter);
     const response = await apiGet<PaginatedResult<Permission>>(V1_PERMISSIONS + `?${queryString}`)

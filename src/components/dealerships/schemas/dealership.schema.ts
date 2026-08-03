@@ -38,7 +38,6 @@ const validate_members = (data: DealershipFormData, ctx: z.RefinementCtx) => {
 
 const dealership_fields_schema = z.object({
   name: z.string().min(1, { message: "El nombre es obligatorio" }),
-  slug: z.string().min(1, { message: "El slug es obligatorio" }),
   avatar_url: z.string().optional(),
   banner_url: z.string().optional(),
   description: z.string().min(1, { message: "La descripción es obligatoria" }),
