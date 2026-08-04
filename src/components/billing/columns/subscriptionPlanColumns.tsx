@@ -11,13 +11,6 @@ export const subscriptionPlanColumns: DynamicTableColumn[] = [
     modifiable: true,
   },
   {
-    header: "Visibilidad",
-    accessorKey: "visibility_label",
-    type: "badge",
-    sortable: false,
-    modifiable: false,
-  },
-  {
     header: "Audiencia",
     accessorKey: "audience",
     type: "text",

@@ -5,23 +5,23 @@ import type {
   CatalogBodyTypeItem,
   CatalogBodyTypePaginationParams,
 } from "../types/catalog.types";
+import { createCatalogCrudService } from "./catalogCrudService";
 import { V1_CATALOG_BODY_TYPES } from "./route.constants";
 
-type BodyTypeResponse = { body_type: CatalogBodyTypeItem };
+const crud = createCatalogCrudService<CatalogBodyTypeItem>(
+  V1_CATALOG_BODY_TYPES,
+  "body_type",
+);
 
 export const bodyTypesService = {
+  ...crud,
   findAll: async (
-    params: CatalogBodyTypePaginationParams,
+    params: CatalogBodyTypePaginationParams = { page: 1, limit: 10 },
   ): Promise<PaginatedResult<CatalogBodyTypeItem>> => {
     const queryString = objectToQueryString(params);
     const response = await apiGet<PaginatedResult<CatalogBodyTypeItem>>(
       `${V1_CATALOG_BODY_TYPES}${queryString ? `?${queryString}` : ""}`,
     );
     return response.data;
-  },
-
-  findOne: async (id: number): Promise<CatalogBodyTypeItem> => {
-    const response = await apiGet<BodyTypeResponse>(`${V1_CATALOG_BODY_TYPES}/${id}`);
-    return response.data.body_type;
   },
 };

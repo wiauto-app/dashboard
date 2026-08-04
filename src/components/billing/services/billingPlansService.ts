@@ -31,13 +31,6 @@ export interface PlanEffectConfig {
   credits?: number;
 }
 
-export interface PlanQuotas {
-  max_listings: number;
-  max_photos: number;
-  allow_videos: boolean;
-  featured_monthly?: number;
-}
-
 export interface SubscriptionPlan {
   id: string;
   name: string;
@@ -48,15 +41,10 @@ export interface SubscriptionPlan {
   stripe_product_id?: string | null;
   is_active: boolean;
   is_featured: boolean;
-  is_custom: boolean;
-  target_dealership_id?: string | null;
-  quotas: PlanQuotas;
   sort_order: number;
   effect_config?: PlanEffectConfig;
   prices?: PlanPrice[];
   features?: PlanFeature[];
-  /** Etiqueta derivada para el listado (badge). */
-  visibility_label?: "Público" | "Personalizado";
 }
 
 export interface CreateSubscriptionPlanDto {
@@ -67,9 +55,6 @@ export interface CreateSubscriptionPlanDto {
   role_id?: string | null;
   is_active?: boolean;
   is_featured?: boolean;
-  is_custom?: boolean;
-  target_dealership_id?: string | null;
-  quotas?: PlanQuotas;
   sort_order?: number;
   prices?: PlanPrice[];
   features?: PlanFeature[];
@@ -79,27 +64,6 @@ export interface CreateSubscriptionPlanDto {
 export interface UpdateSubscriptionPlanDto extends Partial<CreateSubscriptionPlanDto> {
   id: string;
 }
-
-export interface CheckoutLinkResponse {
-  checkout_url: string;
-  plan_id: string;
-  dealership_id: string;
-  profile_id: string;
-}
-
-export const DEFAULT_PLAN_QUOTAS: PlanQuotas = {
-  max_listings: 50,
-  max_photos: 30,
-  allow_videos: true,
-  featured_monthly: 5,
-};
-
-const with_visibility_label = (plan: SubscriptionPlan): SubscriptionPlan => ({
-  ...plan,
-  is_custom: plan.is_custom ?? false,
-  quotas: plan.quotas ?? DEFAULT_PLAN_QUOTAS,
-  visibility_label: plan.is_custom ? "Personalizado" : "Público",
-});
 
 export const billingPlansService = {
   findAll: async (
@@ -116,19 +80,18 @@ export const billingPlansService = {
     const response = await apiGet<PaginatedResult<SubscriptionPlan>>(
       `${V1_BILLING_PLANS}?${query_string}`,
     );
-    const page = response.data;
-    return {
-      ...page,
-      data: (page?.data ?? []).map(with_visibility_label),
-    };
+    return (
+      response.data ?? {
+        data: [],
+        total: 0,
+        page: merged.page,
+        limit: merged.limit,
+      }
+    );
   },
 
   findOne: async (id: string): Promise<apiResponse<SubscriptionPlan>> => {
-    const response = await apiGet<SubscriptionPlan>(`${V1_BILLING_PLANS}/${id}`);
-    if (response.ok && response.data) {
-      return { ...response, data: with_visibility_label(response.data) };
-    }
-    return response;
+    return apiGet<SubscriptionPlan>(`${V1_BILLING_PLANS}/${id}`);
   },
 
   create: async (
@@ -150,14 +113,5 @@ export const billingPlansService = {
 
   syncStripe: async (id: string): Promise<apiResponse<SubscriptionPlan>> => {
     return apiPost<SubscriptionPlan>(`${V1_BILLING_PLANS}/${id}/sync-stripe`, {});
-  },
-
-  createCheckoutLink: async (
-    id: string,
-  ): Promise<apiResponse<CheckoutLinkResponse>> => {
-    return apiPost<CheckoutLinkResponse>(
-      `${V1_BILLING_PLANS}/${id}/checkout-link`,
-      {},
-    );
   },
 };

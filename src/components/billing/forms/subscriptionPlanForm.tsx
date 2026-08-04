@@ -7,16 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Switch } from "@/components/ui/switch";
 import {
   Select,
-  SelectContent, 
+  SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { RolesSelector } from "@/components/dynamicSelectors/rolesSelector";
-import { DealershipsSelector } from "@/components/dynamicSelectors/dealershipsSelector";
 import { permissionService } from "@/components/permissions/services/permissionService";
 import { rolesService } from "@/components/roles/services/rolesService";
 import { rolesPermissionsService } from "@/components/roles/services/roles-permissionsService";
@@ -24,8 +22,6 @@ import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import {
   billingPlansService,
-  DEFAULT_PLAN_QUOTAS,
-  type PlanQuotas,
   type SubscriptionPlan,
 } from "../services/billingPlansService";
 
@@ -41,12 +37,9 @@ interface PlanFormValues {
   role_id: string;
   is_active: boolean;
   is_featured: boolean;
-  is_custom: boolean;
-  target_dealership_id: string;
   sort_order: number;
   effect_type: "none" | "assistant_credits" | "feature_vehicle";
   effect_credits: number;
-  quotas: PlanQuotas;
   permission_ids: string[];
   prices: Array<{
     interval: "month" | "year" | "one_time";
@@ -70,37 +63,12 @@ const default_values: PlanFormValues = {
   role_id: "",
   is_active: true,
   is_featured: false,
-  is_custom: false,
-  target_dealership_id: "",
   sort_order: 0,
   effect_type: "none",
   effect_credits: 100,
-  quotas: { ...DEFAULT_PLAN_QUOTAS },
   permission_ids: [],
   prices: [{ interval: "month", amount_euros: 0, currency: "eur", is_active: true }],
   features: [{ label: "", description: "", included: true, sort_order: 0 }],
-};
-
-const build_quotas_payload = (quotas: PlanQuotas): PlanQuotas => {
-  const payload: PlanQuotas = {
-    max_listings: Number.isFinite(quotas.max_listings)
-      ? Math.floor(quotas.max_listings)
-      : DEFAULT_PLAN_QUOTAS.max_listings,
-    max_photos: Number.isFinite(quotas.max_photos)
-      ? Math.floor(quotas.max_photos)
-      : DEFAULT_PLAN_QUOTAS.max_photos,
-    allow_videos: !!quotas.allow_videos,
-  };
-
-  if (
-    typeof quotas.featured_monthly === "number" &&
-    Number.isFinite(quotas.featured_monthly) &&
-    quotas.featured_monthly >= 0
-  ) {
-    payload.featured_monthly = Math.floor(quotas.featured_monthly);
-  }
-
-  return payload;
 };
 
 export const SubscriptionPlanForm = () => {
@@ -129,7 +97,6 @@ export const SubscriptionPlanForm = () => {
   const features_field = useFieldArray({ control: form.control, name: "features" });
 
   const role_id = form.watch("role_id");
-  const is_custom = form.watch("is_custom");
 
   const { data: role_response } = useQuery({
     queryKey: ["subscription-plan-role", role_id],
@@ -185,18 +152,9 @@ export const SubscriptionPlanForm = () => {
       role_id: plan.role_id ?? "",
       is_active: plan.is_active,
       is_featured: plan.is_featured,
-      is_custom: plan.is_custom ?? false,
-      target_dealership_id: plan.target_dealership_id ?? "",
       sort_order: plan.sort_order,
       effect_type: plan.effect_config?.type ?? "none",
       effect_credits: plan.effect_config?.credits ?? 100,
-      quotas: {
-        max_listings: plan.quotas?.max_listings ?? DEFAULT_PLAN_QUOTAS.max_listings,
-        max_photos: plan.quotas?.max_photos ?? DEFAULT_PLAN_QUOTAS.max_photos,
-        allow_videos: plan.quotas?.allow_videos ?? DEFAULT_PLAN_QUOTAS.allow_videos,
-        featured_monthly:
-          plan.quotas?.featured_monthly ?? DEFAULT_PLAN_QUOTAS.featured_monthly,
-      },
       permission_ids: [],
       prices:
         plan.prices?.length
@@ -245,11 +203,6 @@ export const SubscriptionPlanForm = () => {
   };
 
   const handleSubmit = form.handleSubmit(async (values) => {
-    if (values.is_custom && !values.target_dealership_id) {
-      toast.error("Selecciona el concesionario objetivo del plan personalizado");
-      return;
-    }
-
     const { effect_type, effect_credits, permission_ids, ...rest } = values;
 
     const effect_config =
@@ -270,11 +223,6 @@ export const SubscriptionPlanForm = () => {
       role_id: rest.role_id || null,
       is_active: rest.is_active,
       is_featured: rest.is_featured,
-      is_custom: rest.is_custom,
-      target_dealership_id: rest.is_custom
-        ? rest.target_dealership_id || null
-        : null,
-      quotas: build_quotas_payload(rest.quotas),
       sort_order: rest.sort_order,
       effect_config,
       prices: rest.prices
@@ -329,28 +277,6 @@ export const SubscriptionPlanForm = () => {
     }
 
     toast.success("Plan sincronizado con Stripe");
-  };
-
-  const handleCopyCheckoutLink = async () => {
-    if (!selected_id) {
-      toast.error("Guarda el plan personalizado antes de copiar el enlace");
-      return;
-    }
-
-    const response = await billingPlansService.createCheckoutLink(selected_id);
-    if (!response.ok || !response.data?.checkout_url) {
-      toast.error(
-        response.message || "No se pudo generar el enlace de suscripción",
-      );
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(response.data.checkout_url);
-      toast.success("Enlace de suscripción copiado");
-    } catch {
-      toast.error("No se pudo copiar el enlace al portapapeles");
-    }
   };
 
   const selected_permission_ids = form.watch("permission_ids") ?? [];
@@ -432,119 +358,6 @@ export const SubscriptionPlanForm = () => {
             />
             Destacado
           </label>
-        </div>
-      </div>
-
-      <div className="space-y-4 rounded-lg border p-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="font-semibold">¿Plan personalizado?</h3>
-            <p className="text-sm text-muted-foreground">
-              Los planes personalizados no aparecen en la landing de /planes.
-              Requieren un concesionario objetivo y un enlace de checkout
-              exclusivo.
-            </p>
-          </div>
-          <Controller
-            control={form.control}
-            name="is_custom"
-            render={({ field }) => (
-              <Switch
-                checked={field.value}
-                onCheckedChange={(checked) => {
-                  field.onChange(!!checked);
-                  if (!checked) {
-                    form.setValue("target_dealership_id", "");
-                  }
-                }}
-                aria-label="Plan personalizado"
-              />
-            )}
-          />
-        </div>
-
-        {is_custom ? (
-          <Field>
-            <FieldLabel>Concesionario objetivo</FieldLabel>
-            <Controller
-              control={form.control}
-              name="target_dealership_id"
-              rules={{
-                validate: (value) =>
-                  !form.getValues("is_custom") || !!value
-                    ? true
-                    : "Selecciona un concesionario",
-              }}
-              render={({ field }) => (
-                <DealershipsSelector
-                  value={field.value || undefined}
-                  onValueChange={(dealership_id) =>
-                    field.onChange(dealership_id ?? "")
-                  }
-                  placeholder="Buscar concesionario por nombre..."
-                />
-              )}
-            />
-            {form.formState.errors.target_dealership_id ? (
-              <FieldError>
-                {form.formState.errors.target_dealership_id.message}
-              </FieldError>
-            ) : null}
-          </Field>
-        ) : null}
-
-        {is_custom && selected_id ? (
-          <Button type="button" variant="outline" onClick={handleCopyCheckoutLink}>
-            Copiar enlace de suscripción
-          </Button>
-        ) : null}
-      </div>
-
-      <div className="space-y-3 rounded-lg border p-4">
-        <div>
-          <h3 className="font-semibold">Cuotas del plan</h3>
-          <p className="text-sm text-muted-foreground">
-            Límites compartidos por el concesionario (o por el perfil si es
-            particular).
-          </p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field>
-            <FieldLabel>Anuncios activos (máx.)</FieldLabel>
-            <Input
-              type="number"
-              min={0}
-              {...form.register("quotas.max_listings", { valueAsNumber: true })}
-            />
-          </Field>
-          <Field>
-            <FieldLabel>Fotos por anuncio (máx.)</FieldLabel>
-            <Input
-              type="number"
-              min={0}
-              {...form.register("quotas.max_photos", { valueAsNumber: true })}
-            />
-          </Field>
-          <Field>
-            <FieldLabel>Destacados al mes (opcional)</FieldLabel>
-            <Input
-              type="number"
-              min={0}
-              {...form.register("quotas.featured_monthly", {
-                valueAsNumber: true,
-              })}
-            />
-          </Field>
-          <div className="flex items-center gap-2 pt-6">
-            <Checkbox
-              checked={form.watch("quotas.allow_videos")}
-              onCheckedChange={(v) => form.setValue("quotas.allow_videos", !!v)}
-              id="allow-videos"
-            />
-            <FieldLabel htmlFor="allow-videos" className="m-0">
-              Permitir vídeos
-            </FieldLabel>
-          </div>
         </div>
       </div>
 

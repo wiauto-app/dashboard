@@ -4,43 +4,10 @@ import { deleteRowAction } from "@/components/dynamic-table/deleteResourceDialog
 import { billingPlansService, type SubscriptionPlan } from "../services/billingPlansService";
 import { Button } from "@/components/ui/button";
 
-const copy_checkout_link = async (plan_id: string) => {
-  const response = await billingPlansService.createCheckoutLink(plan_id);
-  if (!response.ok || !response.data?.checkout_url) {
-    toast.error(response.message || "No se pudo generar el enlace de suscripción");
-    return;
-  }
-
-  try {
-    await navigator.clipboard.writeText(response.data.checkout_url);
-    toast.success("Enlace de suscripción copiado");
-  } catch {
-    toast.error("No se pudo copiar el enlace al portapapeles");
-  }
-};
-
 export const subscriptionPlanActions = (
   row: SubscriptionPlan,
   on_success?: () => void,
 ) => [
-  ...(row.is_custom
-    ? [
-        {
-          key: "copy-checkout-link",
-          label: "Copiar enlace",
-          component: (
-            <Button
-              type="button"
-              className="w-fit"
-              variant="outline"
-              onClick={() => copy_checkout_link(row.id)}
-            >
-              Copiar enlace de suscripción
-            </Button>
-          ),
-        },
-      ]
-    : []),
   {
     key: "sync-stripe",
     label: "Sync Stripe",

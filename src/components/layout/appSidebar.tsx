@@ -53,6 +53,7 @@ const rest_nav_items = [
   { to: "/permissions" as const, label: "Permisos", icon: ShieldCheck },
   { to: "/role" as const, label: "Roles", icon: UserKey },
   { to: "/subscription-plans" as const, label: "Planes de suscripción", icon: ShieldCheck },
+  { to: "/cupones" as const, label: "Cupones", icon: ShieldCheck },
   { to: "/plan-lead-requests" as const, label: "Solicitudes de planes", icon: ShieldCheck },
   { to: "/tasaciones" as const, label: "Tasaciones", icon: Calculator },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
@@ -72,6 +73,11 @@ const vehicle_admin_children = [
   { to: "/warranty-types" as const, label: "Tipos de garantía" },
   { to: "/catalog-services" as const, label: "Servicios" },
   { to: "/marcas" as const, label: "Marcas" },
+  { to: "/modelos" as const, label: "Modelos" },
+  { to: "/versiones" as const, label: "Versiones" },
+  { to: "/anos" as const, label: "Años" },
+  { to: "/combustibles" as const, label: "Combustibles" },
+  { to: "/carrocerias" as const, label: "Carrocerías" },
 ] as const;
 
 const support_admin_children = [

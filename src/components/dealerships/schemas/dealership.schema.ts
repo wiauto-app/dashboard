@@ -49,6 +49,9 @@ const dealership_fields_schema = z.object({
   lat: z.coerce.number().optional(),
   lng: z.coerce.number().optional(),
   is_featured: z.boolean().optional(),
+  max_listings: z.coerce.number().int().min(0).optional(),
+  max_photos: z.coerce.number().int().min(0).optional(),
+  allow_videos: z.boolean().optional(),
   members: z
     .array(dealershipMemberSchema)
     .min(1, { message: "Debe haber al menos un miembro" }),

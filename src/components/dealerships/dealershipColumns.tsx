@@ -20,6 +20,24 @@ export const dealershipColumns: DynamicTableColumn[] = [
     sortable: true,
   },
   {
+    accessorKey: "max_listings",
+    header: "Anuncios máx.",
+    type: "number",
+    sortable: true,
+  },
+  {
+    accessorKey: "max_photos",
+    header: "Fotos máx.",
+    type: "number",
+    sortable: true,
+  },
+  {
+    accessorKey: "allow_videos",
+    header: "Vídeos",
+    type: "boolean",
+    sortable: true,
+  },
+  {
     accessorKey: "rating",
     header: "Valoración",
     type: "number",

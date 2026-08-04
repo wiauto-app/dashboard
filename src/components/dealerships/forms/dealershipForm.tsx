@@ -56,6 +56,9 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       lat: undefined,
       lng: undefined,
       is_featured: false,
+      max_listings: 3,
+      max_photos: 6,
+      allow_videos: false,
       members: [],
     },
   });
@@ -86,6 +89,9 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       lat: dealership.lat,
       lng: dealership.lng,
       is_featured: dealership.is_featured,
+      max_listings: dealership.max_listings ?? 3,
+      max_photos: dealership.max_photos ?? 6,
+      allow_videos: dealership.allow_videos ?? false,
       members: (dealership.members ?? []).map((member) => ({
         profile_id: member.profile_id,
         role: member.role,
@@ -115,6 +121,9 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     lat: formData.lat ?? null,
     lng: formData.lng ?? null,
     is_featured: formData.is_featured ?? false,
+    max_listings: formData.max_listings ?? 3,
+    max_photos: formData.max_photos ?? 6,
+    allow_videos: formData.allow_videos ?? false,
     members: formData.members,
   });
 
@@ -302,6 +311,84 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 </Field>
               )}
             />
+
+            <section className="flex flex-col gap-4 rounded-xl border p-4">
+              <div className="flex flex-col gap-1">
+                <h2 className="text-sm font-semibold">Límites de anuncios</h2>
+                <p className="text-muted-foreground text-sm">
+                  Cuotas compartidas por todos los miembros del concesionario.
+                </p>
+              </div>
+              <div className="grid gap-4 md:grid-cols-3">
+                <Controller
+                  name="max_listings"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="max_listings">
+                        Anuncios activos (máx.)
+                      </FieldLabel>
+                      <Input
+                        id="max_listings"
+                        type="number"
+                        min={0}
+                        aria-invalid={fieldState.invalid}
+                        value={field.value ?? 3}
+                        onChange={(event) =>
+                          field.onChange(Number(event.target.value))
+                        }
+                      />
+                      {fieldState.error ? (
+                        <FieldError errors={[fieldState.error]} />
+                      ) : null}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="max_photos"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor="max_photos">
+                        Fotos por anuncio (máx.)
+                      </FieldLabel>
+                      <Input
+                        id="max_photos"
+                        type="number"
+                        min={0}
+                        aria-invalid={fieldState.invalid}
+                        value={field.value ?? 6}
+                        onChange={(event) =>
+                          field.onChange(Number(event.target.value))
+                        }
+                      />
+                      {fieldState.error ? (
+                        <FieldError errors={[fieldState.error]} />
+                      ) : null}
+                    </Field>
+                  )}
+                />
+                <Controller
+                  name="allow_videos"
+                  control={form.control}
+                  render={({ field }) => (
+                    <Field className="flex items-center gap-3 pt-6">
+                      <Checkbox
+                        id="allow_videos"
+                        checked={field.value ?? false}
+                        onCheckedChange={(checked) =>
+                          field.onChange(checked === true)
+                        }
+                        aria-label="Permitir vídeos en anuncios"
+                      />
+                      <FieldLabel htmlFor="allow_videos" className="m-0">
+                        Permitir vídeos
+                      </FieldLabel>
+                    </Field>
+                  )}
+                />
+              </div>
+            </section>
 
             <Controller
               name="address"

@@ -1,14 +1,22 @@
 import { objectToQueryString } from "@/lib/utils";
 import { apiGet } from "@/services/api";
 import type { PaginatedResult } from "@/types/general.types";
-import type { CatalogVersionItem, CatalogVersionPaginationParams } from "../types/catalog.types";
+import type {
+  CatalogVersionItem,
+  CatalogVersionPaginationParams,
+} from "../types/catalog.types";
+import { createCatalogCrudService } from "./catalogCrudService";
 import { V1_CATALOG_VERSIONS } from "./route.constants";
-
-type VersionResponse = { version: CatalogVersionItem };
 
 const DEFAULT_LIMIT = 100;
 
+const crud = createCatalogCrudService<CatalogVersionItem>(
+  V1_CATALOG_VERSIONS,
+  "version",
+);
+
 export const catalogVersionsService = {
+  ...crud,
   findAll: async (
     params: CatalogVersionPaginationParams = {
       page: 1,
@@ -24,10 +32,5 @@ export const catalogVersionsService = {
       `${V1_CATALOG_VERSIONS}${queryString ? `?${queryString}` : ""}`,
     );
     return response.data;
-  },
-
-  findOne: async (id: number): Promise<CatalogVersionItem> => {
-    const response = await apiGet<VersionResponse>(`${V1_CATALOG_VERSIONS}/${id}`);
-    return response.data.version;
   },
 };

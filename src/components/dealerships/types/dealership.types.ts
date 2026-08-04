@@ -19,6 +19,9 @@ export interface Dealership {
   lng?: number;
   is_featured: boolean;
   rating: number | null;
+  max_listings: number;
+  max_photos: number;
+  allow_videos: boolean;
   created_at: Date;
   updated_at: Date;
   members: DealershipMember[];
@@ -40,6 +43,9 @@ export interface CreateDealershipPayload {
   lat?: number | null;
   lng?: number | null;
   is_featured?: boolean;
+  max_listings?: number;
+  max_photos?: number;
+  allow_videos?: boolean;
   members: DealershipMemberInput[];
 }
 

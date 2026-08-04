@@ -15,6 +15,7 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRecoverPasswordRouteImport } from './routes/auth/recover-password'
 import { Route as AuthenticatedWarrantyTypesRouteImport } from './routes/_authenticated/warranty-types'
+import { Route as AuthenticatedVersionesRouteImport } from './routes/_authenticated/versiones'
 import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
 import { Route as AuthenticatedVehicleTypesRouteImport } from './routes/_authenticated/vehicle-types'
 import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
@@ -31,16 +32,21 @@ import { Route as AuthenticatedPlanLeadRequestsRouteImport } from './routes/_aut
 import { Route as AuthenticatedPermissionsRouteImport } from './routes/_authenticated/permissions'
 import { Route as AuthenticatedMunicipalitiesRouteImport } from './routes/_authenticated/municipalities'
 import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
+import { Route as AuthenticatedModelosRouteImport } from './routes/_authenticated/modelos'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMarcasRouteImport } from './routes/_authenticated/marcas'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
 import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
 import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
+import { Route as AuthenticatedCuponesRouteImport } from './routes/_authenticated/cupones'
 import { Route as AuthenticatedCuotasRouteImport } from './routes/_authenticated/cuotas'
 import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
+import { Route as AuthenticatedCombustiblesRouteImport } from './routes/_authenticated/combustibles'
 import { Route as AuthenticatedColorsRouteImport } from './routes/_authenticated/colors'
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedCatalogServicesRouteImport } from './routes/_authenticated/catalog-services'
+import { Route as AuthenticatedCarroceriasRouteImport } from './routes/_authenticated/carrocerias'
+import { Route as AuthenticatedAnosRouteImport } from './routes/_authenticated/anos'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedProfileConfigRouteImport } from './routes/_authenticated/profile/config'
 
@@ -74,6 +80,11 @@ const AuthenticatedWarrantyTypesRoute =
     path: '/warranty-types',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedVersionesRoute = AuthenticatedVersionesRouteImport.update({
+  id: '/versiones',
+  path: '/versiones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
   id: '/vehicles',
   path: '/vehicles',
@@ -161,6 +172,11 @@ const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
   path: '/moderation',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedModelosRoute = AuthenticatedModelosRouteImport.update({
+  id: '/modelos',
+  path: '/modelos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
@@ -186,6 +202,11 @@ const AuthenticatedDealershipRoute = AuthenticatedDealershipRouteImport.update({
   path: '/dealership',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCuponesRoute = AuthenticatedCuponesRouteImport.update({
+  id: '/cupones',
+  path: '/cupones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedCuotasRoute = AuthenticatedCuotasRouteImport.update({
   id: '/cuotas',
   path: '/cuotas',
@@ -195,6 +216,12 @@ const AuthenticatedCommunitiesRoute =
   AuthenticatedCommunitiesRouteImport.update({
     id: '/communities',
     path: '/communities',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCombustiblesRoute =
+  AuthenticatedCombustiblesRouteImport.update({
+    id: '/combustibles',
+    path: '/combustibles',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedColorsRoute = AuthenticatedColorsRouteImport.update({
@@ -213,6 +240,17 @@ const AuthenticatedCatalogServicesRoute =
     path: '/catalog-services',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedCarroceriasRoute =
+  AuthenticatedCarroceriasRouteImport.update({
+    id: '/carrocerias',
+    path: '/carrocerias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnosRoute = AuthenticatedAnosRouteImport.update({
+  id: '/anos',
+  path: '/anos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -228,16 +266,21 @@ const AuthenticatedProfileConfigRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/about': typeof AuthenticatedAboutRoute
+  '/anos': typeof AuthenticatedAnosRoute
+  '/carrocerias': typeof AuthenticatedCarroceriasRoute
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/colors': typeof AuthenticatedColorsRoute
+  '/combustibles': typeof AuthenticatedCombustiblesRoute
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/cuotas': typeof AuthenticatedCuotasRoute
+  '/cupones': typeof AuthenticatedCuponesRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
   '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/modelos': typeof AuthenticatedModelosRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
@@ -254,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersRoute
   '/vehicle-types': typeof AuthenticatedVehicleTypesRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
+  '/versiones': typeof AuthenticatedVersionesRoute
   '/warranty-types': typeof AuthenticatedWarrantyTypesRoute
   '/auth/recover-password': typeof AuthRecoverPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -262,16 +306,21 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/about': typeof AuthenticatedAboutRoute
+  '/anos': typeof AuthenticatedAnosRoute
+  '/carrocerias': typeof AuthenticatedCarroceriasRoute
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/categories': typeof AuthenticatedCategoriesRoute
   '/colors': typeof AuthenticatedColorsRoute
+  '/combustibles': typeof AuthenticatedCombustiblesRoute
   '/communities': typeof AuthenticatedCommunitiesRoute
   '/cuotas': typeof AuthenticatedCuotasRoute
+  '/cupones': typeof AuthenticatedCuponesRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/features': typeof AuthenticatedFeaturesRoute
   '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
+  '/modelos': typeof AuthenticatedModelosRoute
   '/moderation': typeof AuthenticatedModerationRoute
   '/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/permissions': typeof AuthenticatedPermissionsRoute
@@ -288,6 +337,7 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersRoute
   '/vehicle-types': typeof AuthenticatedVehicleTypesRoute
   '/vehicles': typeof AuthenticatedVehiclesRoute
+  '/versiones': typeof AuthenticatedVersionesRoute
   '/warranty-types': typeof AuthenticatedWarrantyTypesRoute
   '/auth/recover-password': typeof AuthRecoverPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -299,16 +349,21 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/about': typeof AuthenticatedAboutRoute
+  '/_authenticated/anos': typeof AuthenticatedAnosRoute
+  '/_authenticated/carrocerias': typeof AuthenticatedCarroceriasRoute
   '/_authenticated/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
   '/_authenticated/colors': typeof AuthenticatedColorsRoute
+  '/_authenticated/combustibles': typeof AuthenticatedCombustiblesRoute
   '/_authenticated/communities': typeof AuthenticatedCommunitiesRoute
   '/_authenticated/cuotas': typeof AuthenticatedCuotasRoute
+  '/_authenticated/cupones': typeof AuthenticatedCuponesRoute
   '/_authenticated/dealership': typeof AuthenticatedDealershipRoute
   '/_authenticated/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
   '/_authenticated/marcas': typeof AuthenticatedMarcasRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
+  '/_authenticated/modelos': typeof AuthenticatedModelosRoute
   '/_authenticated/moderation': typeof AuthenticatedModerationRoute
   '/_authenticated/municipalities': typeof AuthenticatedMunicipalitiesRoute
   '/_authenticated/permissions': typeof AuthenticatedPermissionsRoute
@@ -325,6 +380,7 @@ export interface FileRoutesById {
   '/_authenticated/users': typeof AuthenticatedUsersRoute
   '/_authenticated/vehicle-types': typeof AuthenticatedVehicleTypesRoute
   '/_authenticated/vehicles': typeof AuthenticatedVehiclesRoute
+  '/_authenticated/versiones': typeof AuthenticatedVersionesRoute
   '/_authenticated/warranty-types': typeof AuthenticatedWarrantyTypesRoute
   '/auth/recover-password': typeof AuthRecoverPasswordRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
@@ -337,16 +393,21 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/anos'
+    | '/carrocerias'
     | '/catalog-services'
     | '/categories'
     | '/colors'
+    | '/combustibles'
     | '/communities'
     | '/cuotas'
+    | '/cupones'
     | '/dealership'
     | '/dgt-labels'
     | '/features'
     | '/marcas'
     | '/messages'
+    | '/modelos'
     | '/moderation'
     | '/municipalities'
     | '/permissions'
@@ -363,6 +424,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/vehicle-types'
     | '/vehicles'
+    | '/versiones'
     | '/warranty-types'
     | '/auth/recover-password'
     | '/auth/reset-password'
@@ -371,16 +433,21 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/about'
+    | '/anos'
+    | '/carrocerias'
     | '/catalog-services'
     | '/categories'
     | '/colors'
+    | '/combustibles'
     | '/communities'
     | '/cuotas'
+    | '/cupones'
     | '/dealership'
     | '/dgt-labels'
     | '/features'
     | '/marcas'
     | '/messages'
+    | '/modelos'
     | '/moderation'
     | '/municipalities'
     | '/permissions'
@@ -397,6 +464,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/vehicle-types'
     | '/vehicles'
+    | '/versiones'
     | '/warranty-types'
     | '/auth/recover-password'
     | '/auth/reset-password'
@@ -407,16 +475,21 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/_authenticated/about'
+    | '/_authenticated/anos'
+    | '/_authenticated/carrocerias'
     | '/_authenticated/catalog-services'
     | '/_authenticated/categories'
     | '/_authenticated/colors'
+    | '/_authenticated/combustibles'
     | '/_authenticated/communities'
     | '/_authenticated/cuotas'
+    | '/_authenticated/cupones'
     | '/_authenticated/dealership'
     | '/_authenticated/dgt-labels'
     | '/_authenticated/features'
     | '/_authenticated/marcas'
     | '/_authenticated/messages'
+    | '/_authenticated/modelos'
     | '/_authenticated/moderation'
     | '/_authenticated/municipalities'
     | '/_authenticated/permissions'
@@ -433,6 +506,7 @@ export interface FileRouteTypes {
     | '/_authenticated/users'
     | '/_authenticated/vehicle-types'
     | '/_authenticated/vehicles'
+    | '/_authenticated/versiones'
     | '/_authenticated/warranty-types'
     | '/auth/recover-password'
     | '/auth/reset-password'
@@ -490,6 +564,13 @@ declare module '@tanstack/react-router' {
       path: '/warranty-types'
       fullPath: '/warranty-types'
       preLoaderRoute: typeof AuthenticatedWarrantyTypesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/versiones': {
+      id: '/_authenticated/versiones'
+      path: '/versiones'
+      fullPath: '/versiones'
+      preLoaderRoute: typeof AuthenticatedVersionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/vehicles': {
@@ -604,6 +685,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedModerationRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/modelos': {
+      id: '/_authenticated/modelos'
+      path: '/modelos'
+      fullPath: '/modelos'
+      preLoaderRoute: typeof AuthenticatedModelosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/messages': {
       id: '/_authenticated/messages'
       path: '/messages'
@@ -639,6 +727,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDealershipRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cupones': {
+      id: '/_authenticated/cupones'
+      path: '/cupones'
+      fullPath: '/cupones'
+      preLoaderRoute: typeof AuthenticatedCuponesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/cuotas': {
       id: '/_authenticated/cuotas'
       path: '/cuotas'
@@ -651,6 +746,13 @@ declare module '@tanstack/react-router' {
       path: '/communities'
       fullPath: '/communities'
       preLoaderRoute: typeof AuthenticatedCommunitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/combustibles': {
+      id: '/_authenticated/combustibles'
+      path: '/combustibles'
+      fullPath: '/combustibles'
+      preLoaderRoute: typeof AuthenticatedCombustiblesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/colors': {
@@ -674,6 +776,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCatalogServicesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/carrocerias': {
+      id: '/_authenticated/carrocerias'
+      path: '/carrocerias'
+      fullPath: '/carrocerias'
+      preLoaderRoute: typeof AuthenticatedCarroceriasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/anos': {
+      id: '/_authenticated/anos'
+      path: '/anos'
+      fullPath: '/anos'
+      preLoaderRoute: typeof AuthenticatedAnosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/about': {
       id: '/_authenticated/about'
       path: '/about'
@@ -693,16 +809,21 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
+  AuthenticatedAnosRoute: typeof AuthenticatedAnosRoute
+  AuthenticatedCarroceriasRoute: typeof AuthenticatedCarroceriasRoute
   AuthenticatedCatalogServicesRoute: typeof AuthenticatedCatalogServicesRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
   AuthenticatedColorsRoute: typeof AuthenticatedColorsRoute
+  AuthenticatedCombustiblesRoute: typeof AuthenticatedCombustiblesRoute
   AuthenticatedCommunitiesRoute: typeof AuthenticatedCommunitiesRoute
   AuthenticatedCuotasRoute: typeof AuthenticatedCuotasRoute
+  AuthenticatedCuponesRoute: typeof AuthenticatedCuponesRoute
   AuthenticatedDealershipRoute: typeof AuthenticatedDealershipRoute
   AuthenticatedDgtLabelsRoute: typeof AuthenticatedDgtLabelsRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
   AuthenticatedMarcasRoute: typeof AuthenticatedMarcasRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
+  AuthenticatedModelosRoute: typeof AuthenticatedModelosRoute
   AuthenticatedModerationRoute: typeof AuthenticatedModerationRoute
   AuthenticatedMunicipalitiesRoute: typeof AuthenticatedMunicipalitiesRoute
   AuthenticatedPermissionsRoute: typeof AuthenticatedPermissionsRoute
@@ -719,6 +840,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersRoute: typeof AuthenticatedUsersRoute
   AuthenticatedVehicleTypesRoute: typeof AuthenticatedVehicleTypesRoute
   AuthenticatedVehiclesRoute: typeof AuthenticatedVehiclesRoute
+  AuthenticatedVersionesRoute: typeof AuthenticatedVersionesRoute
   AuthenticatedWarrantyTypesRoute: typeof AuthenticatedWarrantyTypesRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedProfileConfigRoute: typeof AuthenticatedProfileConfigRoute
@@ -726,16 +848,21 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
+  AuthenticatedAnosRoute: AuthenticatedAnosRoute,
+  AuthenticatedCarroceriasRoute: AuthenticatedCarroceriasRoute,
   AuthenticatedCatalogServicesRoute: AuthenticatedCatalogServicesRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
   AuthenticatedColorsRoute: AuthenticatedColorsRoute,
+  AuthenticatedCombustiblesRoute: AuthenticatedCombustiblesRoute,
   AuthenticatedCommunitiesRoute: AuthenticatedCommunitiesRoute,
   AuthenticatedCuotasRoute: AuthenticatedCuotasRoute,
+  AuthenticatedCuponesRoute: AuthenticatedCuponesRoute,
   AuthenticatedDealershipRoute: AuthenticatedDealershipRoute,
   AuthenticatedDgtLabelsRoute: AuthenticatedDgtLabelsRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
   AuthenticatedMarcasRoute: AuthenticatedMarcasRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
+  AuthenticatedModelosRoute: AuthenticatedModelosRoute,
   AuthenticatedModerationRoute: AuthenticatedModerationRoute,
   AuthenticatedMunicipalitiesRoute: AuthenticatedMunicipalitiesRoute,
   AuthenticatedPermissionsRoute: AuthenticatedPermissionsRoute,
@@ -752,6 +879,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedUsersRoute: AuthenticatedUsersRoute,
   AuthenticatedVehicleTypesRoute: AuthenticatedVehicleTypesRoute,
   AuthenticatedVehiclesRoute: AuthenticatedVehiclesRoute,
+  AuthenticatedVersionesRoute: AuthenticatedVersionesRoute,
   AuthenticatedWarrantyTypesRoute: AuthenticatedWarrantyTypesRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedProfileConfigRoute: AuthenticatedProfileConfigRoute,

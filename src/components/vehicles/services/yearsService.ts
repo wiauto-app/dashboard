@@ -5,23 +5,23 @@ import type {
   CatalogYearItem,
   CatalogYearPaginationParams,
 } from "../types/catalog.types";
+import { createCatalogCrudService } from "./catalogCrudService";
 import { V1_CATALOG_YEARS } from "./route.constants";
 
-type YearResponse = { year: CatalogYearItem };
+const crud = createCatalogCrudService<CatalogYearItem>(
+  V1_CATALOG_YEARS,
+  "year",
+);
 
 export const yearsService = {
+  ...crud,
   findAll: async (
-    params: CatalogYearPaginationParams,
+    params: CatalogYearPaginationParams = { page: 1, limit: 10 },
   ): Promise<PaginatedResult<CatalogYearItem>> => {
     const queryString = objectToQueryString(params);
     const response = await apiGet<PaginatedResult<CatalogYearItem>>(
       `${V1_CATALOG_YEARS}${queryString ? `?${queryString}` : ""}`,
     );
     return response.data;
-  },
-
-  findOne: async (id: number): Promise<CatalogYearItem> => {
-    const response = await apiGet<YearResponse>(`${V1_CATALOG_YEARS}/${id}`);
-    return response.data.year;
   },
 };

@@ -76,6 +76,11 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/warranty-types": vehicle_admin_trail("Tipos de garantía", "/warranty-types"),
   "/catalog-services": vehicle_admin_trail("Servicios", "/catalog-services"),
   "/marcas": vehicle_admin_trail("Marcas", "/marcas"),
+  "/modelos": vehicle_admin_trail("Modelos", "/modelos"),
+  "/versiones": vehicle_admin_trail("Versiones", "/versiones"),
+  "/anos": vehicle_admin_trail("Años", "/anos"),
+  "/combustibles": vehicle_admin_trail("Combustibles", "/combustibles"),
+  "/carrocerias": vehicle_admin_trail("Carrocerías", "/carrocerias"),
   "/tickets": support_admin_trail("Tickets", "/tickets"),
   "/ticket-categories": support_admin_trail(
     "Categorías de ticket",
@@ -96,5 +101,6 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
     "/plan-lead-requests",
   ),
   "/subscription-plans": with_home("Planes", "/subscription-plans"),
+  "/cupones": with_home("Cupones", "/cupones"),
   "/messages": with_home("Mensajes", "/messages"),
 };
