@@ -1,4 +1,3 @@
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -12,6 +11,7 @@ import { ImageInput } from "@/components/ui/imageInput";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { asFormResolver } from "@/lib/asFormResolver";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 
@@ -42,7 +42,7 @@ export const DealershipForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   });
 
   const form = useForm<FormSchema>({
-    resolver: standardSchemaResolver(formSchema),
+    resolver: asFormResolver<FormSchema>(formSchema),
     defaultValues: {
       name: "",
       avatar_url: "",

@@ -4,7 +4,7 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { asFormResolver } from "@/lib/asFormResolver";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -38,7 +38,7 @@ export const ReportCategoryForm = ({
   });
 
   const form = useForm<FormSchema>({
-    resolver: standardSchemaResolver(formSchema),
+    resolver: asFormResolver<FormSchema>(formSchema),
     defaultValues: {
       name: "",
       target_type: "profile" as ReportTargetType,

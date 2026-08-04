@@ -61,7 +61,7 @@ const optional_vehicle_videos_array = z
   .default([]);
 
 const optionalNonNegativeNumber = z.coerce
-  .number({ error: "Introduce un número válido." })
+  .number<number>({ error: "Introduce un número válido." })
   .min(0, { error: "El valor no puede ser negativo." })
   .optional();
 
@@ -87,30 +87,30 @@ export const vehicleSchema = z.object({
     .min(1, { error: "La descripción es obligatoria." })
     .min(10, { error: "La descripción debe tener al menos 10 caracteres." }),
   price: z.coerce
-    .number({ error: "Introduce un precio válido." })
+    .number<number>({ error: "Introduce un precio válido." })
     .min(0, { error: "El precio no puede ser negativo." }),
   mileage: z.coerce
-    .number({ error: "Introduce un kilometraje válido." })
+    .number<number>({ error: "Introduce un kilometraje válido." })
     .min(0, { error: "El kilometraje no puede ser negativo." }),
   condition: z.enum(VEHICLE_CONDITION, {
     error: "Selecciona si el vehículo es nuevo o usado.",
   }),
 
   // --- Ubicación ---
-  lat: z.coerce.number({ error: "Introduce una latitud válida." }),
-  lng: z.coerce.number({ error: "Introduce una longitud válida." }),
+  lat: z.coerce.number<number>({ error: "Introduce una latitud válida." }),
+  lng: z.coerce.number<number>({ error: "Introduce una longitud válida." }),
 
   // --- Catálogo y ficha técnica ---
   version_id: z.coerce
-    .number({ error: "Selecciona una versión del catálogo." })
+    .number<number>({ error: "Selecciona una versión del catálogo." })
     .int({ error: "Selecciona una versión del catálogo." })
     .positive({ error: "Selecciona una versión del catálogo." }),
   /** Solo formulario: precarga la cascada del catálogo al editar. No se envía al API. */
-  catalog_make_id: z.coerce.number().int().positive().optional(),
-  catalog_model_id: z.coerce.number().int().positive().optional(),
-  catalog_body_type_id: z.coerce.number().int().positive().optional(),
-  catalog_fuel_type_id: z.coerce.number().int().positive().optional(),
-  catalog_year_id: z.coerce.number().int().positive().optional(),
+  catalog_make_id: z.coerce.number<number>().int().positive().optional(),
+  catalog_model_id: z.coerce.number<number>().int().positive().optional(),
+  catalog_body_type_id: z.coerce.number<number>().int().positive().optional(),
+  catalog_fuel_type_id: z.coerce.number<number>().int().positive().optional(),
+  catalog_year_id: z.coerce.number<number>().int().positive().optional(),
   /** Solo formulario: reactivar un precio histórico en update. No se envía en create. */
   vehicle_price_id: optionalUuid,
   traction_id: z.uuid({ error: "Selecciona un tipo de tracción." }),
@@ -118,10 +118,10 @@ export const vehicleSchema = z.object({
     error: "Selecciona un tipo de transmisión.",
   }).default("manual"),
   power: z.coerce
-    .number({ error: "Introduce la potencia." })
+    .number<number>({ error: "Introduce la potencia." })
     .optional(),
   displacement: z.coerce
-    .number({ error: "Introduce la cilindrada." }),
+    .number<number>({ error: "Introduce la cilindrada." }),
   autonomy: optionalNonNegativeNumber,
   battery_capacity: optionalNonNegativeNumber,
   time_to_charge: optionalNonNegativeNumber,

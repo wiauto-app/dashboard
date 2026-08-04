@@ -1,5 +1,4 @@
 import { FormProvider, useForm } from "react-hook-form";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import {
   updateVehicleSchema,
   vehicleSchema,
@@ -17,6 +16,7 @@ import { MediaForm } from "./mediaForm";
 import { VehicleSummaryForm } from "./vehicleSummaryForm";
 import { vehiclesService } from "../services/vehiclesService";
 import { toast } from "sonner";
+import { asFormResolver } from "@/lib/asFormResolver";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useQuery } from "@tanstack/react-query";
@@ -39,7 +39,7 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   });
 
   const form = useForm<FormSchema>({
-    resolver: standardSchemaResolver(formSchema),
+    resolver: asFormResolver<FormSchema>(formSchema),
     defaultValues: createVehicleDefaultValues,
   });
 

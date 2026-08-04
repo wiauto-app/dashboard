@@ -1,11 +1,11 @@
 import { Controller, useForm } from "react-hook-form";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { asFormResolver } from "@/lib/asFormResolver";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 
@@ -31,7 +31,9 @@ export const AppraisalRequestForm = ({
   const request = requests.find((item) => item.id === selectedId);
 
   const form = useForm<RespondAppraisalRequestSchema>({
-    resolver: standardSchemaResolver(respondAppraisalRequestSchema),
+    resolver: asFormResolver<RespondAppraisalRequestSchema>(
+      respondAppraisalRequestSchema,
+    ),
     defaultValues: {
       estimated_price_min: request?.estimated_price_min ?? 0,
       estimated_price_max: request?.estimated_price_max ?? 0,

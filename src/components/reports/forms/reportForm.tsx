@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { get_report_target_type_label } from "../constants/report-target-type.constants";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
-import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { asFormResolver } from "@/lib/asFormResolver";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -91,7 +91,7 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   });
 
   const form = useForm<FormSchema>({
-    resolver: standardSchemaResolver(formSchema),
+    resolver: asFormResolver<FormSchema>(formSchema),
     defaultValues: {
       title: "",
       description: "",

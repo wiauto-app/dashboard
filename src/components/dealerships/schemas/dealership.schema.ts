@@ -46,11 +46,11 @@ const dealership_fields_schema = z.object({
   phone_code: z.string().min(1, { message: "El código de país es obligatorio" }),
   phone: z.string().min(1, { message: "El teléfono es obligatorio" }),
   address: z.string().min(1, { message: "La dirección es obligatoria" }),
-  lat: z.coerce.number().optional(),
-  lng: z.coerce.number().optional(),
+  lat: z.coerce.number<number>().optional(),
+  lng: z.coerce.number<number>().optional(),
   is_featured: z.boolean().optional(),
-  max_listings: z.coerce.number().int().min(0).optional(),
-  max_photos: z.coerce.number().int().min(0).optional(),
+  max_listings: z.coerce.number<number>().int().min(0).optional(),
+  max_photos: z.coerce.number<number>().int().min(0).optional(),
   allow_videos: z.boolean().optional(),
   members: z
     .array(dealershipMemberSchema)
