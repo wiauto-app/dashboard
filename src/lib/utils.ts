@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { MINIO_ENDPOINT } from "./media.constants";
+import { MEDIA_URL } from "./media.constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -34,8 +34,16 @@ export const objectToQueryString = (obj?: any) => {
 }
 
 
+/** Prefijo del CDN público (`MEDIA_URL`) + pathname `/{bucket}/{key}` (o sin barra inicial). */
 export const getImageUrl = (fileKey: string) => {
-  return `${MINIO_ENDPOINT}/${fileKey}`;
+  if (!fileKey) return "";
+  if (fileKey.startsWith("http://") || fileKey.startsWith("https://")) {
+    return fileKey;
+  }
+  if (fileKey.startsWith("/")) {
+    return `${MEDIA_URL ?? ""}${fileKey}`;
+  }
+  return `${MEDIA_URL ?? ""}/${fileKey}`;
 };
 
 export const getDirtyValues = (dirtyFields: any, allValues: any): any => {

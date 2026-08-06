@@ -22,7 +22,7 @@ export interface DynamicTableColumn {
   modifiable?: boolean;
   arrayDisplayKey?: string;
   bucketName?: BucketName;
-  /** Prefijo de clave en MinIO para columnas `image` (p. ej. `categories`). */
+  /** Prefijo de clave en object storage para columnas `image` (p. ej. `categories`). */
   image_upload_path?: string;
   /** Ancho en px para virtualización de columnas. */
   size?: number;

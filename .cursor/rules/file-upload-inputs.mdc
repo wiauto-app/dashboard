@@ -1,5 +1,5 @@
 ---
-description: Cuándo usar ImageInput vs FileInput para subidas a MinIO
+description: Cuándo usar ImageInput vs FileInput para subidas a object storage
 globs: src/components/**/*.tsx
 alwaysApply: false
 ---
@@ -31,7 +31,7 @@ El valor guardado en el formulario es la ruta compuesta `bucket/clave-del-objeto
 
 ## Flujo común
 
-Ambos componentes usan `filesService.uploadFile` → URL firmada → MinIO. No pegar URLs manualmente en inputs de texto cuando exista subida al storage del proyecto.
+Ambos componentes usan `filesService.uploadFile` → URL firmada → PUT al host de la URL firmada (API R2). Previews públicas van por `VITE_MEDIA_URL` (`media.wiauto.es`). No pegar URLs manualmente en inputs de texto cuando exista subida al storage del proyecto.
 
 ## Chat y vídeos
 

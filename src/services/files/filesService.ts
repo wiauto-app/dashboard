@@ -202,7 +202,7 @@ export const filesService = {
     return response.data;
   },
 
-  /** URL firmada → PUT a MinIO → cola de transcodificación (respuesta incluye la clave final esperada `.mp4`). */
+  /** URL firmada → PUT al storage (host de la URL firmada) → cola de transcodificación (clave final esperada `.mp4`). */
   async upload_vehicle_video(file: File): Promise<{ path: string | null }> {
     const content_type = normalize_vehicle_video_upload_content_type(file);
     if (!content_type) {

@@ -73,7 +73,6 @@ export const SignInFormContent = ({
     set_isLoading(true);
     try {
       const response = await authService.login(data.email, data.password);
-
       if (!response.ok || response.status === 401) {
         toast.error(response.message || "Credenciales incorrectas");
         return;
