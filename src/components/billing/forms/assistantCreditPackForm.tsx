@@ -43,9 +43,13 @@ export const AssistantCreditPackForm = () => {
   });
 
   useEffect(() => {
+    if (!selected_id) {
+      form.reset(default_values);
+      return;
+    }
+
     const pack = pack_response?.data;
     if (!pack) {
-      form.reset(default_values);
       return;
     }
 
@@ -57,7 +61,7 @@ export const AssistantCreditPackForm = () => {
       is_active: pack.is_active,
       sort_order: pack.sort_order,
     });
-  }, [pack_response, form]);
+  }, [selected_id, pack_response, form]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
     const payload = {

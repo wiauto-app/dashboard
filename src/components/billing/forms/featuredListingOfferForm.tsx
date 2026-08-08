@@ -45,9 +45,13 @@ export const FeaturedListingOfferForm = () => {
   });
 
   useEffect(() => {
+    if (!selected_id) {
+      form.reset(default_values);
+      return;
+    }
+
     const offer = offer_response?.data;
     if (!offer) {
-      form.reset(default_values);
       return;
     }
 
@@ -60,7 +64,7 @@ export const FeaturedListingOfferForm = () => {
       is_active: offer.is_active,
       sort_order: offer.sort_order,
     });
-  }, [offer_response, form]);
+  }, [selected_id, offer_response, form]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
     const payload = {
@@ -98,9 +102,17 @@ export const FeaturedListingOfferForm = () => {
         <FieldLabel htmlFor="offer-title">Título</FieldLabel>
         <Input
           id="offer-title"
-          {...form.register("title", { required: true })}
+          {...form.register("title", {
+            required: "El título es obligatorio",
+            minLength: { value: 1, message: "El título es obligatorio" },
+          })}
           aria-label="Título de la oferta"
         />
+        {form.formState.errors.title ? (
+          <p className="text-xs text-destructive">
+            {form.formState.errors.title.message}
+          </p>
+        ) : null}
       </Field>
       <Field>
         <FieldLabel htmlFor="offer-description">Descripción</FieldLabel>
