@@ -17,6 +17,7 @@ export interface User {
   suspension_reason: string | null;
   suspension_end_time: Date | null;
   created_at: string;
+  is_admin?: boolean;
 }
 
 export type SuspendUserSchema =  z.infer<typeof suspendUserSchema>

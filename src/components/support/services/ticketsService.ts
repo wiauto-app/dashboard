@@ -13,7 +13,7 @@ import type {
   UpdateTicketPayload,
 } from "../types/ticket.types";
 import type { TicketsParams } from "../schemas/tickets-params.schema";
-import { V1_TICKETS } from "./route.constants";
+import { V1_ADMIN_TICKETS, V1_TICKETS } from "./route.constants";
 
 export const ticketsService = {
   findAll: async (
@@ -30,13 +30,13 @@ export const ticketsService = {
     };
     const query_string = objectToQueryString(merged);
     const response = await apiGet<PaginatedResult<TicketListItem>>(
-      `${V1_TICKETS}${query_string ? `?${query_string}` : ""}`,
+      `${V1_ADMIN_TICKETS}${query_string ? `?${query_string}` : ""}`,
     );
     return response.data;
   },
 
   findOne: async (id: string): Promise<apiResponse<TicketListItem>> => {
-    return apiGet<TicketListItem>(`${V1_TICKETS}/${id}`);
+    return apiGet<TicketListItem>(`${V1_ADMIN_TICKETS}/${id}`);
   },
 
   create: async (
@@ -61,10 +61,14 @@ export const ticketsService = {
           }
         : {}),
     };
-    return apiPatch<TicketListItem>(`${V1_TICKETS}/${id}`, body);
+    return apiPatch<TicketListItem>(`${V1_ADMIN_TICKETS}/${id}`, body);
+  },
+
+  ensureChat: async (id: string): Promise<apiResponse<TicketListItem>> => {
+    return apiPost<TicketListItem>(`${V1_ADMIN_TICKETS}/${id}/ensure-chat`, {});
   },
 
   delete: async (id: string): Promise<apiResponse<void>> => {
-    return apiDelete<void>(`${V1_TICKETS}/${id}`);
+    return apiDelete<void>(`${V1_ADMIN_TICKETS}/${id}`);
   },
 };

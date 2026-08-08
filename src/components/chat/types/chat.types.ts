@@ -1,6 +1,7 @@
 export const CHAT_TYPE = {
   INDIVIDUAL: "individual",
   GROUP: "group",
+  SUPPORT: "support",
 } as const;
 
 export type ChatType = (typeof CHAT_TYPE)[keyof typeof CHAT_TYPE];
@@ -43,10 +44,18 @@ export interface ChatParticipantSummary {
   email?: string;
 }
 
+export interface ChatTicketSummary {
+  id: string;
+  title: string;
+  status: import("../../support/types/ticket.types").TicketStatus;
+}
+
 export interface ChatListItem {
   id: string;
   chat_type: ChatType;
   vehicle_id: string | null;
+  ticket_id: string | null;
+  ticket: ChatTicketSummary | null;
   created_at: string;
   updated_at: string;
   other_participants: ChatParticipantSummary[];
@@ -61,6 +70,7 @@ export interface ChatItem {
   participants: string[];
   chat_type: ChatType;
   vehicle_id: string | null;
+  ticket_id?: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -30,9 +30,7 @@ import {
   LogOut,
   MapPin,
   MessageCircle,
-  ShieldCheck,
   Store,
-  UserKey,
   Users,
 } from "lucide-react";
 import { SidebarItem } from "./components/sidebarItem";
@@ -51,8 +49,6 @@ const dashboard_nav_item = {
 const rest_nav_items = [
   { to: "/users" as const, label: "Usuarios", icon: Users },
   { to: "/messages" as const, label: "Mensajes", icon: MessageCircle },
-  { to: "/permissions" as const, label: "Permisos", icon: ShieldCheck },
-  { to: "/role" as const, label: "Roles", icon: UserKey },
   { to: "/tasaciones" as const, label: "Tasaciones", icon: Calculator },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
   // { to: "/moderation" as const, label: "Moderación", icon: ShieldCheck },

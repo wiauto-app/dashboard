@@ -65,9 +65,13 @@ export const ChatList = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2 max-h-[70vh] overflow-y-auto">
+    <div className="flex max-h-[70vh] flex-col gap-2 overflow-y-auto">
       {chats.map((chat) => {
-        const title = formatParticipantNames(chat.other_participants);
+        const is_support =
+          Boolean(chat.ticket_id) || chat.chat_type === "support";
+        const title = is_support
+          ? chat.ticket?.title?.trim() || "Soporte"
+          : formatParticipantNames(chat.other_participants);
         const subtitle =
           chat.last_message_preview?.trim() ||
           chat.other_participants[0]?.email?.trim() ||
@@ -84,31 +88,46 @@ export const ChatList = () => {
               selected_chat_id === chat.id
                 ? "border-primary bg-primary/5"
                 : "hover:bg-muted/50",
-              has_unread && selected_chat_id !== chat.id && "border-primary/30 bg-primary/5",
+              has_unread &&
+                selected_chat_id !== chat.id &&
+                "border-primary/30 bg-primary/5",
             )}
             onClick={() => handleSelectChat(chat.id)}
           >
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <AvatarGroup>
-                {chat.other_participants.map((participant) => (
-                  <Avatar key={participant.id}>
-                    <AvatarImage src={participant.avatar_url} />
-                    <AvatarFallback>
-                      {participant.name?.charAt(0)}
-                    </AvatarFallback>
+                {chat.other_participants.length > 0 ? (
+                  chat.other_participants.map((participant) => (
+                    <Avatar key={participant.id}>
+                      <AvatarImage src={participant.avatar_url} />
+                      <AvatarFallback>
+                        {participant.name?.charAt(0) ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  ))
+                ) : (
+                  <Avatar>
+                    <AvatarFallback>S</AvatarFallback>
                   </Avatar>
-                ))}
+                )}
               </AvatarGroup>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p
-                    className={cn(
-                      "truncate text-sm",
-                      has_unread ? "font-semibold" : "font-medium",
-                    )}
-                  >
-                    {title}
-                  </p>
+                  <div className="flex min-w-0 items-center gap-2">
+                    <p
+                      className={cn(
+                        "truncate text-sm",
+                        has_unread ? "font-semibold" : "font-medium",
+                      )}
+                    >
+                      {title}
+                    </p>
+                    {is_support ? (
+                      <span className="shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-700">
+                        Ticket
+                      </span>
+                    ) : null}
+                  </div>
                   {time_label ? (
                     <span className="shrink-0 text-[10px] text-muted-foreground">
                       {time_label}

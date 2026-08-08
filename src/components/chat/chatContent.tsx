@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Skeleton } from "../ui/skeleton";
 
 import { ChatMessageComposer } from "./chatMessageComposer";
+import { ChatTicketStatusPanel } from "./ChatTicketStatusPanel";
 import { MessageStatusIcon } from "./components/MessageStatusIcon";
 import { useChatSocket } from "./context/chatSocketContext";
 import { chatService } from "./services/chatService";
@@ -204,10 +205,14 @@ export const ChatContent = () => {
   }, [typing_by_chat_id, chat_id, user?.id]);
 
   const header_title = selected_chat
-    ? formatParticipantNames(selected_chat.other_participants)
+    ? selected_chat.ticket?.title?.trim() ||
+      formatParticipantNames(selected_chat.other_participants)
     : "Conversación";
 
   const presence_label = useMemo(() => {
+    if (selected_chat?.ticket) {
+      return "Soporte WiAuto";
+    }
     if (other_participant_ids.length === 0) return null;
     const online_count = other_participant_ids.filter(
       (id) => presence_by_user_id[id] === "online",
@@ -219,7 +224,7 @@ export const ChatContent = () => {
       return `${online_count} en línea`;
     }
     return "Desconectado";
-  }, [other_participant_ids, presence_by_user_id]);
+  }, [other_participant_ids, presence_by_user_id, selected_chat?.ticket]);
 
   if (!chat_id) {
     return (
@@ -232,19 +237,26 @@ export const ChatContent = () => {
 
   return (
     <div className="flex min-h-[60vh] flex-col">
-      <header className="flex items-center gap-3 border-b pb-3">
-        <Avatar className="size-10">
-          <AvatarImage src={selected_chat?.other_participants[0]?.avatar_url} />
-          <AvatarFallback>
-            {selected_chat?.other_participants[0]?.name?.charAt(0) ?? "?"}
-          </AvatarFallback>
-        </Avatar>
-        <div className="min-w-0">
-          <h2 className="truncate text-sm font-semibold">{header_title}</h2>
-          {presence_label ? (
-            <p className="text-xs text-muted-foreground">{presence_label}</p>
-          ) : null}
+      <header className="flex flex-col gap-3 border-b pb-3">
+        <div className="flex items-center gap-3">
+          <Avatar className="size-10">
+            <AvatarImage src={selected_chat?.other_participants[0]?.avatar_url} />
+            <AvatarFallback>
+              {selected_chat?.ticket
+                ? "S"
+                : (selected_chat?.other_participants[0]?.name?.charAt(0) ?? "?")}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-semibold">{header_title}</h2>
+            {presence_label ? (
+              <p className="text-xs text-muted-foreground">{presence_label}</p>
+            ) : null}
+          </div>
         </div>
+        {selected_chat?.ticket ? (
+          <ChatTicketStatusPanel ticket={selected_chat.ticket} />
+        ) : null}
       </header>
 
       <div

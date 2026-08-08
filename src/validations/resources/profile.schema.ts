@@ -10,7 +10,7 @@ export const profileSchema = z.object({
     .string()
     .min(1, { error: "Los apellidos son obligatorios." })
     .max(40, { error: "Los apellidos admiten como máximo 40 caracteres." }),
-  role_id: z.uuid({ error: "Selecciona un rol válido." }),
+  is_admin: z.boolean(),
   avatar_url: z.string().optional(),
   // image_url: z.string().optional(),
 })

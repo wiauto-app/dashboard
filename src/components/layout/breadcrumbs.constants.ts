@@ -60,8 +60,6 @@ const locations_admin_trail = (
 export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
   "/": [{ label: "Dashboard", icon: HomeIcon, href: "/" }],
   "/users": with_home("Usuarios", "/users"),
-  "/permissions": with_home("Permisos", "/permissions"),
-  "/role": with_home("Roles", "/role"),
   "/dealership": with_home("Concesionarios", "/dealership"),
   "/moderation": with_home("Moderación", "/moderation"),
   "/about": with_home("Acerca", "/about"),

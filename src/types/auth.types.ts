@@ -11,6 +11,7 @@ export interface AuthUser {
   last_name: string;
   avatar_url: string;
   type: "session" | "2fa_challenge";
+  isAdmin?: boolean;
 }
 
 export type AdminLoginType = "session" | "2fa_required";

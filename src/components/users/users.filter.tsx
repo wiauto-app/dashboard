@@ -1,5 +1,4 @@
 import { useFiltersManager } from "@/hooks/useFiltersManager";
-import { RolesSelector } from "../dynamicSelectors/rolesSelector";
 import { Input } from "../ui/input";
 import { Controller, useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
@@ -12,7 +11,6 @@ import { Field, FieldError } from "../ui/field";
 
 const SelectedFieldsSchema = userParamsSchema.pick({
   name: true,
-  role_id: true,
 });
 
 type SelectedFields = z.infer<typeof SelectedFieldsSchema>;
@@ -23,21 +21,17 @@ export const UsersFilter = () => {
     resolver: standardSchemaResolver(SelectedFieldsSchema),
     defaultValues: {
       name: values.name ?? "",
-      role_id: values.role_id ?? "",
     },
   });
   const onSubmit = (data: SelectedFields) => {
     handleChange("name", data.name);
-    handleChange("role_id", data.role_id);
 
     setIsOpen(false);
   };
   const handleReset = () => {
-    handleChange("role_id", undefined);
     handleChange("name", undefined);
     form.reset({
       name: "",
-      role_id: "",
     });
     setIsOpen(false);
   };
@@ -57,20 +51,6 @@ export const UsersFilter = () => {
               type="text"
               placeholder="Buscar"
               {...field}
-            />
-            {fieldState.error && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      />
-      <Controller
-        name="role_id"
-        control={form.control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <RolesSelector
-              ariaInvalid={fieldState.invalid}
-              onValueChange={field.onChange}
-              value={field.value ?? null}
             />
             {fieldState.error && <FieldError errors={[fieldState.error]} />}
           </Field>

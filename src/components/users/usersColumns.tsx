@@ -71,9 +71,9 @@ export const usersColumns: DynamicTableColumn[] = [
     sortable: false,
   },
   {
-    header: "Rol",
-    accessorKey: "role.name",
-    type: "badge",
+    header: "Administrador",
+    accessorKey: "user.is_admin",
+    type: "boolean",
     sortable: false,
   },
 ];

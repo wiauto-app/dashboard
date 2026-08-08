@@ -31,7 +31,7 @@ export const userService = {
       email: user.email,
       name: user.name,
       last_name: user.last_name,
-      role_id: user.role_id,
+      is_admin: user.is_admin,
       avatar_url: user.avatar_url,
       ...(user.password ? { password: user.password } : {}),
     };

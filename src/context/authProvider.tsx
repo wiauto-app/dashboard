@@ -4,6 +4,22 @@ import { authService } from "@/services/authServices/AuthService";
 import type { AuthUser } from "@/types/auth.types";
 import { isPasswordRecoveryRoute } from "@/lib/publicAuthRoutes";
 
+const rejectNonAdminSession = async (user: AuthUser | undefined) => {
+  if (!user || user.type !== "session") {
+    return undefined;
+  }
+
+  if (!user.isAdmin) {
+    await authService.logout();
+    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/signIn")) {
+      window.location.href = "/signIn";
+    }
+    return undefined;
+  }
+
+  return user;
+};
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +46,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           response.data?.id &&
           response.data.type === "session"
         ) {
-          setUser(response.data as AuthUser);
+          const sessionUser = await rejectNonAdminSession(response.data);
+          if (cancelled) {
+            return;
+          }
+          setUser(sessionUser);
         } else {
           setUser(undefined);
         }
@@ -59,7 +79,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         response.data?.id &&
         response.data.type === "session"
       ) {
-        setUser(response.data);
+        const sessionUser = await rejectNonAdminSession(response.data);
+        setUser(sessionUser);
       } else {
         setUser(undefined);
       }

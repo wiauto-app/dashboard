@@ -1,6 +1,5 @@
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { RolesSelector } from "../dynamicSelectors/rolesSelector";
 import { Controller, useForm } from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import {
@@ -19,6 +18,7 @@ import { profileSchema } from "@/validations/resources/profile.schema";
 import type z from "zod";
 import { userService } from "@/services/users/userService";
 import { ImageInput } from "../ui/imageInput";
+import { Checkbox } from "../ui/checkbox";
 
 export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
@@ -42,7 +42,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       password: "",
       name: "",
       last_name: "",
-      role_id: "",
+      is_admin: false,
       avatar_url: "",
       // image_url: "",
     },
@@ -55,7 +55,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         name: profile.name,
         last_name: profile.last_name,
         email: profile.user.email,
-        role_id: profile.role?.id,
+        is_admin: profile.user.is_admin === true,
         avatar_url: profile.avatar_url,
         // image_url: profile.image_url,
       });
@@ -69,7 +69,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         email: formData.email,
         name: formData.name,
         last_name: formData.last_name,
-        role_id: formData.role_id,
+        is_admin: formData.is_admin,
         avatar_url: formData.avatar_url,
         ...(dirtyFields.password && formData.password
           ? { password: formData.password }
@@ -92,7 +92,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         password: formData.password,
         name: formData.name,
         last_name: formData.last_name,
-        role_id: formData.role_id,
+        is_admin: formData.is_admin,
         avatar_url: formData.avatar_url,
       });
 
@@ -232,27 +232,31 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         </div>
       </section>
 
-      {/* Permisos */}
+      {/* Acceso admin */}
       <section className="flex flex-col gap-4 rounded-xl border p-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-semibold">Permisos</h2>
+          <h2 className="text-sm font-semibold">Acceso de plataforma</h2>
           <p className="text-muted-foreground text-sm">
-            Rol y nivel de acceso del usuario.
+            Define si el usuario puede acceder al panel de administración.
           </p>
         </div>
 
         <Controller
-          name="role_id"
+          name="is_admin"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Rol</FieldLabel>
-
-              <RolesSelector
-                onValueChange={field.onChange}
-                value={field.value}
-                ariaInvalid={fieldState.invalid}
-              />
+              <label className="flex items-center gap-2">
+                <Checkbox
+                  id="is_admin"
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
+                  aria-invalid={fieldState.invalid}
+                />
+                <FieldLabel htmlFor="is_admin" className="font-normal">
+                  Es administrador
+                </FieldLabel>
+              </label>
 
               {fieldState.error && <FieldError errors={[fieldState.error]} />}
             </Field>

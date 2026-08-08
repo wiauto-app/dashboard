@@ -106,8 +106,6 @@ export interface SubscriptionPlan {
   /** @deprecated */
   audience?: "particular" | "dealership" | "buyer" | null;
   billing_type: "recurring" | "one_time";
-  /** @deprecated */
-  role_id?: string | null;
   stripe_product_id?: string | null;
   is_active: boolean;
   is_featured: boolean;
