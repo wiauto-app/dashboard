@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { featuredListingOffersService } from "../services/featuredListingOffersService";
+import { ControllerInput } from "@/components/ui/controllerInput";
 
 interface OfferFormValues {
   title: string;
@@ -78,7 +79,7 @@ export const FeaturedListingOfferForm = () => {
       sort_order: values.sort_order,
     };
 
-    const response = selected_id
+      const response = selected_id
       ? await featuredListingOffersService.update({
           id: selected_id,
           ...payload,
@@ -99,20 +100,12 @@ export const FeaturedListingOfferForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Field>
-        <FieldLabel htmlFor="offer-title">Título</FieldLabel>
-        <Input
-          id="offer-title"
-          {...form.register("title", {
-            required: "El título es obligatorio",
-            minLength: { value: 1, message: "El título es obligatorio" },
-          })}
-          aria-label="Título de la oferta"
+        <ControllerInput
+          control={form.control}
+          name="title"
+          label="Título"
         />
-        {form.formState.errors.title ? (
-          <p className="text-xs text-destructive">
-            {form.formState.errors.title.message}
-          </p>
-        ) : null}
+      
       </Field>
       <Field>
         <FieldLabel htmlFor="offer-description">Descripción</FieldLabel>
