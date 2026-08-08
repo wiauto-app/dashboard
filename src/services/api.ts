@@ -160,7 +160,7 @@ export const apiGet = async <T>(path: string): Promise<apiResponse<T>> => {
   return fetchWithAuth<T>(path, { method: "GET" })
 }
 
-export const apiPost = async <T>(path: string, body: unknown): Promise<apiResponse<T>> => {
+export const apiPost = async <T>(path: string, body?: unknown): Promise<apiResponse<T>> => {
   return fetchWithAuth<T>(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) })
 }
 
