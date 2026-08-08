@@ -7,7 +7,7 @@ export const VEHICLE_CONDITION_VALUES = ["new", "used"] as const;
 export type VehicleConditionValue = (typeof VEHICLE_CONDITION_VALUES)[number];
 
 export const VEHICLE_PUBLISHER_TYPE_VALUES = [
-  "professional",
+  "dealership",
   "particular",
 ] as const;
 export type VehiclePublisherTypeValue =
@@ -49,7 +49,7 @@ export const VEHICLE_PUBLISHER_TYPE_OPTIONS: {
   value: VehiclePublisherTypeValue;
   label: string;
 }[] = [
-  { value: "professional", label: "Profesional" },
+  { value: "dealership", label: "Concesionaria" },
   { value: "particular", label: "Particular" },
 ];
 

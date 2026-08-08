@@ -11,20 +11,6 @@ export const subscriptionPlanColumns: DynamicTableColumn[] = [
     modifiable: true,
   },
   {
-    header: "Audiencia",
-    accessorKey: "audience",
-    type: "text",
-    sortable: true,
-    modifiable: true,
-  },
-  {
-    header: "Tipo",
-    accessorKey: "billing_type",
-    type: "text",
-    sortable: true,
-    modifiable: true,
-  },
-  {
     header: "Activo",
     accessorKey: "is_active",
     type: "boolean",

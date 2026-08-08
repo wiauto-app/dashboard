@@ -22,6 +22,7 @@ import {
   Car,
   ChevronDown,
   ChevronLeft,
+  CreditCard,
   Flag,
   HomeIcon,
   Info,
@@ -52,13 +53,18 @@ const rest_nav_items = [
   { to: "/messages" as const, label: "Mensajes", icon: MessageCircle },
   { to: "/permissions" as const, label: "Permisos", icon: ShieldCheck },
   { to: "/role" as const, label: "Roles", icon: UserKey },
-  { to: "/subscription-plans" as const, label: "Planes de suscripción", icon: ShieldCheck },
-  { to: "/cupones" as const, label: "Cupones", icon: ShieldCheck },
-  { to: "/plan-lead-requests" as const, label: "Solicitudes de planes", icon: ShieldCheck },
   { to: "/tasaciones" as const, label: "Tasaciones", icon: Calculator },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
   // { to: "/moderation" as const, label: "Moderación", icon: ShieldCheck },
   { to: "/about" as const, label: "Acerca", icon: Info },
+] as const;
+
+const pagos_admin_children = [
+  { to: "/subscription-plans" as const, label: "Planes" },
+  { to: "/assistant-credit-packs" as const, label: "Consultas del asistente" },
+  { to: "/featured-listing-offers" as const, label: "Destacar anuncios" },
+  { to: "/cupones" as const, label: "Cupones" },
+  { to: "/plan-lead-requests" as const, label: "Solicitudes de planes" },
 ] as const;
 
 const vehicle_admin_children = [
@@ -116,6 +122,11 @@ const is_locations_admin_section_active = (pathname: string) =>
 
 const is_reports_admin_section_active = (pathname: string) =>
   reports_admin_children.some(
+    ({ to }) => pathname === to || pathname.startsWith(`${to}/`),
+  );
+
+const is_pagos_admin_section_active = (pathname: string) =>
+  pagos_admin_children.some(
     ({ to }) => pathname === to || pathname.startsWith(`${to}/`),
   );
 
@@ -331,6 +342,57 @@ const ReportsNav = ({ pathname }: { pathname: string }) => {
   );
 };
 
+const PagosNav = ({ pathname }: { pathname: string }) => {
+  const [open, setOpen] = useState(() => is_pagos_admin_section_active(pathname));
+
+  const handleToggle = () => {
+    setOpen((prev) => !prev);
+  };
+
+  const parent_active = is_pagos_admin_section_active(pathname);
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton
+        type="button"
+        onClick={handleToggle}
+        isActive={parent_active}
+        tooltip="Pagos"
+        className="text-white flex items-center gap-2 justify-between"
+        aria-expanded={open}
+        aria-controls="sidebar-pagos-admin-sub"
+      >
+        <div className="flex items-center gap-5">
+          <CreditCard aria-hidden />
+          <span>Pagos</span>
+        </div>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 transition-transform",
+            open && "rotate-180",
+          )}
+          aria-hidden
+        />
+      </SidebarMenuButton>
+      {open ? (
+        <SidebarMenuSub id="sidebar-pagos-admin-sub">
+          {pagos_admin_children.map(({ to, label }) => (
+            <SidebarMenuSubItem key={to}>
+              <SidebarMenuSubButton
+                className="text-white hover:text-muted-foreground data-active:text-black data-active:bg-brand-mist"
+                render={<Link to={to} />}
+                isActive={route_is_active(pathname, to)}
+              >
+                <span>{label}</span>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+          ))}
+        </SidebarMenuSub>
+      ) : null}
+    </SidebarMenuItem>
+  );
+};
+
 export const AppSidebar = ({
   ...props
 }: ComponentProps<typeof Sidebar>) => {
@@ -409,6 +471,14 @@ export const AppSidebar = ({
                   is_reports_admin_section_active(pathname)
                     ? "reports-admin-in"
                     : "reports-admin-out"
+                }
+                pathname={pathname}
+              />
+              <PagosNav
+                key={
+                  is_pagos_admin_section_active(pathname)
+                    ? "pagos-admin-in"
+                    : "pagos-admin-out"
                 }
                 pathname={pathname}
               />

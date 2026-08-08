@@ -101,6 +101,14 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
     "/plan-lead-requests",
   ),
   "/subscription-plans": with_home("Planes", "/subscription-plans"),
+  "/assistant-credit-packs": with_home(
+    "Consultas del asistente",
+    "/assistant-credit-packs",
+  ),
+  "/featured-listing-offers": with_home(
+    "Destacar anuncios",
+    "/featured-listing-offers",
+  ),
   "/cupones": with_home("Cupones", "/cupones"),
   "/messages": with_home("Mensajes", "/messages"),
 };

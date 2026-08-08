@@ -3,11 +3,79 @@ import {
   apiGet,
   apiPatch,
   apiPost,
+  apiPut,
   type apiResponse,
 } from "@/services/api";
 import { objectToQueryString } from "@/lib/utils";
 import type { PaginatedResult, PaginationParams } from "@/types/general.types";
-import { V1_BILLING_PLANS } from "./route.constants";
+import { V1_BILLING_FEATURE_CATALOG, V1_BILLING_PLANS } from "./route.constants";
+
+export type EntitlementValueType = "boolean" | "limit" | "unlimited";
+
+export type PlanVersionStatus = "draft" | "published" | "archived";
+
+export type EntitlementFeature =
+  | "vehicles"
+  | "photos_per_vehicle"
+  | "videos_per_vehicle"
+  | "ai_requests"
+  | "users"
+  | "video_upload"
+  | "ai_generation"
+  | "statistics"
+  | "featured_listings"
+  | "dismissed_vehicles"
+  | "advanced_listing_editor";
+
+export interface EntitlementBooleanValue {
+  bool: boolean;
+}
+
+export interface EntitlementLimitValue {
+  limit: number;
+}
+
+export interface EntitlementUnlimitedValue {
+  unlimited: true;
+}
+
+export type EntitlementValue =
+  | EntitlementBooleanValue
+  | EntitlementLimitValue
+  | EntitlementUnlimitedValue;
+
+export interface PlanEntitlementInput {
+  feature: EntitlementFeature | string;
+  value_type: EntitlementValueType;
+  value: EntitlementValue;
+}
+
+export interface FeatureCatalogItem {
+  feature: EntitlementFeature | string;
+  value_type: EntitlementValueType;
+  label: string;
+  description: string;
+  metered: boolean;
+}
+
+export interface PlanEntitlement {
+  id?: string;
+  plan_version_id?: string;
+  feature: string;
+  value_type: EntitlementValueType;
+  value: EntitlementValue;
+}
+
+export interface PlanVersion {
+  id: string;
+  plan_id: string;
+  version: number;
+  status: PlanVersionStatus;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  entitlements?: PlanEntitlement[];
+}
 
 export interface PlanPrice {
   id?: string;
@@ -35,8 +103,10 @@ export interface SubscriptionPlan {
   id: string;
   name: string;
   description?: string | null;
-  audience: "particular" | "professional" | "buyer";
+  /** @deprecated */
+  audience?: "particular" | "dealership" | "buyer" | null;
   billing_type: "recurring" | "one_time";
+  /** @deprecated */
   role_id?: string | null;
   stripe_product_id?: string | null;
   is_active: boolean;
@@ -50,9 +120,7 @@ export interface SubscriptionPlan {
 export interface CreateSubscriptionPlanDto {
   name: string;
   description?: string | null;
-  audience: SubscriptionPlan["audience"];
   billing_type: SubscriptionPlan["billing_type"];
-  role_id?: string | null;
   is_active?: boolean;
   is_featured?: boolean;
   sort_order?: number;
@@ -63,6 +131,10 @@ export interface CreateSubscriptionPlanDto {
 
 export interface UpdateSubscriptionPlanDto extends Partial<CreateSubscriptionPlanDto> {
   id: string;
+}
+
+export interface ReplaceDraftEntitlementsDto {
+  entitlements: PlanEntitlementInput[];
 }
 
 export const billingPlansService = {
@@ -113,5 +185,32 @@ export const billingPlansService = {
 
   syncStripe: async (id: string): Promise<apiResponse<SubscriptionPlan>> => {
     return apiPost<SubscriptionPlan>(`${V1_BILLING_PLANS}/${id}/sync-stripe`, {});
+  },
+
+  getFeatureCatalog: async (): Promise<FeatureCatalogItem[]> => {
+    const response = await apiGet<FeatureCatalogItem[]>(V1_BILLING_FEATURE_CATALOG);
+    return response.data ?? [];
+  },
+
+  listVersions: async (planId: string): Promise<apiResponse<PlanVersion[]>> => {
+    return apiGet<PlanVersion[]>(`${V1_BILLING_PLANS}/${planId}/versions`);
+  },
+
+  ensureDraft: async (planId: string): Promise<apiResponse<PlanVersion>> => {
+    return apiPost<PlanVersion>(`${V1_BILLING_PLANS}/${planId}/versions/draft`, {});
+  },
+
+  replaceDraftEntitlements: async (
+    planId: string,
+    entitlements: PlanEntitlementInput[],
+  ): Promise<apiResponse<PlanVersion>> => {
+    return apiPut<PlanVersion>(
+      `${V1_BILLING_PLANS}/${planId}/versions/draft/entitlements`,
+      { entitlements } satisfies ReplaceDraftEntitlementsDto,
+    );
+  },
+
+  publishPlan: async (planId: string): Promise<apiResponse<PlanVersion>> => {
+    return apiPost<PlanVersion>(`${V1_BILLING_PLANS}/${planId}/publish`, {});
   },
 };

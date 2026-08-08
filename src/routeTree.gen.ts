@@ -36,6 +36,7 @@ import { Route as AuthenticatedModelosRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMarcasRouteImport } from './routes/_authenticated/marcas'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
+import { Route as AuthenticatedFeaturedListingOffersRouteImport } from './routes/_authenticated/featured-listing-offers'
 import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
 import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
 import { Route as AuthenticatedCuponesRouteImport } from './routes/_authenticated/cupones'
@@ -46,6 +47,7 @@ import { Route as AuthenticatedColorsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
 import { Route as AuthenticatedCatalogServicesRouteImport } from './routes/_authenticated/catalog-services'
 import { Route as AuthenticatedCarroceriasRouteImport } from './routes/_authenticated/carrocerias'
+import { Route as AuthenticatedAssistantCreditPacksRouteImport } from './routes/_authenticated/assistant-credit-packs'
 import { Route as AuthenticatedAnosRouteImport } from './routes/_authenticated/anos'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedProfileConfigRouteImport } from './routes/_authenticated/profile/config'
@@ -192,6 +194,12 @@ const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
   path: '/features',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFeaturedListingOffersRoute =
+  AuthenticatedFeaturedListingOffersRouteImport.update({
+    id: '/featured-listing-offers',
+    path: '/featured-listing-offers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDgtLabelsRoute = AuthenticatedDgtLabelsRouteImport.update({
   id: '/dgt-labels',
   path: '/dgt-labels',
@@ -246,6 +254,12 @@ const AuthenticatedCarroceriasRoute =
     path: '/carrocerias',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAssistantCreditPacksRoute =
+  AuthenticatedAssistantCreditPacksRouteImport.update({
+    id: '/assistant-credit-packs',
+    path: '/assistant-credit-packs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnosRoute = AuthenticatedAnosRouteImport.update({
   id: '/anos',
   path: '/anos',
@@ -267,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/about': typeof AuthenticatedAboutRoute
   '/anos': typeof AuthenticatedAnosRoute
+  '/assistant-credit-packs': typeof AuthenticatedAssistantCreditPacksRoute
   '/carrocerias': typeof AuthenticatedCarroceriasRoute
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/categories': typeof AuthenticatedCategoriesRoute
@@ -277,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/cupones': typeof AuthenticatedCuponesRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
+  '/featured-listing-offers': typeof AuthenticatedFeaturedListingOffersRoute
   '/features': typeof AuthenticatedFeaturesRoute
   '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -307,6 +323,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/about': typeof AuthenticatedAboutRoute
   '/anos': typeof AuthenticatedAnosRoute
+  '/assistant-credit-packs': typeof AuthenticatedAssistantCreditPacksRoute
   '/carrocerias': typeof AuthenticatedCarroceriasRoute
   '/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/categories': typeof AuthenticatedCategoriesRoute
@@ -317,6 +334,7 @@ export interface FileRoutesByTo {
   '/cupones': typeof AuthenticatedCuponesRoute
   '/dealership': typeof AuthenticatedDealershipRoute
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
+  '/featured-listing-offers': typeof AuthenticatedFeaturedListingOffersRoute
   '/features': typeof AuthenticatedFeaturesRoute
   '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
@@ -350,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/anos': typeof AuthenticatedAnosRoute
+  '/_authenticated/assistant-credit-packs': typeof AuthenticatedAssistantCreditPacksRoute
   '/_authenticated/carrocerias': typeof AuthenticatedCarroceriasRoute
   '/_authenticated/catalog-services': typeof AuthenticatedCatalogServicesRoute
   '/_authenticated/categories': typeof AuthenticatedCategoriesRoute
@@ -360,6 +379,7 @@ export interface FileRoutesById {
   '/_authenticated/cupones': typeof AuthenticatedCuponesRoute
   '/_authenticated/dealership': typeof AuthenticatedDealershipRoute
   '/_authenticated/dgt-labels': typeof AuthenticatedDgtLabelsRoute
+  '/_authenticated/featured-listing-offers': typeof AuthenticatedFeaturedListingOffersRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
   '/_authenticated/marcas': typeof AuthenticatedMarcasRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
@@ -394,6 +414,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/anos'
+    | '/assistant-credit-packs'
     | '/carrocerias'
     | '/catalog-services'
     | '/categories'
@@ -404,6 +425,7 @@ export interface FileRouteTypes {
     | '/cupones'
     | '/dealership'
     | '/dgt-labels'
+    | '/featured-listing-offers'
     | '/features'
     | '/marcas'
     | '/messages'
@@ -434,6 +456,7 @@ export interface FileRouteTypes {
   to:
     | '/about'
     | '/anos'
+    | '/assistant-credit-packs'
     | '/carrocerias'
     | '/catalog-services'
     | '/categories'
@@ -444,6 +467,7 @@ export interface FileRouteTypes {
     | '/cupones'
     | '/dealership'
     | '/dgt-labels'
+    | '/featured-listing-offers'
     | '/features'
     | '/marcas'
     | '/messages'
@@ -476,6 +500,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/_authenticated/about'
     | '/_authenticated/anos'
+    | '/_authenticated/assistant-credit-packs'
     | '/_authenticated/carrocerias'
     | '/_authenticated/catalog-services'
     | '/_authenticated/categories'
@@ -486,6 +511,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cupones'
     | '/_authenticated/dealership'
     | '/_authenticated/dgt-labels'
+    | '/_authenticated/featured-listing-offers'
     | '/_authenticated/features'
     | '/_authenticated/marcas'
     | '/_authenticated/messages'
@@ -713,6 +739,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFeaturesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/featured-listing-offers': {
+      id: '/_authenticated/featured-listing-offers'
+      path: '/featured-listing-offers'
+      fullPath: '/featured-listing-offers'
+      preLoaderRoute: typeof AuthenticatedFeaturedListingOffersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dgt-labels': {
       id: '/_authenticated/dgt-labels'
       path: '/dgt-labels'
@@ -783,6 +816,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCarroceriasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/assistant-credit-packs': {
+      id: '/_authenticated/assistant-credit-packs'
+      path: '/assistant-credit-packs'
+      fullPath: '/assistant-credit-packs'
+      preLoaderRoute: typeof AuthenticatedAssistantCreditPacksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/anos': {
       id: '/_authenticated/anos'
       path: '/anos'
@@ -810,6 +850,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedAnosRoute: typeof AuthenticatedAnosRoute
+  AuthenticatedAssistantCreditPacksRoute: typeof AuthenticatedAssistantCreditPacksRoute
   AuthenticatedCarroceriasRoute: typeof AuthenticatedCarroceriasRoute
   AuthenticatedCatalogServicesRoute: typeof AuthenticatedCatalogServicesRoute
   AuthenticatedCategoriesRoute: typeof AuthenticatedCategoriesRoute
@@ -820,6 +861,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedCuponesRoute: typeof AuthenticatedCuponesRoute
   AuthenticatedDealershipRoute: typeof AuthenticatedDealershipRoute
   AuthenticatedDgtLabelsRoute: typeof AuthenticatedDgtLabelsRoute
+  AuthenticatedFeaturedListingOffersRoute: typeof AuthenticatedFeaturedListingOffersRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
   AuthenticatedMarcasRoute: typeof AuthenticatedMarcasRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
@@ -849,6 +891,8 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedAnosRoute: AuthenticatedAnosRoute,
+  AuthenticatedAssistantCreditPacksRoute:
+    AuthenticatedAssistantCreditPacksRoute,
   AuthenticatedCarroceriasRoute: AuthenticatedCarroceriasRoute,
   AuthenticatedCatalogServicesRoute: AuthenticatedCatalogServicesRoute,
   AuthenticatedCategoriesRoute: AuthenticatedCategoriesRoute,
@@ -859,6 +903,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedCuponesRoute: AuthenticatedCuponesRoute,
   AuthenticatedDealershipRoute: AuthenticatedDealershipRoute,
   AuthenticatedDgtLabelsRoute: AuthenticatedDgtLabelsRoute,
+  AuthenticatedFeaturedListingOffersRoute:
+    AuthenticatedFeaturedListingOffersRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
   AuthenticatedMarcasRoute: AuthenticatedMarcasRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,

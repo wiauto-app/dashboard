@@ -25,6 +25,20 @@ export const planLeadRequestColumns: DynamicTableColumn[] = [
     modifiable: false,
   },
   {
+    header: "Vehículos",
+    accessorKey: "cars_quantity",
+    type: "badge",
+    sortable: true,
+    modifiable: false,
+  },
+  {
+    header: "Estado",
+    accessorKey: "status_label",
+    type: "badge",
+    sortable: false,
+    modifiable: false,
+  },
+  {
     header: "Mensaje",
     accessorKey: "message",
     type: "text",

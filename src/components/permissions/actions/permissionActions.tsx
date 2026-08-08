@@ -12,7 +12,5 @@ export const permissionActions = (
     description: "¿Estás seguro de querer eliminar este permiso?",
     successToast: "Permiso eliminado correctamente",
     errorToast: "Error al eliminar el permiso",
-    undo_pending_message:
-      "El permiso se eliminará en unos segundos. Pulsa Deshacer para cancelar.",
   }),
 ];

@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { deleteRowAction } from "@/components/dynamic-table/deleteResourceDialog";
 import { billingPlansService, type SubscriptionPlan } from "../services/billingPlansService";
 import { Button } from "@/components/ui/button";
+import CustomAlertDialog from "@/components/ui/customAlertDialog";
 
 export const subscriptionPlanActions = (
   row: SubscriptionPlan,
@@ -27,6 +28,32 @@ export const subscriptionPlanActions = (
       >
         Sincronizar con Stripe
       </Button>
+    ),
+  },
+  {
+    key: "publish-version",
+    label: "Publicar versión",
+    component: (
+      <CustomAlertDialog
+        title="Publicar versión del plan"
+        description={`Se publicará la versión borrador de «${row.name}». Las suscripciones nuevas usarán estas capacidades.`}
+        confirmText="Publicar"
+        confirmVariant="default"
+        onConfirm={async () => {
+          const response = await billingPlansService.publishPlan(row.id);
+          if (!response.ok) {
+            toast.error(response.message || "No se pudo publicar la versión");
+            return;
+          }
+          toast.success("Versión publicada");
+          on_success?.();
+        }}
+        trigger={
+          <Button type="button" className="w-fit" variant="secondary">
+            Publicar versión
+          </Button>
+        }
+      />
     ),
   },
   deleteRowAction(row.id, on_success, {

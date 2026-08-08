@@ -1,12 +1,20 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import {
+  ChevronDown,
+  CreditCard,
+  Layers,
+  Sparkles,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -14,16 +22,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RolesSelector } from "@/components/dynamicSelectors/rolesSelector";
-import { permissionService } from "@/components/permissions/services/permissionService";
-import { rolesService } from "@/components/roles/services/rolesService";
-import { rolesPermissionsService } from "@/components/roles/services/roles-permissionsService";
+import { cn } from "@/lib/utils";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import {
   billingPlansService,
   type SubscriptionPlan,
 } from "../services/billingPlansService";
+import {
+  PlanEntitlementsFields,
+  buildDefaultEntitlementsState,
+  entitlementsStateToPayload,
+  type EntitlementsFormState,
+} from "./planEntitlementsFields";
+import { Textarea } from "@/components/ui/textarea";
 
 const centsToEuros = (amount_cents: number) => amount_cents / 100;
 
@@ -32,15 +44,9 @@ const eurosToCents = (amount_euros: number) => Math.round(amount_euros * 100);
 interface PlanFormValues {
   name: string;
   description: string;
-  audience: "particular" | "professional" | "buyer";
-  billing_type: "recurring" | "one_time";
-  role_id: string;
   is_active: boolean;
   is_featured: boolean;
   sort_order: number;
-  effect_type: "none" | "assistant_credits" | "feature_vehicle";
-  effect_credits: number;
-  permission_ids: string[];
   prices: Array<{
     interval: "month" | "year" | "one_time";
     amount_euros: number;
@@ -55,20 +61,63 @@ interface PlanFormValues {
   }>;
 }
 
+interface PlanSectionProps {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  className?: string;
+  action?: React.ReactNode;
+}
+
+const PlanSection = ({
+  title,
+  description,
+  children,
+  className,
+  action,
+}: PlanSectionProps) => (
+  <section
+    className={cn(
+      "space-y-4 rounded-xl border bg-muted/30 p-4 md:p-5",
+      className,
+    )}
+  >
+    <div className="flex items-start justify-between gap-3">
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          {description}
+        </p>
+      </div>
+      {action}
+    </div>
+    {children}
+  </section>
+);
+
 const default_values: PlanFormValues = {
   name: "",
   description: "",
-  audience: "particular",
-  billing_type: "recurring",
-  role_id: "",
   is_active: true,
   is_featured: false,
   sort_order: 0,
-  effect_type: "none",
-  effect_credits: 100,
-  permission_ids: [],
   prices: [{ interval: "month", amount_euros: 0, currency: "eur", is_active: true }],
   features: [{ label: "", description: "", included: true, sort_order: 0 }],
+};
+
+const formatPublishedAt = (value: string | null | undefined) => {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new Intl.DateTimeFormat("es-ES", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(new Date(value));
+  } catch {
+    return value;
+  }
 };
 
 export const SubscriptionPlanForm = () => {
@@ -82,80 +131,53 @@ export const SubscriptionPlanForm = () => {
     enabled: !!selected_id,
   });
 
-  const { data: catalog = [] } = useQuery({
-    queryKey: ["permissions-catalog"],
-    queryFn: () => permissionService.getCatalog(),
+  const { data: feature_catalog = [] } = useQuery({
+    queryKey: ["billing-feature-catalog"],
+    queryFn: () => billingPlansService.getFeatureCatalog(),
   });
 
-  const { data: permissions_page } = useQuery({
-    queryKey: ["permissions", "catalog-ids"],
-    queryFn: () => permissionService.findAll({ page: 1, limit: 100 }),
+  const { data: versions_response, refetch: refetch_versions } = useQuery({
+    queryKey: ["subscription-plan-versions", selected_id],
+    queryFn: () => billingPlansService.listVersions(selected_id ?? ""),
+    enabled: !!selected_id,
   });
 
   const form = useForm<PlanFormValues>({ defaultValues: default_values });
   const prices_field = useFieldArray({ control: form.control, name: "prices" });
   const features_field = useFieldArray({ control: form.control, name: "features" });
+  const [entitlements_state, set_entitlements_state] =
+    useState<EntitlementsFormState>({});
+  const [marketing_open, set_marketing_open] = useState(false);
+  const [is_saving, set_is_saving] = useState(false);
+  const [is_publishing, set_is_publishing] = useState(false);
+  const [is_syncing, set_is_syncing] = useState(false);
 
-  const role_id = form.watch("role_id");
-
-  const { data: role_response } = useQuery({
-    queryKey: ["subscription-plan-role", role_id],
-    queryFn: () => rolesService.findOne(role_id),
-    enabled: !!role_id,
-  });
-
-  const key_to_permission_id = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const permission of permissions_page?.data ?? []) {
-      map.set(permission.key, permission.id);
-    }
-    return map;
-  }, [permissions_page?.data]);
-
-  const catalog_with_ids = useMemo(
-    () =>
-      catalog
-        .map((item) => ({
-          ...item,
-          id: key_to_permission_id.get(item.key),
-        }))
-        .filter((item): item is typeof item & { id: string } => !!item.id),
-    [catalog, key_to_permission_id],
+  const versions = versions_response?.data ?? [];
+  const draft_version = versions.find((version) => version.status === "draft");
+  const published_version = versions.find(
+    (version) => version.status === "published",
   );
-
-  const grouped_catalog = useMemo(() => {
-    return catalog_with_ids.reduce(
-      (acc: Record<string, typeof catalog_with_ids>, item) => {
-        const [module_name] = item.key.split(".");
-        if (!acc[module_name]) {
-          acc[module_name] = [];
-        }
-        acc[module_name].push(item);
-        return acc;
-      },
-      {},
-    );
-  }, [catalog_with_ids]);
+  const published_at_label = formatPublishedAt(published_version?.published_at);
 
   useEffect(() => {
     const plan = plan_response?.data as SubscriptionPlan | undefined;
     if (!plan) {
       form.reset(default_values);
+      set_marketing_open(false);
       return;
     }
+
+    const has_marketing = Boolean(
+      plan.features?.some((feature) => feature.label.trim()),
+    );
+    set_marketing_open(has_marketing);
 
     form.reset({
       name: plan.name,
       description: plan.description ?? "",
-      audience: plan.audience,
-      billing_type: plan.billing_type,
-      role_id: plan.role_id ?? "",
       is_active: plan.is_active,
       is_featured: plan.is_featured,
       sort_order: plan.sort_order,
-      effect_type: plan.effect_config?.type ?? "none",
-      effect_credits: plan.effect_config?.credits ?? 100,
-      permission_ids: [],
       prices:
         plan.prices?.length
           ? plan.prices.map((price) => ({
@@ -178,54 +200,29 @@ export const SubscriptionPlanForm = () => {
   }, [plan_response, form, selected_id]);
 
   useEffect(() => {
-    if (!role_id) {
-      form.setValue("permission_ids", []);
+    if (feature_catalog.length === 0) {
       return;
     }
 
-    const permission_ids =
-      role_response?.data?.roles_permissions?.map(
-        (role_permission) => role_permission.permission_id,
-      ) ?? [];
-    form.setValue("permission_ids", permission_ids);
-  }, [role_id, role_response, form]);
+    const versions = versions_response?.data ?? [];
+    const draft = versions.find((version) => version.status === "draft");
+    const published = versions.find((version) => version.status === "published");
+    const source = draft ?? published;
 
-  const handleTogglePermission = (permission_id: string) => {
-    const current = form.getValues("permission_ids") ?? [];
-    if (current.includes(permission_id)) {
-      form.setValue(
-        "permission_ids",
-        current.filter((id) => id !== permission_id),
-      );
-      return;
-    }
-    form.setValue("permission_ids", [...current, permission_id]);
-  };
+    set_entitlements_state(
+      buildDefaultEntitlementsState(feature_catalog, source?.entitlements),
+    );
+  }, [feature_catalog, versions_response, selected_id]);
 
-  const handleSubmit = form.handleSubmit(async (values) => {
-    const { effect_type, effect_credits, permission_ids, ...rest } = values;
-
-    const effect_config =
-      rest.billing_type === "one_time" && effect_type !== "none"
-        ? effect_type === "assistant_credits"
-          ? {
-              type: "assistant_credits" as const,
-              credits: effect_credits,
-            }
-          : { type: "feature_vehicle" as const }
-        : {};
-
-    const payload = {
-      name: rest.name,
-      description: rest.description || null,
-      audience: rest.audience,
-      billing_type: rest.billing_type,
-      role_id: rest.role_id || null,
-      is_active: rest.is_active,
-      is_featured: rest.is_featured,
-      sort_order: rest.sort_order,
-      effect_config,
-      prices: rest.prices
+  const buildPayload = (values: PlanFormValues) => {
+    return {
+      name: values.name,
+      description: values.description || null,
+      billing_type: "recurring" as const,
+      is_active: values.is_active,
+      is_featured: values.is_featured,
+      sort_order: values.sort_order,
+      prices: values.prices
         .filter((price) => price.amount_euros > 0)
         .map((price) => ({
           interval: price.interval,
@@ -233,36 +230,152 @@ export const SubscriptionPlanForm = () => {
           currency: price.currency || "eur",
           is_active: price.is_active,
         })),
-      features: rest.features.filter((feature) => feature.label.trim()),
+      features: values.features.filter((feature) => feature.label.trim()),
     };
+  };
 
-    const response = selected_id
-      ? await billingPlansService.update({ id: selected_id, ...payload })
-      : await billingPlansService.create(payload);
+  const handleSaveEntitlements = async (plan_id: string) => {
+    if (feature_catalog.length === 0) {
+      return true;
+    }
 
-    if (!response.ok) {
-      toast.error(response.message || "Error al guardar el plan");
+    const draft_response = await billingPlansService.ensureDraft(plan_id);
+    if (!draft_response.ok) {
+      toast.error(
+        draft_response.message ||
+          "El plan se guardó, pero no se pudo crear la versión borrador",
+      );
+      return false;
+    }
+
+    const entitlements = entitlementsStateToPayload(
+      feature_catalog,
+      entitlements_state,
+    );
+    const entitlements_response =
+      await billingPlansService.replaceDraftEntitlements(plan_id, entitlements);
+
+    if (!entitlements_response.ok) {
+      toast.error(
+        entitlements_response.message ||
+          "El plan se guardó, pero no se pudieron guardar las capacidades",
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const handlePublish = async (plan_id: string) => {
+    set_is_publishing(true);
+    try {
+      const entitlements_ok = await handleSaveEntitlements(plan_id);
+      if (!entitlements_ok) {
+        return false;
+      }
+
+      const publish_response = await billingPlansService.publishPlan(plan_id);
+      if (!publish_response.ok) {
+        toast.error(publish_response.message || "No se pudo publicar la versión");
+        return false;
+      }
+
+      toast.success("Versión publicada");
+      await refetch_versions();
+      return true;
+    } finally {
+      set_is_publishing(false);
+    }
+  };
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    set_is_saving(true);
+    try {
+      const payload = buildPayload(values);
+      const response = selected_id
+        ? await billingPlansService.update({ id: selected_id, ...payload })
+        : await billingPlansService.create(payload);
+
+      if (!response.ok) {
+        toast.error(response.message || "Error al guardar el plan");
+        return;
+      }
+
+      const plan_id = response.data?.id ?? selected_id;
+      if (!plan_id) {
+        toast.error("No se pudo obtener el identificador del plan");
+        return;
+      }
+
+      const entitlements_ok = await handleSaveEntitlements(plan_id);
+      if (!entitlements_ok) {
+        return;
+      }
+
+      toast.success(selected_id ? "Plan actualizado" : "Plan creado");
+      set_is_open(false);
+      set_selected_id(null);
+      window.location.reload();
+    } finally {
+      set_is_saving(false);
+    }
+  });
+
+  const handleSaveAndPublish = form.handleSubmit(async (values) => {
+    set_is_saving(true);
+    try {
+      const payload = buildPayload(values);
+      const response = selected_id
+        ? await billingPlansService.update({ id: selected_id, ...payload })
+        : await billingPlansService.create(payload);
+
+      if (!response.ok) {
+        toast.error(response.message || "Error al guardar el plan");
+        return;
+      }
+
+      const plan_id = response.data?.id ?? selected_id;
+      if (!plan_id) {
+        toast.error("No se pudo obtener el identificador del plan");
+        return;
+      }
+
+      const published = await handlePublish(plan_id);
+      if (!published) {
+        return;
+      }
+
+      toast.success(
+        selected_id
+          ? "Plan actualizado y versión publicada"
+          : "Plan creado y versión publicada",
+      );
+      set_is_open(false);
+      set_selected_id(null);
+      window.location.reload();
+    } finally {
+      set_is_saving(false);
+    }
+  });
+
+  const handleSaveEntitlementsOnly = async () => {
+    if (!selected_id) {
+      toast.error("Guarda el plan antes de guardar solo las capacidades");
       return;
     }
 
-    if (rest.role_id) {
-      const sync_response = await rolesPermissionsService.syncPermissions({
-        role_id: rest.role_id,
-        permission_ids: permission_ids ?? [],
-      });
-      if (!sync_response.ok) {
-        toast.error(
-          sync_response.message ||
-            "El plan se guardó, pero no se pudieron sincronizar los permisos del rol",
-        );
+    set_is_saving(true);
+    try {
+      const ok = await handleSaveEntitlements(selected_id);
+      if (!ok) {
+        return;
       }
+      toast.success("Capacidades guardadas en borrador");
+      await refetch_versions();
+    } finally {
+      set_is_saving(false);
     }
-
-    toast.success(selected_id ? "Plan actualizado" : "Plan creado");
-    set_is_open(false);
-    set_selected_id(null);
-    window.location.reload();
-  });
+  };
 
   const handleSyncStripe = async () => {
     if (!selected_id) {
@@ -270,295 +383,316 @@ export const SubscriptionPlanForm = () => {
       return;
     }
 
-    const response = await billingPlansService.syncStripe(selected_id);
-    if (!response.ok) {
-      toast.error(response.message || "Error al sincronizar con Stripe");
-      return;
+    set_is_syncing(true);
+    try {
+      const response = await billingPlansService.syncStripe(selected_id);
+      if (!response.ok) {
+        toast.error(response.message || "Error al sincronizar con Stripe");
+        return;
+      }
+      toast.success("Plan sincronizado con Stripe");
+    } finally {
+      set_is_syncing(false);
     }
-
-    toast.success("Plan sincronizado con Stripe");
   };
 
-  const selected_permission_ids = form.watch("permission_ids") ?? [];
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-h-[80vh] overflow-y-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field className="md:col-span-2">
-          <FieldLabel>Nombre</FieldLabel>
-          <Input {...form.register("name", { required: true })} />
-        </Field>
-        <Field className="md:col-span-2">
-          <FieldLabel>Descripción</FieldLabel>
-          <Input {...form.register("description")} />
-        </Field>
-        <Field>
-          <FieldLabel>Audiencia</FieldLabel>
-          <Controller
-            control={form.control}
-            name="audience"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Audiencia" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="particular">Particular</SelectItem>
-                  <SelectItem value="professional">Profesional</SelectItem>
-                  <SelectItem value="buyer">Comprador</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </Field>
-        <Field>
-          <FieldLabel>Tipo de cobro</FieldLabel>
-          <Controller
-            control={form.control}
-            name="billing_type"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recurring">Recurrente</SelectItem>
-                  <SelectItem value="one_time">Pago único</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </Field>
-        <Field className="md:col-span-2">
-          <FieldLabel>Rol asociado</FieldLabel>
-          <Controller
-            control={form.control}
-            name="role_id"
-            render={({ field }) => (
-              <RolesSelector value={field.value} onValueChange={field.onChange} />
-            )}
-          />
-        </Field>
-        <Field>
-          <FieldLabel>Orden</FieldLabel>
-          <Input type="number" {...form.register("sort_order", { valueAsNumber: true })} />
-        </Field>
-        <div className="flex items-center gap-6 pt-6">
-          <label className="flex items-center gap-2">
-            <Checkbox
-              checked={form.watch("is_active")}
-              onCheckedChange={(v) => form.setValue("is_active", !!v)}
-            />
-            Activo
-          </label>
-          <label className="flex items-center gap-2">
-            <Checkbox
-              checked={form.watch("is_featured")}
-              onCheckedChange={(v) => form.setValue("is_featured", !!v)}
-            />
-            Destacado
-          </label>
-        </div>
-      </div>
-
-      <div className="space-y-3 rounded-lg border p-4">
-        <div>
-          <h3 className="font-semibold">Permisos del rol</h3>
-          <p className="text-sm text-muted-foreground">
-            Solo capacidades del catálogo fijo. Los cambios se aplican al rol
-            asociado al guardar el plan.
-          </p>
-        </div>
-        {!role_id ? (
-          <p className="text-sm text-muted-foreground">
-            Selecciona un rol para asignar permisos del catálogo.
-          </p>
-        ) : (
-          <div className="max-h-70 space-y-4 overflow-y-auto">
-            {Object.entries(grouped_catalog).map(([module_name, items]) => (
-              <div key={module_name} className="rounded-lg border">
-                <div className="border-b px-3 py-2">
-                  <h4 className="text-sm font-medium capitalize">{module_name}</h4>
+    <form
+      onSubmit={handleSubmit}
+      className="flex max-h-[80vh] flex-col gap-0 overflow-hidden"
+    >
+      <div className="flex-1 space-y-5 overflow-y-auto pr-1 pb-4">
+        <div className="grid gap-5 lg:grid-cols-2">
+          <PlanSection
+            title="Identidad y visibilidad"
+            description="Nombre, descripción y cómo aparece el plan en el catálogo."
+          >
+            <div className="grid gap-3">
+              <Field>
+                <FieldLabel>Nombre</FieldLabel>
+                <Input
+                  {...form.register("name", { required: true })}
+                  placeholder="Plan Profesional"
+                  aria-label="Nombre del plan"
+                />
+              </Field>
+              <Field>
+                <FieldLabel>Descripción</FieldLabel>
+                <Textarea
+                  {...form.register("description")}
+                  placeholder="Resumen corto para el catálogo"
+                  aria-label="Descripción del plan"
+                />
+              </Field>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Field>
+                  <FieldLabel>Orden</FieldLabel>
+                  <Input
+                    type="number"
+                    {...form.register("sort_order", { valueAsNumber: true })}
+                    aria-label="Orden de visualización"
+                  />
+                </Field>
+                <div className="flex flex-col justify-end gap-3 rounded-lg border bg-background px-3 py-2">
+                  <label className="flex items-center justify-between gap-3">
+                    <span className="text-sm">Activo</span>
+                    <Switch
+                      checked={form.watch("is_active")}
+                      onCheckedChange={(checked) =>
+                        form.setValue("is_active", !!checked)
+                      }
+                      aria-label="Plan activo"
+                    />
+                  </label>
+                  <label className="flex items-center justify-between gap-3">
+                    <span className="text-sm">Destacado</span>
+                    <Switch
+                      checked={form.watch("is_featured")}
+                      onCheckedChange={(checked) =>
+                        form.setValue("is_featured", !!checked)
+                      }
+                      aria-label="Plan destacado"
+                    />
+                  </label>
                 </div>
-                <div className="grid gap-2 p-3 md:grid-cols-2">
-                  {items.map((item) => {
-                    const checked = selected_permission_ids.includes(item.id);
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => handleTogglePermission(item.id)}
-                        className={`flex items-start gap-3 rounded-lg border p-3 text-left transition hover:bg-muted/50 ${
-                          checked ? "border-primary bg-primary/5" : ""
-                        }`}
-                        aria-pressed={checked}
-                        aria-label={item.name}
+              </div>
+            </div>
+          </PlanSection>
+        </div>
+
+        <PlanSection
+          title="Precios"
+          description="Importes en euros. Sincroniza con Stripe cuando el plan ya exista."
+          action={
+            selected_id ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleSyncStripe}
+                disabled={is_syncing}
+                aria-label="Sincronizar con Stripe"
+              >
+                <CreditCard className="size-3.5" />
+                {is_syncing ? "Sincronizando…" : "Sync Stripe"}
+              </Button>
+            ) : null
+          }
+        >
+          <div className="space-y-3">
+            {prices_field.fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="grid grid-cols-1 gap-2 rounded-lg border bg-background p-3 md:grid-cols-[1fr_1fr_auto]"
+              >
+                <Field>
+                  <FieldLabel>Intervalo</FieldLabel>
+                  <Controller
+                    control={form.control}
+                    name={`prices.${index}.interval`}
+                    render={({ field: price_field }) => (
+                      <Select
+                        value={price_field.value}
+                        onValueChange={price_field.onChange}
                       >
-                        <Checkbox checked={checked} tabIndex={-1} />
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium">{item.name}</p>
-                          <p className="truncate text-xs text-muted-foreground">
-                            {item.description || item.key}
-                          </p>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        <SelectTrigger className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="month">Mensual</SelectItem>
+                          <SelectItem value="year">Anual</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel>Precio (€)</FieldLabel>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    placeholder="9,99"
+                    {...form.register(`prices.${index}.amount_euros`, {
+                      valueAsNumber: true,
+                      min: 0,
+                    })}
+                    aria-label={`Precio ${index + 1}`}
+                  />
+                </Field>
+                <div className="flex items-end">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => prices_field.remove(index)}
+                    aria-label={`Quitar precio ${index + 1}`}
+                  >
+                    Quitar
+                  </Button>
                 </div>
               </div>
             ))}
-            {catalog_with_ids.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No hay permisos del catálogo sincronizados en la base de datos.
-                Ejecuta la sincronización del catálogo en Permisos.
-              </p>
-            ) : null}
-          </div>
-        )}
-      </div>
-
-      {form.watch("billing_type") === "one_time" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-lg border p-4">
-          <Field>
-            <FieldLabel>Tipo de efecto</FieldLabel>
-            <Controller
-              control={form.control}
-              name="effect_type"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Tipo de efecto" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Ninguno</SelectItem>
-                    <SelectItem value="assistant_credits">Consultas del asistente</SelectItem>
-                    <SelectItem value="feature_vehicle">Destacar vehículo</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-          </Field>
-          {form.watch("effect_type") === "assistant_credits" ? (
-            <Field>
-              <FieldLabel>Consultas incluidas</FieldLabel>
-              <Input
-                type="number"
-                min={1}
-                {...form.register("effect_credits", { valueAsNumber: true, min: 1 })}
-              />
-            </Field>
-          ) : null}
-        </div>
-      ) : null}
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Precios</h3>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() =>
-              prices_field.append({
-                interval: "month",
-                amount_euros: 0,
-                currency: "eur",
-                is_active: true,
-              })
-            }
-          >
-            Añadir precio
-          </Button>
-        </div>
-        {prices_field.fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-2">
-            <Field>
-              <FieldLabel>Intervalo</FieldLabel>
-              <Controller
-                control={form.control}
-                name={`prices.${index}.interval`}
-                render={({ field: price_field }) => (
-                  <Select value={price_field.value} onValueChange={price_field.onChange}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="month">Mensual</SelectItem>
-                      <SelectItem value="year">Anual</SelectItem>
-                      <SelectItem value="one_time">Único</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-              />
-            </Field>
-            <Field>
-              <FieldLabel>Precio (€)</FieldLabel>
-              <Input
-                type="number"
-                min={0}
-                step={0.01}
-                placeholder="9,99"
-                {...form.register(`prices.${index}.amount_euros`, {
-                  valueAsNumber: true,
-                  min: 0,
-                })}
-              />
-            </Field>
-            <div className="flex items-end">
-              <Button type="button" variant="ghost" onClick={() => prices_field.remove(index)}>
-                Quitar
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Características</h3>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() =>
-              features_field.append({
-                label: "",
-                description: "",
-                included: true,
-                sort_order: features_field.fields.length,
-              })
-            }
-          >
-            Añadir característica
-          </Button>
-        </div>
-        {features_field.fields.map((field, index) => (
-          <div key={field.id} className="grid grid-cols-1 md:grid-cols-4 gap-2">
-            <Input placeholder="Etiqueta" {...form.register(`features.${index}.label`)} />
-            <Input placeholder="Descripción" {...form.register(`features.${index}.description`)} />
-            <label className="flex items-center gap-2">
-              <Checkbox
-                checked={form.watch(`features.${index}.included`)}
-                onCheckedChange={(v) => form.setValue(`features.${index}.included`, !!v)}
-              />
-              Incluido
-            </label>
-            <Button type="button" variant="ghost" onClick={() => features_field.remove(index)}>
-              Quitar
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                prices_field.append({
+                  interval: "month",
+                  amount_euros: 0,
+                  currency: "eur",
+                  is_active: true,
+                })
+              }
+            >
+              Añadir precio
             </Button>
           </div>
-        ))}
+        </PlanSection>
+
+        <PlanSection
+          title="Capacidades"
+          description="Esto define lo que puede hacer el suscriptor. Se guarda en la versión borrador y se aplica al publicar."
+          className="border-primary/20"
+          action={
+            <div className="flex flex-wrap items-center gap-2">
+              {draft_version ? (
+                <Badge variant="outline">Borrador v{draft_version.version}</Badge>
+              ) : null}
+              {published_version ? (
+                <Badge variant="secondary">
+                  Publicado v{published_version.version}
+                  {published_at_label ? ` · ${published_at_label}` : ""}
+                </Badge>
+              ) : (
+                <Badge variant="outline">Sin versión publicada</Badge>
+              )}
+            </div>
+          }
+        >
+          <div className="mb-1 flex items-center gap-2 text-xs text-muted-foreground">
+            <Layers className="size-3.5" />
+            Catálogo tipado de entitlements (límites, toggles e ilimitado)
+          </div>
+          <PlanEntitlementsFields
+            catalog={feature_catalog}
+            value={entitlements_state}
+            onChange={set_entitlements_state}
+          />
+        </PlanSection>
+
+        <section className="rounded-xl border bg-muted/30">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between gap-3 p-4 text-left md:px-5"
+            onClick={() => set_marketing_open((open) => !open)}
+            aria-expanded={marketing_open}
+            aria-label="Mostrar u ocultar texto en tarjetas"
+            tabIndex={0}
+          >
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-3.5 text-muted-foreground" />
+                <h3 className="text-sm font-semibold tracking-tight">
+                  Texto en tarjetas
+                </h3>
+                <Badge variant="outline">Marketing</Badge>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Copy opcional de las cards. No confundir con las capacidades del
+                plan.
+              </p>
+            </div>
+            <ChevronDown
+              className={cn(
+                "size-4 shrink-0 text-muted-foreground transition-transform",
+                marketing_open && "rotate-180",
+              )}
+            />
+          </button>
+
+          {marketing_open ? (
+            <div className="space-y-3 border-t px-4 pb-4 pt-3 md:px-5">
+              {features_field.fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="grid grid-cols-1 gap-2 rounded-lg border bg-background p-3 md:grid-cols-[1fr_1fr_auto_auto]"
+                >
+                  <Input
+                    placeholder="Etiqueta"
+                    {...form.register(`features.${index}.label`)}
+                    aria-label={`Etiqueta marketing ${index + 1}`}
+                  />
+                  <Input
+                    placeholder="Descripción"
+                    {...form.register(`features.${index}.description`)}
+                    aria-label={`Descripción marketing ${index + 1}`}
+                  />
+                  <label className="flex items-center gap-2">
+                    <Checkbox
+                      checked={form.watch(`features.${index}.included`)}
+                      onCheckedChange={(checked) =>
+                        form.setValue(`features.${index}.included`, !!checked)
+                      }
+                    />
+                    Incluido
+                  </label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => features_field.remove(index)}
+                    aria-label={`Quitar característica ${index + 1}`}
+                  >
+                    Quitar
+                  </Button>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  features_field.append({
+                    label: "",
+                    description: "",
+                    included: true,
+                    sort_order: features_field.fields.length,
+                  })
+                }
+              >
+                Añadir característica
+              </Button>
+            </div>
+          ) : null}
+        </section>
       </div>
 
-      <div className="flex flex-wrap gap-2 pt-2">
-        <Button type="submit">Guardar</Button>
+      <div className="sticky bottom-0 z-10 -mx-1 flex flex-wrap items-center gap-2 border-t bg-background/95 px-1 pt-3 backdrop-blur supports-backdrop-filter:bg-background/80">
+        <Button type="submit" disabled={is_saving || is_publishing}>
+          {is_saving ? "Guardando…" : "Guardar plan"}
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          disabled={is_saving || is_publishing}
+          onClick={handleSaveAndPublish}
+        >
+          {is_publishing ? "Publicando…" : "Guardar y publicar"}
+        </Button>
         {selected_id ? (
-          <Button type="button" variant="secondary" onClick={handleSyncStripe}>
-            Sincronizar con Stripe
+          <Button
+            type="button"
+            variant="outline"
+            disabled={is_saving || is_publishing}
+            onClick={handleSaveEntitlementsOnly}
+          >
+            Guardar borrador de capacidades
           </Button>
         ) : null}
+        {form.formState.errors.root ? (
+          <FieldError>{form.formState.errors.root.message}</FieldError>
+        ) : null}
       </div>
-      {form.formState.errors.root ? (
-        <FieldError>{form.formState.errors.root.message}</FieldError>
-      ) : null}
     </form>
   );
 };
