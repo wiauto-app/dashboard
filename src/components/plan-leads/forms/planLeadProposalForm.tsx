@@ -64,11 +64,9 @@ export const PlanLeadProposalForm = ({
   const plans = (plans_page?.data ?? []) as SubscriptionPlan[];
 
   const [status, set_status] = useState<PlanLeadStatus>(detail.status);
-  const [base_plan_id, set_base_plan_id] = useState(detail.base_plan_id ?? "");
+  const [base_plan_id, set_base_plan_id] = useState<string | null>(detail.base_plan_id ?? null);
   const [price_euros, set_price_euros] = useState(
-    detail.proposed_price_cents
-      ? centsToEuros(detail.proposed_price_cents)
-      : 0,
+    detail.proposed_price_cents ? centsToEuros(detail.proposed_price_cents) : 0,
   );
   const [interval, set_interval] = useState<PlanLeadInterval>(
     detail.proposed_interval ?? "month",
@@ -79,27 +77,31 @@ export const PlanLeadProposalForm = ({
   const [is_submitting, set_is_submitting] = useState(false);
 
   useEffect(() => {
-    set_status(detail.status);
-    set_base_plan_id(detail.base_plan_id ?? "");
-    set_price_euros(
-      detail.proposed_price_cents
-        ? centsToEuros(detail.proposed_price_cents)
-        : 0,
-    );
-    set_interval(detail.proposed_interval ?? "month");
-    set_notes(detail.proposal_notes ?? "");
+    setTimeout(() => {
+      set_status(detail.status);
+      set_base_plan_id(detail.base_plan_id ?? "");
+      set_price_euros(
+        detail.proposed_price_cents
+          ? centsToEuros(detail.proposed_price_cents)
+          : 0,
+      );
+      set_interval(detail.proposed_interval ?? "month");
+      set_notes(detail.proposal_notes ?? "");
+    }, 1000);
   }, [detail]);
 
   useEffect(() => {
     if (feature_catalog.length === 0) {
       return;
     }
-    set_entitlements_state(
-      buildDefaultEntitlementsState(
-        feature_catalog,
-        detail.proposed_overrides,
-      ),
-    );
+    setTimeout(() => {
+      set_entitlements_state(
+        buildDefaultEntitlementsState(
+          feature_catalog,
+          detail.proposed_overrides,
+        ),
+      );
+    }, 1000);
   }, [feature_catalog, detail.proposed_overrides]);
 
   const handleUpdateStatus = async () => {
@@ -199,7 +201,7 @@ export const PlanLeadProposalForm = ({
             <FieldLabel>Plan base</FieldLabel>
             <Select
               value={base_plan_id || undefined}
-              onValueChange={set_base_plan_id}
+              onValueChange={(value) => set_base_plan_id(value)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Selecciona un plan" />
@@ -232,9 +234,7 @@ export const PlanLeadProposalForm = ({
             <FieldLabel>Intervalo</FieldLabel>
             <Select
               value={interval}
-              onValueChange={(value) =>
-                set_interval(value as PlanLeadInterval)
-              }
+              onValueChange={(value) => set_interval(value as PlanLeadInterval)}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Intervalo" />
