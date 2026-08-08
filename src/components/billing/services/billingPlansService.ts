@@ -9,6 +9,7 @@ import {
 import { objectToQueryString } from "@/lib/utils";
 import type { PaginatedResult, PaginationParams } from "@/types/general.types";
 import { V1_BILLING_FEATURE_CATALOG, V1_BILLING_PLANS } from "./route.constants";
+import { toast } from "sonner";
 
 export type EntitlementValueType = "boolean" | "limit" | "unlimited";
 
@@ -178,7 +179,11 @@ export const billingPlansService = {
   },
 
   delete: async (id: string): Promise<apiResponse<void>> => {
-    return apiDelete<void>(`${V1_BILLING_PLANS}/${id}`);
+    const response =  await apiDelete<void>(`${V1_BILLING_PLANS}/${id}`);
+    if(!response.ok){
+      toast.error(response.message ?? "Error al eliminar el plan");
+    }
+    return response;
   },
 
   syncStripe: async (id: string): Promise<apiResponse<SubscriptionPlan>> => {
