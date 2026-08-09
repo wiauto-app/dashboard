@@ -58,28 +58,22 @@ export const FeaturedListingOfferForm = () => {
 
     form.reset({
       title: offer.title,
-      description: offer.description ?? "",
+      description: offer.description || "",
       duration_days: offer.duration_days,
       boost_weight: offer.boost_weight,
       amount_euros: offer.amount_cents / 100,
       is_active: offer.is_active,
       sort_order: offer.sort_order,
     });
-  }, [selected_id, offer_response, form]);
+  }, [selected_id, offer_response]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
     const payload = {
-      title: values.title.trim(),
-      description: values.description.trim() || null,
-      duration_days: values.duration_days,
-      boost_weight: values.boost_weight,
+      ...values,
       amount_cents: Math.round(values.amount_euros * 100),
       currency: "eur",
-      is_active: values.is_active,
-      sort_order: values.sort_order,
     };
-
-      const response = selected_id
+    const response = selected_id
       ? await featuredListingOffersService.update({
           id: selected_id,
           ...payload,
@@ -100,20 +94,24 @@ export const FeaturedListingOfferForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Field>
-        <ControllerInput
-          control={form.control}
-          name="title"
-          label="Título"
-        />
-      
+        <ControllerInput control={form.control} name="title" label="Título" />
       </Field>
       <Field>
-        <FieldLabel htmlFor="offer-description">Descripción</FieldLabel>
-        <Textarea
-          id="offer-description"
-          {...form.register("description")}
-          aria-label="Descripción de la oferta"
-        />
+        <ControllerInput
+          control={form.control}
+          name="description"
+          label="Descripción"
+        >
+          {({ field }) => (
+            <Textarea
+              id="offer-description"
+              aria-label="Descripción de la oferta"
+              value={field.value as string}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+            />
+          )}
+        </ControllerInput>
       </Field>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field>
