@@ -137,7 +137,6 @@ export function normalize_vehicle_video_upload_content_type(
 export const filesService = {
   async generateFileSignedUrl(generateFileSignedUrlDto: GenerateFileSignedUrlDto): Promise<string | null> {
     const response = await apiPost<GenerateFileSignedUrlResponse>(GENERATE_FILE_SIGNED_URL, generateFileSignedUrlDto)
-    console.log(response);
     if (!response.ok) {
       return null
     }
@@ -177,15 +176,13 @@ export const filesService = {
       content_type: uploadFileDto.content_type ?? (uploadFileDto.file.type as UploadContentType),
       bucket_name: uploadFileDto.bucket_name,
     });
-    console.log(signedUrl);
     if (!signedUrl) {
       toast.error("No se pudo generar la URL de subida");
       return { path: null };
     }
-   const result = await filesService.uploadImage(signedUrl, uploadFileDto.file);
-    console.log(result);
-   
-    return {  path: `${uploadFileDto.bucket_name}/${uploadFileDto.file_key}` };
+    await filesService.uploadImage(signedUrl, uploadFileDto.file);
+
+    return { path: `${uploadFileDto.bucket_name}/${uploadFileDto.file_key}` };
   },
 
   async confirm_vehicle_video_upload(
