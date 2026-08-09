@@ -60,6 +60,7 @@ export const fetchWithAuth = async <T>(
     },
   })
 
+
   if (
     res.status === 401 &&
     !is_public_auth_route &&
@@ -67,6 +68,9 @@ export const fetchWithAuth = async <T>(
     !is_auth_refresh_request &&
     !is_auth_logout_request
   ) {
+      const data = await res.json()
+      console.log("data", data);
+
     if (_auth_retry_count >= 1) {
       await best_effort_raw_logout()
       window.location.href = "/signIn"
@@ -85,6 +89,8 @@ export const fetchWithAuth = async <T>(
       },
       credentials: "include",
     })
+    const refresh_data = await refresh_response.json()
+    console.log("refresh_data", refresh_data);
 
     if (refresh_response.ok) {
       return fetchWithAuth<T>(path, {
@@ -93,8 +99,8 @@ export const fetchWithAuth = async <T>(
       })
     }
 
-    await best_effort_raw_logout()
-    window.location.href = "/signIn"
+    // await best_effort_raw_logout()
+    // window.location.href = "/signIn"
     return {
       ok: false,
       message: "Sesión expirada",
