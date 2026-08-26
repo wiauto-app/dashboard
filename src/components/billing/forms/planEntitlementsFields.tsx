@@ -1,7 +1,22 @@
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Switch } from "@/components/ui/switch";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { BrainCircuit, CarFront, Layers, Search, Users } from "lucide-react";
 import type {
   FeatureCatalogItem,
   PlanEntitlement,
@@ -20,7 +35,38 @@ interface PlanEntitlementsFieldsProps {
   catalog: FeatureCatalogItem[];
   value: EntitlementsFormState;
   onChange: (next: EntitlementsFormState) => void;
+  variant?: "cards" | "builder";
 }
+
+const entitlement_groups = [
+  {
+    id: "catalog",
+    label: "Catálogo y contenido",
+    description: "Publicación, multimedia y visibilidad de los anuncios.",
+    icon: CarFront,
+    features: [
+      "vehicles",
+      "photos_per_vehicle",
+      "videos_per_vehicle",
+      "featured_listings",
+      "video_upload",
+    ],
+  },
+  {
+    id: "team",
+    label: "Equipo y gestión",
+    description: "Usuarios y herramientas operativas del concesionario.",
+    icon: Users,
+    features: ["users", "dismissed_vehicles", "advanced_listing_editor"],
+  },
+  {
+    id: "intelligence",
+    label: "IA y analítica",
+    description: "Consumo de IA, generación y estadísticas avanzadas.",
+    icon: BrainCircuit,
+    features: ["ai_requests", "ai_generation", "statistics"],
+  },
+] as const;
 
 export const buildDefaultEntitlementsState = (
   catalog: FeatureCatalogItem[],
@@ -107,7 +153,10 @@ export const PlanEntitlementsFields = ({
   catalog,
   value,
   onChange,
+  variant = "cards",
 }: PlanEntitlementsFieldsProps) => {
+  const [search, set_search] = useState("");
+
   if (catalog.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
@@ -150,6 +199,174 @@ export const PlanEntitlementsFields = ({
       },
     });
   };
+
+  if (variant === "builder") {
+    const normalized_search = search.trim().toLocaleLowerCase("es");
+    const filtered_catalog = catalog.filter((item) =>
+      `${item.label} ${item.description}`
+        .toLocaleLowerCase("es")
+        .includes(normalized_search),
+    );
+    const grouped_features = new Set<string>(
+      entitlement_groups.flatMap((group) => [...group.features]),
+    );
+    const groups = [
+      ...entitlement_groups.map((group) => ({
+        ...group,
+        items: filtered_catalog.filter((item) =>
+          new Set<string>(group.features).has(item.feature),
+        ),
+      })),
+      {
+        id: "other",
+        label: "Otras capacidades",
+        description: "Capacidades adicionales configuradas en el catálogo.",
+        icon: LayersIcon,
+        features: [] as readonly string[],
+        items: filtered_catalog.filter(
+          (item) => !grouped_features.has(item.feature),
+        ),
+      },
+    ].filter((group) => group.items.length > 0);
+
+    return (
+      <div className="flex flex-col gap-4">
+        <InputGroup className="h-10 max-w-md bg-background">
+          <InputGroupAddon>
+            <Search />
+          </InputGroupAddon>
+          <InputGroupInput
+            value={search}
+            onChange={(event) => set_search(event.target.value)}
+            placeholder="Buscar capacidad…"
+            aria-label="Buscar capacidad"
+          />
+        </InputGroup>
+
+        {groups.length === 0 ? (
+          <div className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+            No hay capacidades que coincidan con la búsqueda.
+          </div>
+        ) : (
+          groups.map((group) => {
+            const GroupIcon = group.icon;
+            return (
+              <section
+                key={group.id}
+                className="overflow-hidden rounded-xl border bg-background"
+              >
+                <header className="flex items-center gap-3 border-b bg-muted/20 px-4 py-3">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <GroupIcon className="size-4" aria-hidden="true" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-medium">{group.label}</h4>
+                    <p className="text-xs text-muted-foreground">
+                      {group.description}
+                    </p>
+                  </div>
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {group.items.length} capacidades
+                  </span>
+                </header>
+
+                <div className="divide-y">
+                  {group.items.map((item) => {
+                    const entry = value[item.feature];
+                    const is_boolean = item.value_type === "boolean";
+                    const is_unlimited = entry?.value_type === "unlimited";
+                    const is_enabled = is_boolean
+                      ? Boolean(entry?.bool)
+                      : is_unlimited || (entry?.limit ?? 0) > 0;
+
+                    return (
+                      <div
+                        key={item.feature}
+                        className={cn(
+                          "grid gap-4 px-4 py-3.5 transition-colors md:grid-cols-[minmax(0,1fr)_auto] md:items-center",
+                          is_enabled && "bg-primary/[0.025]",
+                        )}
+                      >
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium">{item.label}</p>
+                            {item.metered ? (
+                              <span className="rounded-full border px-2 py-0.5 text-[10px] text-muted-foreground">
+                                Medido
+                              </span>
+                            ) : null}
+                          </div>
+                          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                            {item.description}
+                          </p>
+                        </div>
+
+                        {is_boolean ? (
+                          <label className="flex min-w-36 items-center justify-between gap-4 rounded-lg border bg-background px-3 py-2">
+                            <span className="text-sm text-muted-foreground">
+                              Incluido
+                            </span>
+                            <Switch
+                              checked={entry?.bool ?? false}
+                              onCheckedChange={(checked) =>
+                                handleBoolChange(item.feature, !!checked)
+                              }
+                              aria-label={item.label}
+                            />
+                          </label>
+                        ) : (
+                          <div className="grid gap-2 sm:grid-cols-[9rem_7rem]">
+                            <Select
+                              value={is_unlimited ? "unlimited" : "limit"}
+                              onValueChange={(next) =>
+                                handleUnlimitedChange(
+                                  item.feature,
+                                  next === "unlimited",
+                                )
+                              }
+                            >
+                              <SelectTrigger className="w-full" aria-label={`Tipo de límite de ${item.label}`}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectItem value="limit">Con límite</SelectItem>
+                                  <SelectItem value="unlimited">Ilimitado</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
+                            {is_unlimited ? (
+                              <div className="flex h-9 items-center justify-center rounded-md border bg-muted/30 px-3 text-sm text-muted-foreground">
+                                Sin límite
+                              </div>
+                            ) : (
+                              <Input
+                                type="number"
+                                min={0}
+                                value={entry?.limit ?? 0}
+                                onChange={(event) =>
+                                  handleLimitChange(
+                                    item.feature,
+                                    Number(event.target.value) || 0,
+                                  )
+                                }
+                                aria-label={`Límite de ${item.label}`}
+                                className="tabular-nums"
+                              />
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -231,3 +448,5 @@ export const PlanEntitlementsFields = ({
     </div>
   );
 };
+
+const LayersIcon = Layers;

@@ -35,7 +35,7 @@ export const BrandIcon = ({ className, width, height }: BrandIconProps) => {
     <img
       src="https://media.wiauto.es/wiauto-strapi/Group_1000002682_1_8cc20235e5.avif"
       alt="Wiauto Logo"
-      className={cn("inline-block shrink-0", className)}
+      className={cn("inline-block shrink-0 object-contain", className)}
       style={Object.keys(style).length > 0 ? style : undefined}
     />
   );

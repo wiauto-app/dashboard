@@ -31,7 +31,7 @@ function RouteComponent() {
       title="Planes de suscripción"
       route={Route}
       total={data?.total ?? 0}
-      form_size="5xl"
+      form_size="9xl"
       actions={(row) => subscriptionPlanActions(row, invalidate_data)}
       form={<SubscriptionPlanForm />}
     />
