@@ -11,7 +11,7 @@ export const userActions = (
   const actions: DynamicTableAction[] = [
     {
       key: `assign-plan-${row.id}`,
-      label: "Asignar plan sin cobro",
+      label: "Asignar plan",
       component: <PlanAccessGrantDialog profile={row} onSuccess={onSuccess} />,
     },
     // {

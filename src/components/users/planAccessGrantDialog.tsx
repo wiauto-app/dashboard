@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { IconButton } from "@/components/ui/iconButton";
 import {
   Select,
   SelectContent,
@@ -135,15 +136,15 @@ export function PlanAccessGrantDialog({
       }}
     >
       <DialogTrigger>
-        <Button
+        <IconButton
+          text="Asignar plan sin cobro"
           type="button"
           variant="outline"
           size="icon-sm"
           aria-label={`Asignar plan a ${display_name}`}
-          title="Asignar plan sin cobro"
         >
           <ShieldCheck className="size-4 text-emerald-600" />
-        </Button>
+        </IconButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
