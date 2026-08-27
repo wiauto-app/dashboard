@@ -24,7 +24,7 @@ export const ImageInput = ({
   value,
   onChange,
 
-  label: _label = "Imagen",
+  label = "Imagen",
   description = "PNG, JPG o WEBP",
 
   bucketName,
@@ -98,12 +98,12 @@ export const ImageInput = ({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1">
-        {/* <label className="text-sm font-medium">{label}</label> */}
+        <label className="text-sm font-medium">{label}</label>
 
         <p className="text-muted-foreground text-sm">{description}</p>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col items-center gap-4">
         <div className="relative">
           <div className="bg-muted flex h-28 w-28 items-center justify-center overflow-hidden rounded-2xl border">
             {preview ? (

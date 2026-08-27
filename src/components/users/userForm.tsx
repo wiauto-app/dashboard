@@ -18,7 +18,7 @@ import { profileSchema } from "@/validations/resources/profile.schema";
 import type z from "zod";
 import { userService } from "@/services/users/userService";
 import { ImageInput } from "../ui/imageInput";
-import { Checkbox } from "../ui/checkbox";
+import { Switch } from "../ui/switch";
 
 export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
@@ -47,7 +47,6 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       // image_url: "",
     },
   });
-
 
   useEffect(() => {
     if (profile) {
@@ -116,7 +115,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       <section className="flex flex-col gap-3 rounded-xl border p-3">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold">Cuenta</h2>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-muted-foreground text-xs sr-only">
             Información de acceso del usuario.
           </p>
         </div>
@@ -164,13 +163,13 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       <section className="flex flex-col gap-3 rounded-xl border p-3">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold">Perfil</h2>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-muted-foreground text-xs sr-only">
             Información personal del usuario.
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="sm:col-span-2">
+          <div>
             <Controller
               name="avatar_url"
               control={form.control}
@@ -189,73 +188,74 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
               )}
             />
           </div>
-          <Controller
-            name="name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Nombre</FieldLabel>
+          <div className="space-y-3">
+            <Controller
+              name="name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Nombre</FieldLabel>
 
-                <Input
-                  autoComplete="given-name"
-                  aria-invalid={fieldState.invalid}
-                  type="text"
-                  placeholder="Nombre"
-                  {...field}
-                />
+                  <Input
+                    autoComplete="given-name"
+                    aria-invalid={fieldState.invalid}
+                    type="text"
+                    placeholder="Nombre"
+                    {...field}
+                  />
 
-                {fieldState.error && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+                  {fieldState.error && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-          <Controller
-            name="last_name"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Apellido</FieldLabel>
+            <Controller
+              name="last_name"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Apellido</FieldLabel>
 
-                <Input
-                  autoComplete="family-name"
-                  aria-invalid={fieldState.invalid}
-                  type="text"
-                  placeholder="Apellido"
-                  {...field}
-                />
+                  <Input
+                    autoComplete="family-name"
+                    aria-invalid={fieldState.invalid}
+                    type="text"
+                    placeholder="Apellido"
+                    {...field}
+                  />
 
-                {fieldState.error && <FieldError errors={[fieldState.error]} />}
-              </Field>
-            )}
-          />
+                  {fieldState.error && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
         </div>
       </section>
 
       {/* Acceso admin */}
       <section className="flex items-start justify-between gap-3 rounded-xl border p-3">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-sm font-semibold">Acceso de plataforma</h2>
-          <p className="text-muted-foreground text-xs">
-            Define si el usuario puede acceder al panel de administración.
-          </p>
-        </div>
-
         <Controller
           name="is_admin"
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <label className="flex shrink-0 items-center gap-2 pt-0.5">
-                <Checkbox
-                  id="is_admin"
-                  checked={field.value}
-                  onCheckedChange={(checked) => field.onChange(checked === true)}
-                  aria-invalid={fieldState.invalid}
-                />
+              <div className="flex items-center gap-2 justify-between">
                 <FieldLabel htmlFor="is_admin" className="font-normal">
                   Es administrador
                 </FieldLabel>
-              </label>
+                <Switch
+                  id="is_admin"
+                  checked={field.value}
+                  onCheckedChange={(checked) =>
+                    field.onChange(checked === true)
+                  }
+                  aria-invalid={fieldState.invalid}
+                />
+              </div>
 
               {fieldState.error && <FieldError errors={[fieldState.error]} />}
             </Field>
