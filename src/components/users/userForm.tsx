@@ -109,66 +109,68 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   };
   return (
     <form
-      className="flex flex-col gap-6"
+      className="flex max-h-[calc(100dvh-5rem)] flex-col gap-3 overflow-y-auto overscroll-contain pr-1 pb-1"
       onSubmit={form.handleSubmit(onSubmit)}
     >
       {/* Cuenta */}
-      <section className="flex flex-col gap-4 rounded-xl border p-4">
+      <section className="flex flex-col gap-3 rounded-xl border p-3">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold">Cuenta</h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-xs">
             Información de acceso del usuario.
           </p>
         </div>
 
-        <Controller
-          name="email"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
 
-              <Input
-                autoComplete="email"
-                aria-invalid={fieldState.invalid}
-                type="email"
-                placeholder="Email"
-                {...field}
-              />
+                <Input
+                  autoComplete="email"
+                  aria-invalid={fieldState.invalid}
+                  type="email"
+                  placeholder="Email"
+                  {...field}
+                />
 
-              {fieldState.error && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-        <Controller
-          name="password"
-          control={form.control}
-          render={({ field, fieldState }) => (
-            <Field data-invalid={fieldState.invalid}>
-              <FieldLabel htmlFor={field.name}>
-                Password {selectedId ? " (Opcional)" : ""}
-              </FieldLabel>
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Password {selectedId ? " (Opcional)" : ""}
+                </FieldLabel>
 
-              <PasswordInput aria-invalid={fieldState.invalid} {...field} />
+                <PasswordInput aria-invalid={fieldState.invalid} {...field} />
 
-              {fieldState.error && <FieldError errors={[fieldState.error]} />}
-            </Field>
-          )}
-        />
+                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+        </div>
       </section>
 
       {/* Perfil */}
-      <section className="flex flex-col gap-4 rounded-xl border p-4">
+      <section className="flex flex-col gap-3 rounded-xl border p-3">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold">Perfil</h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-xs">
             Información personal del usuario.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="col-span-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
             <Controller
               name="avatar_url"
               control={form.control}
@@ -176,10 +178,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <Field data-invalid={fieldState.invalid}>
                   <ImageInput
                     value={field.value}
-                    onChange={(value) => {
-                      console.log("value", value);
-                      field.onChange(value);
-                    }}
+                    onChange={field.onChange}
                     bucketName="profile-images"
                     path="avatars"
                   />
@@ -233,10 +232,10 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       </section>
 
       {/* Acceso admin */}
-      <section className="flex flex-col gap-4 rounded-xl border p-4">
+      <section className="flex items-start justify-between gap-3 rounded-xl border p-3">
         <div className="flex flex-col gap-1">
           <h2 className="text-sm font-semibold">Acceso de plataforma</h2>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground text-xs">
             Define si el usuario puede acceder al panel de administración.
           </p>
         </div>
@@ -246,7 +245,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           control={form.control}
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
-              <label className="flex items-center gap-2">
+              <label className="flex shrink-0 items-center gap-2 pt-0.5">
                 <Checkbox
                   id="is_admin"
                   checked={field.value}
@@ -264,7 +263,7 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         />
       </section>
 
-      <div className="flex justify-end">
+      <div className="flex justify-end pt-1">
         <Button type="submit">
           {selectedId ? "Actualizar usuario" : "Crear usuario"}
         </Button>
