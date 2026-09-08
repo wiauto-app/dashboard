@@ -374,9 +374,9 @@ export const SubscriptionPlanForm = () => {
     queryFn: () => billingPlansService.getFeatureCatalog(),
   });
 
-  const { data: versions_response } = useQuery({
-    queryKey: ["subscription-plan-versions", selected_id],
-    queryFn: () => billingPlansService.listVersions(selected_id ?? ""),
+  const { data: entitlements_response } = useQuery({
+    queryKey: ["subscription-plan-entitlements", selected_id],
+    queryFn: () => billingPlansService.getEntitlements(selected_id ?? ""),
     enabled: !!selected_id,
   });
 
@@ -449,17 +449,14 @@ export const SubscriptionPlanForm = () => {
       return;
     }
 
-    const versions = versions_response?.data ?? [];
-    const draft = versions.find((version) => version.status === "draft");
-    const published = versions.find((version) => version.status === "published");
-    const source = draft ?? published;
+    const current_entitlements = entitlements_response?.data?.entitlements;
 
-    // The entitlement editor is intentionally hydrated from the latest version.
+    // Hydrate from the current published version entitlements (in-place edit).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     set_entitlements_state(
-      buildDefaultEntitlementsState(feature_catalog, source?.entitlements),
+      buildDefaultEntitlementsState(feature_catalog, current_entitlements),
     );
-  }, [feature_catalog, versions_response, selected_id]);
+  }, [feature_catalog, entitlements_response, selected_id]);
 
   const enabled_capabilities = useMemo(
     () =>
@@ -496,20 +493,11 @@ export const SubscriptionPlanForm = () => {
     }
 
     set_save_phase("capabilities");
-    const draft_response = await billingPlansService.ensureDraft(plan_id);
-    if (!draft_response.ok) {
-      toast.error(
-        draft_response.message ||
-          "El plan se guardó, pero no se pudo preparar sus capacidades",
-      );
-      return false;
-    }
-
     const entitlements = entitlementsStateToPayload(
       feature_catalog,
       entitlements_state,
     );
-    const response = await billingPlansService.replaceDraftEntitlements(
+    const response = await billingPlansService.replaceEntitlements(
       plan_id,
       entitlements,
     );
@@ -838,7 +826,8 @@ export const SubscriptionPlanForm = () => {
         <CardHeader>
           <CardTitle>Capacidades del plan</CardTitle>
           <CardDescription>
-            Define qué puede hacer el suscriptor mediante límites, acceso ilimitado o inclusión.
+            Define límites y accesos del suscriptor. Al guardar, los cambios
+            quedan activos de inmediato en el catálogo.
           </CardDescription>
         </CardHeader>
         <CardContent>

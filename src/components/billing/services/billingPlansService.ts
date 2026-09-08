@@ -132,7 +132,7 @@ export interface UpdateSubscriptionPlanDto extends Partial<CreateSubscriptionPla
   id: string;
 }
 
-export interface ReplaceDraftEntitlementsDto {
+export interface ReplaceEntitlementsDto {
   entitlements: PlanEntitlementInput[];
 }
 
@@ -195,25 +195,19 @@ export const billingPlansService = {
     return response.data ?? [];
   },
 
-  listVersions: async (planId: string): Promise<apiResponse<PlanVersion[]>> => {
-    return apiGet<PlanVersion[]>(`${V1_BILLING_PLANS}/${planId}/versions`);
+  getEntitlements: async (
+    planId: string,
+  ): Promise<apiResponse<PlanVersion>> => {
+    return apiGet<PlanVersion>(`${V1_BILLING_PLANS}/${planId}/entitlements`);
   },
 
-  ensureDraft: async (planId: string): Promise<apiResponse<PlanVersion>> => {
-    return apiPost<PlanVersion>(`${V1_BILLING_PLANS}/${planId}/versions/draft`, {});
-  },
-
-  replaceDraftEntitlements: async (
+  replaceEntitlements: async (
     planId: string,
     entitlements: PlanEntitlementInput[],
   ): Promise<apiResponse<PlanVersion>> => {
     return apiPut<PlanVersion>(
-      `${V1_BILLING_PLANS}/${planId}/versions/draft/entitlements`,
-      { entitlements } satisfies ReplaceDraftEntitlementsDto,
+      `${V1_BILLING_PLANS}/${planId}/entitlements`,
+      { entitlements } satisfies ReplaceEntitlementsDto,
     );
-  },
-
-  publishPlan: async (planId: string): Promise<apiResponse<PlanVersion>> => {
-    return apiPost<PlanVersion>(`${V1_BILLING_PLANS}/${planId}/publish`, {});
   },
 };

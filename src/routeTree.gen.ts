@@ -10,49 +10,54 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
-import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
-import { Route as AuthenticatedAnosRouteImport } from './routes/_authenticated/anos'
-import { Route as AuthenticatedAssistantCreditPacksRouteImport } from './routes/_authenticated/assistant-credit-packs'
-import { Route as AuthenticatedCarroceriasRouteImport } from './routes/_authenticated/carrocerias'
-import { Route as AuthenticatedCatalogServicesRouteImport } from './routes/_authenticated/catalog-services'
-import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
-import { Route as AuthenticatedColorsRouteImport } from './routes/_authenticated/colors'
-import { Route as AuthenticatedCombustiblesRouteImport } from './routes/_authenticated/combustibles'
-import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
-import { Route as AuthenticatedCuotasRouteImport } from './routes/_authenticated/cuotas'
-import { Route as AuthenticatedCuponesRouteImport } from './routes/_authenticated/cupones'
-import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
-import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
-import { Route as AuthenticatedFeaturedListingOffersRouteImport } from './routes/_authenticated/featured-listing-offers'
-import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
-import { Route as AuthenticatedMarcasRouteImport } from './routes/_authenticated/marcas'
-import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
-import { Route as AuthenticatedModelosRouteImport } from './routes/_authenticated/modelos'
-import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
-import { Route as AuthenticatedMunicipalitiesRouteImport } from './routes/_authenticated/municipalities'
-import { Route as AuthenticatedPlanContactLeadsRouteImport } from './routes/_authenticated/plan-contact-leads'
-import { Route as AuthenticatedPlanLeadRequestsRouteImport } from './routes/_authenticated/plan-lead-requests'
-import { Route as AuthenticatedProvincesRouteImport } from './routes/_authenticated/provinces'
-import { Route as AuthenticatedReportCategoriesRouteImport } from './routes/_authenticated/report-categories'
-import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
-import { Route as AuthenticatedSubscriptionPlansRouteImport } from './routes/_authenticated/subscription-plans'
-import { Route as AuthenticatedTasacionesRouteImport } from './routes/_authenticated/tasaciones'
-import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_authenticated/ticket-categories'
-import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
-import { Route as AuthenticatedTractionsRouteImport } from './routes/_authenticated/tractions'
-import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
-import { Route as AuthenticatedVehicleTypesRouteImport } from './routes/_authenticated/vehicle-types'
-import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
-import { Route as AuthenticatedVersionesRouteImport } from './routes/_authenticated/versiones'
-import { Route as AuthenticatedWarrantyTypesRouteImport } from './routes/_authenticated/warranty-types'
-import { Route as AuthRecoverPasswordRouteImport } from './routes/auth/recover-password'
-import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as SignInIndexRouteImport } from './routes/signIn/index'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
+import { Route as AuthRecoverPasswordRouteImport } from './routes/auth/recover-password'
+import { Route as AuthenticatedWarrantyTypesRouteImport } from './routes/_authenticated/warranty-types'
+import { Route as AuthenticatedVersionesRouteImport } from './routes/_authenticated/versiones'
+import { Route as AuthenticatedVehiclesRouteImport } from './routes/_authenticated/vehicles'
+import { Route as AuthenticatedVehicleTypesRouteImport } from './routes/_authenticated/vehicle-types'
+import { Route as AuthenticatedUsersRouteImport } from './routes/_authenticated/users'
+import { Route as AuthenticatedTractionsRouteImport } from './routes/_authenticated/tractions'
+import { Route as AuthenticatedTicketsRouteImport } from './routes/_authenticated/tickets'
+import { Route as AuthenticatedTicketCategoriesRouteImport } from './routes/_authenticated/ticket-categories'
+import { Route as AuthenticatedTasacionesRouteImport } from './routes/_authenticated/tasaciones'
+import { Route as AuthenticatedSubscriptionPlansRouteImport } from './routes/_authenticated/subscription-plans'
+import { Route as AuthenticatedReportsRouteImport } from './routes/_authenticated/reports'
+import { Route as AuthenticatedReportCategoriesRouteImport } from './routes/_authenticated/report-categories'
+import { Route as AuthenticatedProvincesRouteImport } from './routes/_authenticated/provinces'
+import { Route as AuthenticatedPlanLeadRequestsRouteImport } from './routes/_authenticated/plan-lead-requests'
+import { Route as AuthenticatedPlanContactLeadsRouteImport } from './routes/_authenticated/plan-contact-leads'
+import { Route as AuthenticatedMunicipalitiesRouteImport } from './routes/_authenticated/municipalities'
+import { Route as AuthenticatedModerationRouteImport } from './routes/_authenticated/moderation'
+import { Route as AuthenticatedModelosRouteImport } from './routes/_authenticated/modelos'
+import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
+import { Route as AuthenticatedMarcasRouteImport } from './routes/_authenticated/marcas'
+import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
+import { Route as AuthenticatedFeaturedListingOffersRouteImport } from './routes/_authenticated/featured-listing-offers'
+import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
+import { Route as AuthenticatedDealershipRouteImport } from './routes/_authenticated/dealership'
+import { Route as AuthenticatedCuponesRouteImport } from './routes/_authenticated/cupones'
+import { Route as AuthenticatedCuotasRouteImport } from './routes/_authenticated/cuotas'
+import { Route as AuthenticatedCommunitiesRouteImport } from './routes/_authenticated/communities'
+import { Route as AuthenticatedCombustiblesRouteImport } from './routes/_authenticated/combustibles'
+import { Route as AuthenticatedColorsRouteImport } from './routes/_authenticated/colors'
+import { Route as AuthenticatedCategoriesRouteImport } from './routes/_authenticated/categories'
+import { Route as AuthenticatedCatalogServicesRouteImport } from './routes/_authenticated/catalog-services'
+import { Route as AuthenticatedCarroceriasRouteImport } from './routes/_authenticated/carrocerias'
+import { Route as AuthenticatedAssistantCreditPacksRouteImport } from './routes/_authenticated/assistant-credit-packs'
+import { Route as AuthenticatedAnosRouteImport } from './routes/_authenticated/anos'
+import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 import { Route as AuthenticatedProfileConfigRouteImport } from './routes/_authenticated/profile/config'
 
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInIndexRoute = SignInIndexRouteImport.update({
+  id: '/signIn/',
+  path: '/signIn/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
@@ -60,171 +65,30 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/auth/reset-password',
+  path: '/auth/reset-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAnosRoute = AuthenticatedAnosRouteImport.update({
-  id: '/anos',
-  path: '/anos',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AuthRecoverPasswordRoute = AuthRecoverPasswordRouteImport.update({
+  id: '/auth/recover-password',
+  path: '/auth/recover-password',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedAssistantCreditPacksRoute =
-  AuthenticatedAssistantCreditPacksRouteImport.update({
-    id: '/assistant-credit-packs',
-    path: '/assistant-credit-packs',
+const AuthenticatedWarrantyTypesRoute =
+  AuthenticatedWarrantyTypesRouteImport.update({
+    id: '/warranty-types',
+    path: '/warranty-types',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCarroceriasRoute =
-  AuthenticatedCarroceriasRouteImport.update({
-    id: '/carrocerias',
-    path: '/carrocerias',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCatalogServicesRoute =
-  AuthenticatedCatalogServicesRouteImport.update({
-    id: '/catalog-services',
-    path: '/catalog-services',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
-  id: '/categories',
-  path: '/categories',
+const AuthenticatedVersionesRoute = AuthenticatedVersionesRouteImport.update({
+  id: '/versiones',
+  path: '/versiones',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedColorsRoute = AuthenticatedColorsRouteImport.update({
-  id: '/colors',
-  path: '/colors',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCombustiblesRoute =
-  AuthenticatedCombustiblesRouteImport.update({
-    id: '/combustibles',
-    path: '/combustibles',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCommunitiesRoute =
-  AuthenticatedCommunitiesRouteImport.update({
-    id: '/communities',
-    path: '/communities',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedCuotasRoute = AuthenticatedCuotasRouteImport.update({
-  id: '/cuotas',
-  path: '/cuotas',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCuponesRoute = AuthenticatedCuponesRouteImport.update({
-  id: '/cupones',
-  path: '/cupones',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDealershipRoute = AuthenticatedDealershipRouteImport.update({
-  id: '/dealership',
-  path: '/dealership',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedDgtLabelsRoute = AuthenticatedDgtLabelsRouteImport.update({
-  id: '/dgt-labels',
-  path: '/dgt-labels',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedFeaturedListingOffersRoute =
-  AuthenticatedFeaturedListingOffersRouteImport.update({
-    id: '/featured-listing-offers',
-    path: '/featured-listing-offers',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
-  id: '/features',
-  path: '/features',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMarcasRoute = AuthenticatedMarcasRouteImport.update({
-  id: '/marcas',
-  path: '/marcas',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
-  id: '/messages',
-  path: '/messages',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedModelosRoute = AuthenticatedModelosRouteImport.update({
-  id: '/modelos',
-  path: '/modelos',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
-  id: '/moderation',
-  path: '/moderation',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMunicipalitiesRoute =
-  AuthenticatedMunicipalitiesRouteImport.update({
-    id: '/municipalities',
-    path: '/municipalities',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPlanContactLeadsRoute =
-  AuthenticatedPlanContactLeadsRouteImport.update({
-    id: '/plan-contact-leads',
-    path: '/plan-contact-leads',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedPlanLeadRequestsRoute =
-  AuthenticatedPlanLeadRequestsRouteImport.update({
-    id: '/plan-lead-requests',
-    path: '/plan-lead-requests',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedProvincesRoute = AuthenticatedProvincesRouteImport.update({
-  id: '/provinces',
-  path: '/provinces',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedReportCategoriesRoute =
-  AuthenticatedReportCategoriesRouteImport.update({
-    id: '/report-categories',
-    path: '/report-categories',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
-  id: '/reports',
-  path: '/reports',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedSubscriptionPlansRoute =
-  AuthenticatedSubscriptionPlansRouteImport.update({
-    id: '/subscription-plans',
-    path: '/subscription-plans',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedTasacionesRoute = AuthenticatedTasacionesRouteImport.update({
-  id: '/tasaciones',
-  path: '/tasaciones',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTicketCategoriesRoute =
-  AuthenticatedTicketCategoriesRouteImport.update({
-    id: '/ticket-categories',
-    path: '/ticket-categories',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
-  id: '/tickets',
-  path: '/tickets',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTractionsRoute = AuthenticatedTractionsRouteImport.update({
-  id: '/tractions',
-  path: '/tractions',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
+const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
+  id: '/vehicles',
+  path: '/vehicles',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedVehicleTypesRoute =
@@ -233,36 +97,172 @@ const AuthenticatedVehicleTypesRoute =
     path: '/vehicle-types',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedVehiclesRoute = AuthenticatedVehiclesRouteImport.update({
-  id: '/vehicles',
-  path: '/vehicles',
+const AuthenticatedUsersRoute = AuthenticatedUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedVersionesRoute = AuthenticatedVersionesRouteImport.update({
-  id: '/versiones',
-  path: '/versiones',
+const AuthenticatedTractionsRoute = AuthenticatedTractionsRouteImport.update({
+  id: '/tractions',
+  path: '/tractions',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedWarrantyTypesRoute =
-  AuthenticatedWarrantyTypesRouteImport.update({
-    id: '/warranty-types',
-    path: '/warranty-types',
+const AuthenticatedTicketsRoute = AuthenticatedTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTicketCategoriesRoute =
+  AuthenticatedTicketCategoriesRouteImport.update({
+    id: '/ticket-categories',
+    path: '/ticket-categories',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthRecoverPasswordRoute = AuthRecoverPasswordRouteImport.update({
-  id: '/auth/recover-password',
-  path: '/auth/recover-password',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedTasacionesRoute = AuthenticatedTasacionesRouteImport.update({
+  id: '/tasaciones',
+  path: '/tasaciones',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
-  id: '/auth/reset-password',
-  path: '/auth/reset-password',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedSubscriptionPlansRoute =
+  AuthenticatedSubscriptionPlansRouteImport.update({
+    id: '/subscription-plans',
+    path: '/subscription-plans',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReportsRoute = AuthenticatedReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const SignInIndexRoute = SignInIndexRouteImport.update({
-  id: '/signIn/',
-  path: '/signIn/',
-  getParentRoute: () => rootRouteImport,
+const AuthenticatedReportCategoriesRoute =
+  AuthenticatedReportCategoriesRouteImport.update({
+    id: '/report-categories',
+    path: '/report-categories',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedProvincesRoute = AuthenticatedProvincesRouteImport.update({
+  id: '/provinces',
+  path: '/provinces',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPlanLeadRequestsRoute =
+  AuthenticatedPlanLeadRequestsRouteImport.update({
+    id: '/plan-lead-requests',
+    path: '/plan-lead-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedPlanContactLeadsRoute =
+  AuthenticatedPlanContactLeadsRouteImport.update({
+    id: '/plan-contact-leads',
+    path: '/plan-contact-leads',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMunicipalitiesRoute =
+  AuthenticatedMunicipalitiesRouteImport.update({
+    id: '/municipalities',
+    path: '/municipalities',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedModerationRoute = AuthenticatedModerationRouteImport.update({
+  id: '/moderation',
+  path: '/moderation',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedModelosRoute = AuthenticatedModelosRouteImport.update({
+  id: '/modelos',
+  path: '/modelos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMessagesRoute = AuthenticatedMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMarcasRoute = AuthenticatedMarcasRouteImport.update({
+  id: '/marcas',
+  path: '/marcas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
+  id: '/features',
+  path: '/features',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedFeaturedListingOffersRoute =
+  AuthenticatedFeaturedListingOffersRouteImport.update({
+    id: '/featured-listing-offers',
+    path: '/featured-listing-offers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedDgtLabelsRoute = AuthenticatedDgtLabelsRouteImport.update({
+  id: '/dgt-labels',
+  path: '/dgt-labels',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedDealershipRoute = AuthenticatedDealershipRouteImport.update({
+  id: '/dealership',
+  path: '/dealership',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCuponesRoute = AuthenticatedCuponesRouteImport.update({
+  id: '/cupones',
+  path: '/cupones',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCuotasRoute = AuthenticatedCuotasRouteImport.update({
+  id: '/cuotas',
+  path: '/cuotas',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCommunitiesRoute =
+  AuthenticatedCommunitiesRouteImport.update({
+    id: '/communities',
+    path: '/communities',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCombustiblesRoute =
+  AuthenticatedCombustiblesRouteImport.update({
+    id: '/combustibles',
+    path: '/combustibles',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedColorsRoute = AuthenticatedColorsRouteImport.update({
+  id: '/colors',
+  path: '/colors',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCategoriesRoute = AuthenticatedCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedCatalogServicesRoute =
+  AuthenticatedCatalogServicesRouteImport.update({
+    id: '/catalog-services',
+    path: '/catalog-services',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedCarroceriasRoute =
+  AuthenticatedCarroceriasRouteImport.update({
+    id: '/carrocerias',
+    path: '/carrocerias',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAssistantCreditPacksRoute =
+  AuthenticatedAssistantCreditPacksRouteImport.update({
+    id: '/assistant-credit-packs',
+    path: '/assistant-credit-packs',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnosRoute = AuthenticatedAnosRouteImport.update({
+  id: '/anos',
+  path: '/anos',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedProfileConfigRoute =
   AuthenticatedProfileConfigRouteImport.update({
@@ -545,6 +545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/signIn/': {
+      id: '/signIn/'
+      path: '/signIn'
+      fullPath: '/signIn/'
+      preLoaderRoute: typeof SignInIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/': {
       id: '/_authenticated/'
       path: '/'
@@ -552,235 +559,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/about': {
-      id: '/_authenticated/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AuthenticatedAboutRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/auth/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/anos': {
-      id: '/_authenticated/anos'
-      path: '/anos'
-      fullPath: '/anos'
-      preLoaderRoute: typeof AuthenticatedAnosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/auth/recover-password': {
+      id: '/auth/recover-password'
+      path: '/auth/recover-password'
+      fullPath: '/auth/recover-password'
+      preLoaderRoute: typeof AuthRecoverPasswordRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/assistant-credit-packs': {
-      id: '/_authenticated/assistant-credit-packs'
-      path: '/assistant-credit-packs'
-      fullPath: '/assistant-credit-packs'
-      preLoaderRoute: typeof AuthenticatedAssistantCreditPacksRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/carrocerias': {
-      id: '/_authenticated/carrocerias'
-      path: '/carrocerias'
-      fullPath: '/carrocerias'
-      preLoaderRoute: typeof AuthenticatedCarroceriasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/catalog-services': {
-      id: '/_authenticated/catalog-services'
-      path: '/catalog-services'
-      fullPath: '/catalog-services'
-      preLoaderRoute: typeof AuthenticatedCatalogServicesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/categories': {
-      id: '/_authenticated/categories'
-      path: '/categories'
-      fullPath: '/categories'
-      preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/colors': {
-      id: '/_authenticated/colors'
-      path: '/colors'
-      fullPath: '/colors'
-      preLoaderRoute: typeof AuthenticatedColorsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/combustibles': {
-      id: '/_authenticated/combustibles'
-      path: '/combustibles'
-      fullPath: '/combustibles'
-      preLoaderRoute: typeof AuthenticatedCombustiblesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/communities': {
-      id: '/_authenticated/communities'
-      path: '/communities'
-      fullPath: '/communities'
-      preLoaderRoute: typeof AuthenticatedCommunitiesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/cuotas': {
-      id: '/_authenticated/cuotas'
-      path: '/cuotas'
-      fullPath: '/cuotas'
-      preLoaderRoute: typeof AuthenticatedCuotasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/cupones': {
-      id: '/_authenticated/cupones'
-      path: '/cupones'
-      fullPath: '/cupones'
-      preLoaderRoute: typeof AuthenticatedCuponesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dealership': {
-      id: '/_authenticated/dealership'
-      path: '/dealership'
-      fullPath: '/dealership'
-      preLoaderRoute: typeof AuthenticatedDealershipRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dgt-labels': {
-      id: '/_authenticated/dgt-labels'
-      path: '/dgt-labels'
-      fullPath: '/dgt-labels'
-      preLoaderRoute: typeof AuthenticatedDgtLabelsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/featured-listing-offers': {
-      id: '/_authenticated/featured-listing-offers'
-      path: '/featured-listing-offers'
-      fullPath: '/featured-listing-offers'
-      preLoaderRoute: typeof AuthenticatedFeaturedListingOffersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/features': {
-      id: '/_authenticated/features'
-      path: '/features'
-      fullPath: '/features'
-      preLoaderRoute: typeof AuthenticatedFeaturesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/marcas': {
-      id: '/_authenticated/marcas'
-      path: '/marcas'
-      fullPath: '/marcas'
-      preLoaderRoute: typeof AuthenticatedMarcasRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/messages': {
-      id: '/_authenticated/messages'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/modelos': {
-      id: '/_authenticated/modelos'
-      path: '/modelos'
-      fullPath: '/modelos'
-      preLoaderRoute: typeof AuthenticatedModelosRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/moderation': {
-      id: '/_authenticated/moderation'
-      path: '/moderation'
-      fullPath: '/moderation'
-      preLoaderRoute: typeof AuthenticatedModerationRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/municipalities': {
-      id: '/_authenticated/municipalities'
-      path: '/municipalities'
-      fullPath: '/municipalities'
-      preLoaderRoute: typeof AuthenticatedMunicipalitiesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/plan-contact-leads': {
-      id: '/_authenticated/plan-contact-leads'
-      path: '/plan-contact-leads'
-      fullPath: '/plan-contact-leads'
-      preLoaderRoute: typeof AuthenticatedPlanContactLeadsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/plan-lead-requests': {
-      id: '/_authenticated/plan-lead-requests'
-      path: '/plan-lead-requests'
-      fullPath: '/plan-lead-requests'
-      preLoaderRoute: typeof AuthenticatedPlanLeadRequestsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/provinces': {
-      id: '/_authenticated/provinces'
-      path: '/provinces'
-      fullPath: '/provinces'
-      preLoaderRoute: typeof AuthenticatedProvincesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/report-categories': {
-      id: '/_authenticated/report-categories'
-      path: '/report-categories'
-      fullPath: '/report-categories'
-      preLoaderRoute: typeof AuthenticatedReportCategoriesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/reports': {
-      id: '/_authenticated/reports'
-      path: '/reports'
-      fullPath: '/reports'
-      preLoaderRoute: typeof AuthenticatedReportsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/subscription-plans': {
-      id: '/_authenticated/subscription-plans'
-      path: '/subscription-plans'
-      fullPath: '/subscription-plans'
-      preLoaderRoute: typeof AuthenticatedSubscriptionPlansRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tasaciones': {
-      id: '/_authenticated/tasaciones'
-      path: '/tasaciones'
-      fullPath: '/tasaciones'
-      preLoaderRoute: typeof AuthenticatedTasacionesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/ticket-categories': {
-      id: '/_authenticated/ticket-categories'
-      path: '/ticket-categories'
-      fullPath: '/ticket-categories'
-      preLoaderRoute: typeof AuthenticatedTicketCategoriesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tickets': {
-      id: '/_authenticated/tickets'
-      path: '/tickets'
-      fullPath: '/tickets'
-      preLoaderRoute: typeof AuthenticatedTicketsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tractions': {
-      id: '/_authenticated/tractions'
-      path: '/tractions'
-      fullPath: '/tractions'
-      preLoaderRoute: typeof AuthenticatedTractionsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/users': {
-      id: '/_authenticated/users'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof AuthenticatedUsersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/vehicle-types': {
-      id: '/_authenticated/vehicle-types'
-      path: '/vehicle-types'
-      fullPath: '/vehicle-types'
-      preLoaderRoute: typeof AuthenticatedVehicleTypesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/vehicles': {
-      id: '/_authenticated/vehicles'
-      path: '/vehicles'
-      fullPath: '/vehicles'
-      preLoaderRoute: typeof AuthenticatedVehiclesRouteImport
+    '/_authenticated/warranty-types': {
+      id: '/_authenticated/warranty-types'
+      path: '/warranty-types'
+      fullPath: '/warranty-types'
+      preLoaderRoute: typeof AuthenticatedWarrantyTypesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/versiones': {
@@ -790,33 +587,236 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedVersionesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/warranty-types': {
-      id: '/_authenticated/warranty-types'
-      path: '/warranty-types'
-      fullPath: '/warranty-types'
-      preLoaderRoute: typeof AuthenticatedWarrantyTypesRouteImport
+    '/_authenticated/vehicles': {
+      id: '/_authenticated/vehicles'
+      path: '/vehicles'
+      fullPath: '/vehicles'
+      preLoaderRoute: typeof AuthenticatedVehiclesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/auth/recover-password': {
-      id: '/auth/recover-password'
-      path: '/auth/recover-password'
-      fullPath: '/auth/recover-password'
-      preLoaderRoute: typeof AuthRecoverPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/vehicle-types': {
+      id: '/_authenticated/vehicle-types'
+      path: '/vehicle-types'
+      fullPath: '/vehicle-types'
+      preLoaderRoute: typeof AuthenticatedVehicleTypesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/auth/reset-password': {
-      id: '/auth/reset-password'
-      path: '/auth/reset-password'
-      fullPath: '/auth/reset-password'
-      preLoaderRoute: typeof AuthResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/users': {
+      id: '/_authenticated/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthenticatedUsersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/signIn/': {
-      id: '/signIn/'
-      path: '/signIn'
-      fullPath: '/signIn/'
-      preLoaderRoute: typeof SignInIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_authenticated/tractions': {
+      id: '/_authenticated/tractions'
+      path: '/tractions'
+      fullPath: '/tractions'
+      preLoaderRoute: typeof AuthenticatedTractionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tickets': {
+      id: '/_authenticated/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof AuthenticatedTicketsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ticket-categories': {
+      id: '/_authenticated/ticket-categories'
+      path: '/ticket-categories'
+      fullPath: '/ticket-categories'
+      preLoaderRoute: typeof AuthenticatedTicketCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/tasaciones': {
+      id: '/_authenticated/tasaciones'
+      path: '/tasaciones'
+      fullPath: '/tasaciones'
+      preLoaderRoute: typeof AuthenticatedTasacionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/subscription-plans': {
+      id: '/_authenticated/subscription-plans'
+      path: '/subscription-plans'
+      fullPath: '/subscription-plans'
+      preLoaderRoute: typeof AuthenticatedSubscriptionPlansRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reports': {
+      id: '/_authenticated/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AuthenticatedReportsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/report-categories': {
+      id: '/_authenticated/report-categories'
+      path: '/report-categories'
+      fullPath: '/report-categories'
+      preLoaderRoute: typeof AuthenticatedReportCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/provinces': {
+      id: '/_authenticated/provinces'
+      path: '/provinces'
+      fullPath: '/provinces'
+      preLoaderRoute: typeof AuthenticatedProvincesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/plan-lead-requests': {
+      id: '/_authenticated/plan-lead-requests'
+      path: '/plan-lead-requests'
+      fullPath: '/plan-lead-requests'
+      preLoaderRoute: typeof AuthenticatedPlanLeadRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/plan-contact-leads': {
+      id: '/_authenticated/plan-contact-leads'
+      path: '/plan-contact-leads'
+      fullPath: '/plan-contact-leads'
+      preLoaderRoute: typeof AuthenticatedPlanContactLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/municipalities': {
+      id: '/_authenticated/municipalities'
+      path: '/municipalities'
+      fullPath: '/municipalities'
+      preLoaderRoute: typeof AuthenticatedMunicipalitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/moderation': {
+      id: '/_authenticated/moderation'
+      path: '/moderation'
+      fullPath: '/moderation'
+      preLoaderRoute: typeof AuthenticatedModerationRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/modelos': {
+      id: '/_authenticated/modelos'
+      path: '/modelos'
+      fullPath: '/modelos'
+      preLoaderRoute: typeof AuthenticatedModelosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/messages': {
+      id: '/_authenticated/messages'
+      path: '/messages'
+      fullPath: '/messages'
+      preLoaderRoute: typeof AuthenticatedMessagesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/marcas': {
+      id: '/_authenticated/marcas'
+      path: '/marcas'
+      fullPath: '/marcas'
+      preLoaderRoute: typeof AuthenticatedMarcasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/features': {
+      id: '/_authenticated/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof AuthenticatedFeaturesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/featured-listing-offers': {
+      id: '/_authenticated/featured-listing-offers'
+      path: '/featured-listing-offers'
+      fullPath: '/featured-listing-offers'
+      preLoaderRoute: typeof AuthenticatedFeaturedListingOffersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dgt-labels': {
+      id: '/_authenticated/dgt-labels'
+      path: '/dgt-labels'
+      fullPath: '/dgt-labels'
+      preLoaderRoute: typeof AuthenticatedDgtLabelsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/dealership': {
+      id: '/_authenticated/dealership'
+      path: '/dealership'
+      fullPath: '/dealership'
+      preLoaderRoute: typeof AuthenticatedDealershipRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cupones': {
+      id: '/_authenticated/cupones'
+      path: '/cupones'
+      fullPath: '/cupones'
+      preLoaderRoute: typeof AuthenticatedCuponesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/cuotas': {
+      id: '/_authenticated/cuotas'
+      path: '/cuotas'
+      fullPath: '/cuotas'
+      preLoaderRoute: typeof AuthenticatedCuotasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/communities': {
+      id: '/_authenticated/communities'
+      path: '/communities'
+      fullPath: '/communities'
+      preLoaderRoute: typeof AuthenticatedCommunitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/combustibles': {
+      id: '/_authenticated/combustibles'
+      path: '/combustibles'
+      fullPath: '/combustibles'
+      preLoaderRoute: typeof AuthenticatedCombustiblesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/colors': {
+      id: '/_authenticated/colors'
+      path: '/colors'
+      fullPath: '/colors'
+      preLoaderRoute: typeof AuthenticatedColorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/categories': {
+      id: '/_authenticated/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof AuthenticatedCategoriesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/catalog-services': {
+      id: '/_authenticated/catalog-services'
+      path: '/catalog-services'
+      fullPath: '/catalog-services'
+      preLoaderRoute: typeof AuthenticatedCatalogServicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/carrocerias': {
+      id: '/_authenticated/carrocerias'
+      path: '/carrocerias'
+      fullPath: '/carrocerias'
+      preLoaderRoute: typeof AuthenticatedCarroceriasRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/assistant-credit-packs': {
+      id: '/_authenticated/assistant-credit-packs'
+      path: '/assistant-credit-packs'
+      fullPath: '/assistant-credit-packs'
+      preLoaderRoute: typeof AuthenticatedAssistantCreditPacksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/anos': {
+      id: '/_authenticated/anos'
+      path: '/anos'
+      fullPath: '/anos'
+      preLoaderRoute: typeof AuthenticatedAnosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/about': {
+      id: '/_authenticated/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AuthenticatedAboutRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/profile/config': {
       id: '/_authenticated/profile/config'
