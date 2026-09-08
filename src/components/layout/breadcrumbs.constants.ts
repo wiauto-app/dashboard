@@ -98,6 +98,11 @@ export const breadcrumbs: Record<string, BreadcrumbItem[]> = {
     "Solicitudes de planes",
     "/plan-lead-requests",
   ),
+  "/plan-contact-leads": with_home(
+    "Leads de contacto (planes)",
+    "/plan-contact-leads",
+  ),
+
   "/subscription-plans": with_home("Planes", "/subscription-plans"),
   "/assistant-credit-packs": with_home(
     "Consultas del asistente",

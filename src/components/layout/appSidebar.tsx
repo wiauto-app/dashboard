@@ -61,6 +61,10 @@ const pagos_admin_children = [
   { to: "/featured-listing-offers" as const, label: "Destacar anuncios" },
   { to: "/cupones" as const, label: "Cupones" },
   { to: "/plan-lead-requests" as const, label: "Solicitudes de planes" },
+  {
+    to: "/plan-contact-leads" as const,
+    label: "Leads de contacto (planes)",
+  },
 ] as const;
 
 const vehicle_admin_children = [
