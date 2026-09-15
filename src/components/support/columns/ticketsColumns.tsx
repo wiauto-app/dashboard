@@ -18,8 +18,15 @@ export const ticketsColumns: DynamicTableColumn[] = [
     modifiable: false,
   },
   {
-    header: "Usuario",
+    header: "Contacto",
     accessorKey: "profile_label",
+    type: "text",
+    sortable: false,
+    modifiable: false,
+  },
+  {
+    header: "Correo invitado",
+    accessorKey: "guest_email",
     type: "text",
     sortable: false,
     modifiable: false,

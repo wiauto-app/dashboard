@@ -67,13 +67,20 @@ export const ticketsActions = (
   row: TicketListItem,
   onSuccess?: () => void,
 ): DynamicTableAction[] => [
-  {
-    key: "chat-ticket",
-    label: "Chat del ticket",
-    component: (
-      <TicketSupportChatButton key={`ticket-chat-${row.id}`} ticket={row} />
-    ),
-  },
+  ...(row.profile_id
+    ? [
+        {
+          key: "chat-ticket",
+          label: "Chat del ticket",
+          component: (
+            <TicketSupportChatButton
+              key={`ticket-chat-${row.id}`}
+              ticket={row}
+            />
+          ),
+        },
+      ]
+    : []),
   deleteRowAction(row.id, onSuccess, {
     deleteFn: ticketsService.delete,
     title: "Eliminar ticket",
