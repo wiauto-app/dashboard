@@ -20,20 +20,22 @@ export const ReportTargetTypeSelector = ({
   disabled,
   placeholder = "Tipo de objetivo",
   include_all_option = false,
+  options = REPORT_TARGET_TYPE_OPTIONS,
 }: {
   value?: ReportTargetType;
   onValueChange: (value: ReportTargetType | undefined) => void;
   disabled?: boolean;
   placeholder?: string;
   include_all_option?: boolean;
+  options?: readonly { value: ReportTargetType; label: string }[];
 }) => {
   const items = useMemo<Option[]>(() => {
-    if (!include_all_option) return [...REPORT_TARGET_TYPE_OPTIONS];
+    if (!include_all_option) return [...options];
     return [
       { value: REPORT_FILTER_ALL_VALUE, label: REPORT_FILTER_ALL_LABEL },
-      ...REPORT_TARGET_TYPE_OPTIONS,
+      ...options,
     ];
-  }, [include_all_option]);
+  }, [include_all_option, options]);
 
   const handleChange = (next: string | undefined) => {
     if (next === REPORT_FILTER_ALL_VALUE) {

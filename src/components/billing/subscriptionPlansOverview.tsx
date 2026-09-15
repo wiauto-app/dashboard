@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
-import { useQueries, useQuery } from "@tanstack/react-query";
+import {
+  useQueries,
+  useQuery,
+  type UseQueryResult,
+} from "@tanstack/react-query";
 import {
   BadgeCheck,
   BrainCircuit,
@@ -48,6 +52,7 @@ import {
   type PlanVersion,
   type SubscriptionPlan,
 } from "./services/billingPlansService";
+import type { apiResponse } from "@/services/api";
 
 interface SubscriptionPlansOverviewProps {
   plans: SubscriptionPlan[];
@@ -376,22 +381,22 @@ export const SubscriptionPlansOverview = ({
 
   const version_queries = useQueries({
     queries: plans.map((plan) => ({
-      queryKey: ["subscription-plan-entitlements", plan.id],
-      queryFn: () => billingPlansService.getEntitlements(plan.id),
+      queryKey: ["subscription-plan-entitlements", plan.id] as const,
+      queryFn: (): Promise<apiResponse<PlanVersion>> =>
+        billingPlansService.getEntitlements(plan.id),
       staleTime: 30_000,
     })),
-  });
+  }) as unknown as UseQueryResult<apiResponse<PlanVersion>, Error>[];
 
-  const versions_by_plan = useMemo(
-    () =>
-      new Map(
-        plans.map((plan, index) => [
-          plan.id,
-          version_queries[index]?.data?.data ?? null,
-        ]),
-      ),
-    [plans, version_queries],
-  );
+  const versions_by_plan = useMemo(() => {
+    const map = new Map<string, PlanVersion | null>();
+    for (let index = 0; index < plans.length; index += 1) {
+      const plan = plans[index];
+      const query = version_queries[index];
+      map.set(plan.id, query?.data?.data ?? null);
+    }
+    return map;
+  }, [plans, version_queries]);
 
   const openPlanForm = (id: string | null) => {
     set_selected_id(id);
@@ -516,16 +521,20 @@ export const SubscriptionPlansOverview = ({
 
       {plans.length ? (
         <section className="grid items-stretch gap-5 xl:grid-cols-2" aria-label="Planes configurados">
-          {plans.map((plan, index) => (
+          {plans.map((plan, index) => {
+            const version_query = version_queries[index];
+            const version_response = version_query?.data;
+
+            return (
             <PlanCard
               key={plan.id}
               plan={plan}
               index={index}
               version={versions_by_plan.get(plan.id) ?? null}
-              versionLoading={version_queries[index]?.isLoading ?? false}
+              versionLoading={version_query?.isLoading ?? false}
               versionError={
-                (version_queries[index]?.isError ?? false) ||
-                version_queries[index]?.data?.ok === false
+                (version_query?.isError ?? false) ||
+                version_response?.ok === false
               }
               featureCatalog={feature_catalog}
               syncing={syncing_id === plan.id}
@@ -533,7 +542,8 @@ export const SubscriptionPlansOverview = ({
               onSync={syncPlan}
               onDelete={onDataChange}
             />
-          ))}
+            );
+          })}
         </section>
       ) : (
         <Card className="border-dashed py-16 text-center">

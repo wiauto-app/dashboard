@@ -14,6 +14,20 @@ export const REPORT_TARGET_TYPE_OPTIONS: {
   { value: "assistant_message", label: "Respuesta del asistente" },
 ];
 
+/** Tipos que el admin puede elegir al crear una denuncia manual. */
+export const REPORT_MANUAL_TARGET_TYPE_OPTIONS =
+  REPORT_TARGET_TYPE_OPTIONS.filter(
+    (
+      option,
+    ): option is {
+      value: "profile" | "dealership" | "vehicle";
+      label: string;
+    } =>
+      option.value === "profile" ||
+      option.value === "dealership" ||
+      option.value === "vehicle",
+  );
+
 export const get_report_target_type_label = (
   target_type: ReportTargetType,
 ): string =>

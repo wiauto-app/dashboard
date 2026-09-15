@@ -9,7 +9,10 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { FileInput } from "@/components/ui/fileInput";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { get_report_target_type_label } from "../constants/report-target-type.constants";
+import {
+  get_report_target_type_label,
+  REPORT_MANUAL_TARGET_TYPE_OPTIONS,
+} from "../constants/report-target-type.constants";
 import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { asFormResolver } from "@/lib/asFormResolver";
@@ -21,6 +24,21 @@ import type z from "zod";
 import { createReportSchema, updateReportSchema } from "../schemas/report.schema";
 import { reportsService } from "../services/reportsService";
 import type { ReportStatus, ReportTargetType } from "../types/report.types";
+
+type CreateReportFormValues = z.infer<typeof createReportSchema>;
+type UpdateReportFormValues = z.infer<typeof updateReportSchema>;
+
+/** Valores unificados create|update para un solo `useForm`. */
+interface ReportFormValues {
+  title: string;
+  description: string;
+  category_id: string;
+  target_type: CreateReportFormValues["target_type"];
+  target_id: string;
+  file_url?: string;
+  status: ReportStatus;
+  admin_notes?: string;
+}
 
 const ReportTargetSelector = ({
   target_type,
@@ -39,6 +57,15 @@ const ReportTargetSelector = ({
     return (
       <p className="text-sm text-muted-foreground">
         Selecciona primero el tipo de objetivo.
+      </p>
+    );
+  }
+
+  if (target_type === "chat_message" || target_type === "assistant_message") {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Las denuncias de mensajes se crean desde el chat o el asistente, no de
+        forma manual.
       </p>
     );
   }
@@ -82,7 +109,6 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const selectedId = useSelectedIdStore((state) => state.selectedId);
 
   const formSchema = selectedId ? updateReportSchema : createReportSchema;
-  type FormSchema = z.infer<typeof formSchema>;
 
   const { data: reportResponse } = useQuery({
     queryKey: ["report", selectedId],
@@ -90,25 +116,23 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     enabled: !!selectedId,
   });
 
-  const form = useForm<FormSchema>({
-    resolver: asFormResolver<FormSchema>(formSchema),
+  const form = useForm<ReportFormValues>({
+    resolver: asFormResolver<ReportFormValues>(formSchema),
     defaultValues: {
       title: "",
       description: "",
       category_id: "",
-      target_type: "profile" as ReportTargetType,
+      target_type: "profile",
       target_id: "",
       file_url: "",
-      status: "open" as ReportStatus,
+      status: "open",
       admin_notes: "",
     },
   });
 
   const selected_target_type = selectedId
     ? reportResponse?.data?.target_type
-    : (form.watch("target_type" as keyof FormSchema) as
-        | ReportTargetType
-        | undefined);
+    : form.watch("target_type");
 
   useEffect(() => {
     const report = reportResponse?.data;
@@ -119,22 +143,25 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       file_url: report.file_url ?? "",
       status: report.status,
       admin_notes: report.admin_notes ?? "",
+      category_id: report.category.id,
+      target_type: "profile",
+      target_id: report.target_id,
     });
   }, [reportResponse, form]);
 
   useEffect(() => {
     if (selectedId) return;
-    form.setValue("category_id" as keyof FormSchema, "" as never);
-    form.setValue("target_id" as keyof FormSchema, "" as never);
+    form.setValue("category_id", "");
+    form.setValue("target_id", "");
   }, [selected_target_type, selectedId, form]);
 
-  const onSubmit = async (formData: FormSchema) => {
+  const onSubmit = async (formData: ReportFormValues) => {
     const file_url = formData.file_url?.trim()
       ? formData.file_url.trim()
       : null;
 
     if (selectedId) {
-      const update_data = formData as z.infer<typeof updateReportSchema>;
+      const update_data = formData as UpdateReportFormValues;
       const response = await reportsService.update(selectedId, {
         title: update_data.title,
         description: update_data.description,
@@ -155,7 +182,7 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       return;
     }
 
-    const create_data = formData as z.infer<typeof createReportSchema>;
+    const create_data = formData as CreateReportFormValues;
     if (
       !create_data.category_id ||
       !create_data.title ||
@@ -223,15 +250,20 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
         ) : (
           <>
             <Controller
-              name={"target_type" as keyof FormSchema}
+              name="target_type"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="target_type">Tipo de objetivo</FieldLabel>
                   <ReportTargetTypeSelector
-                    value={field.value as ReportTargetType | undefined}
+                    value={field.value}
+                    options={REPORT_MANUAL_TARGET_TYPE_OPTIONS}
                     onValueChange={(value) => {
-                      if (value) {
+                      if (
+                        value === "profile" ||
+                        value === "dealership" ||
+                        value === "vehicle"
+                      ) {
                         field.onChange(value);
                       }
                     }}
@@ -245,14 +277,14 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             />
 
             <Controller
-              name={"target_id" as keyof FormSchema}
+              name="target_id"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="target_id">Objetivo denunciado</FieldLabel>
                   <ReportTargetSelector
                     target_type={selected_target_type}
-                    value={field.value as string | undefined}
+                    value={field.value}
                     onValueChange={field.onChange}
                     ariaInvalid={fieldState.invalid}
                   />
@@ -264,13 +296,13 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
             />
 
             <Controller
-              name={"category_id" as keyof FormSchema}
+              name="category_id"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="category_id">Categoría</FieldLabel>
                   <ReportCategoriesSelector
-                    value={field.value as string | undefined}
+                    value={field.value}
                     onValueChange={field.onChange}
                     targetType={selected_target_type}
                     ariaInvalid={fieldState.invalid}
@@ -348,7 +380,7 @@ export const ReportForm = ({ onSuccess }: { onSuccess?: () => void }) => {
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor="status">Estado</FieldLabel>
                   <ReportStatusSelector
-                    value={field.value as ReportStatus | undefined}
+                    value={field.value}
                     onValueChange={(value) => {
                       if (value) {
                         field.onChange(value);
