@@ -57,7 +57,7 @@ const entitlement_groups = [
     label: "Equipo y gestión",
     description: "Usuarios y herramientas operativas del concesionario.",
     icon: Users,
-    features: ["users", "dismissed_vehicles", "advanced_listing_editor"],
+    features: ["users", "advanced_listing_editor"],
   },
   {
     id: "intelligence",

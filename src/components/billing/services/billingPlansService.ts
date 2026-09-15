@@ -25,7 +25,6 @@ export type EntitlementFeature =
   | "ai_generation"
   | "statistics"
   | "featured_listings"
-  | "dismissed_vehicles"
   | "advanced_listing_editor";
 
 export interface EntitlementBooleanValue {
