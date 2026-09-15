@@ -1,4 +1,9 @@
-export type ReportTargetType = "profile" | "dealership" | "vehicle";
+export type ReportTargetType =
+  | "profile"
+  | "dealership"
+  | "vehicle"
+  | "chat_message"
+  | "assistant_message";
 
 export type ReportStatus =
   | "open"
@@ -23,6 +28,7 @@ export interface ReportListItem {
   target_type: ReportTargetType;
   target_id: string;
   target_label: string;
+  target_assistant_message_id?: string | null;
   reporter_profile_id: string;
   reporter_label: string;
   implicated_profile_id: string | null;

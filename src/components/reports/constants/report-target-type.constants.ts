@@ -10,6 +10,8 @@ export const REPORT_TARGET_TYPE_OPTIONS: {
   { value: "profile", label: "Perfil" },
   { value: "dealership", label: "Concesionario" },
   { value: "vehicle", label: "Anuncio" },
+  { value: "chat_message", label: "Mensaje de chat" },
+  { value: "assistant_message", label: "Respuesta del asistente" },
 ];
 
 export const get_report_target_type_label = (

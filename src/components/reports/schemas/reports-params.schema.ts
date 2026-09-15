@@ -14,6 +14,8 @@ const report_target_type_values = [
   "profile",
   "dealership",
   "vehicle",
+  "chat_message",
+  "assistant_message",
 ] as const satisfies readonly ReportTargetType[];
 
 export const reportsParamsSchema = z

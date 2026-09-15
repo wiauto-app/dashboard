@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-const report_target_type_enum = z.enum(["profile", "dealership", "vehicle"]);
+const report_target_type_enum = z.enum([
+  "profile",
+  "dealership",
+  "vehicle",
+  "chat_message",
+  "assistant_message",
+]);
 
 export const createReportCategorySchema = z.object({
   name: z.string().min(1, { message: "El nombre es obligatorio" }),
