@@ -34,6 +34,7 @@ import { Route as AuthenticatedModerationRouteImport } from './routes/_authentic
 import { Route as AuthenticatedModelosRouteImport } from './routes/_authenticated/modelos'
 import { Route as AuthenticatedMessagesRouteImport } from './routes/_authenticated/messages'
 import { Route as AuthenticatedMarcasRouteImport } from './routes/_authenticated/marcas'
+import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
 import { Route as AuthenticatedFeaturesRouteImport } from './routes/_authenticated/features'
 import { Route as AuthenticatedFeaturedListingOffersRouteImport } from './routes/_authenticated/featured-listing-offers'
 import { Route as AuthenticatedDgtLabelsRouteImport } from './routes/_authenticated/dgt-labels'
@@ -183,6 +184,11 @@ const AuthenticatedMarcasRoute = AuthenticatedMarcasRouteImport.update({
   path: '/marcas',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedFeaturesRoute = AuthenticatedFeaturesRouteImport.update({
   id: '/features',
   path: '/features',
@@ -288,6 +294,7 @@ export interface FileRoutesByFullPath {
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/featured-listing-offers': typeof AuthenticatedFeaturedListingOffersRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/modelos': typeof AuthenticatedModelosRoute
@@ -329,6 +336,7 @@ export interface FileRoutesByTo {
   '/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/featured-listing-offers': typeof AuthenticatedFeaturedListingOffersRoute
   '/features': typeof AuthenticatedFeaturesRoute
+  '/leads': typeof AuthenticatedLeadsRoute
   '/marcas': typeof AuthenticatedMarcasRoute
   '/messages': typeof AuthenticatedMessagesRoute
   '/modelos': typeof AuthenticatedModelosRoute
@@ -373,6 +381,7 @@ export interface FileRoutesById {
   '/_authenticated/dgt-labels': typeof AuthenticatedDgtLabelsRoute
   '/_authenticated/featured-listing-offers': typeof AuthenticatedFeaturedListingOffersRoute
   '/_authenticated/features': typeof AuthenticatedFeaturesRoute
+  '/_authenticated/leads': typeof AuthenticatedLeadsRoute
   '/_authenticated/marcas': typeof AuthenticatedMarcasRoute
   '/_authenticated/messages': typeof AuthenticatedMessagesRoute
   '/_authenticated/modelos': typeof AuthenticatedModelosRoute
@@ -418,6 +427,7 @@ export interface FileRouteTypes {
     | '/dgt-labels'
     | '/featured-listing-offers'
     | '/features'
+    | '/leads'
     | '/marcas'
     | '/messages'
     | '/modelos'
@@ -459,6 +469,7 @@ export interface FileRouteTypes {
     | '/dgt-labels'
     | '/featured-listing-offers'
     | '/features'
+    | '/leads'
     | '/marcas'
     | '/messages'
     | '/modelos'
@@ -502,6 +513,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dgt-labels'
     | '/_authenticated/featured-listing-offers'
     | '/_authenticated/features'
+    | '/_authenticated/leads'
     | '/_authenticated/marcas'
     | '/_authenticated/messages'
     | '/_authenticated/modelos'
@@ -713,6 +725,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMarcasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/leads': {
+      id: '/_authenticated/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof AuthenticatedLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/features': {
       id: '/_authenticated/features'
       path: '/features'
@@ -844,6 +863,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDgtLabelsRoute: typeof AuthenticatedDgtLabelsRoute
   AuthenticatedFeaturedListingOffersRoute: typeof AuthenticatedFeaturedListingOffersRoute
   AuthenticatedFeaturesRoute: typeof AuthenticatedFeaturesRoute
+  AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRoute
   AuthenticatedMarcasRoute: typeof AuthenticatedMarcasRoute
   AuthenticatedMessagesRoute: typeof AuthenticatedMessagesRoute
   AuthenticatedModelosRoute: typeof AuthenticatedModelosRoute
@@ -886,6 +906,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFeaturedListingOffersRoute:
     AuthenticatedFeaturedListingOffersRoute,
   AuthenticatedFeaturesRoute: AuthenticatedFeaturesRoute,
+  AuthenticatedLeadsRoute: AuthenticatedLeadsRoute,
   AuthenticatedMarcasRoute: AuthenticatedMarcasRoute,
   AuthenticatedMessagesRoute: AuthenticatedMessagesRoute,
   AuthenticatedModelosRoute: AuthenticatedModelosRoute,

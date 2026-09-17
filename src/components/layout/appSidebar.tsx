@@ -50,6 +50,7 @@ const rest_nav_items = [
   { to: "/users" as const, label: "Usuarios", icon: Users },
   { to: "/messages" as const, label: "Mensajes", icon: MessageCircle },
   { to: "/tasaciones" as const, label: "Tasaciones", icon: Calculator },
+  { to: "/leads" as const, label: "Leads", icon: Users },
   { to: "/dealership" as const, label: "Concesionarios", icon: Store },
   // { to: "/moderation" as const, label: "Moderación", icon: ShieldCheck },
   { to: "/about" as const, label: "Acerca", icon: Info },
