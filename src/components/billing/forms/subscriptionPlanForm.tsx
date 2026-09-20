@@ -82,6 +82,7 @@ interface PlanFormValues {
   description: string;
   is_active: boolean;
   is_featured: boolean;
+  is_visible: boolean;
   sort_order: number;
   prices: Array<{
     interval: "month" | "year" | "one_time";
@@ -128,6 +129,7 @@ const default_values: PlanFormValues = {
   description: "",
   is_active: true,
   is_featured: false,
+  is_visible: true,
   sort_order: 0,
   prices: [
     {
@@ -424,6 +426,7 @@ export const SubscriptionPlanForm = () => {
       description: plan.description ?? "",
       is_active: plan.is_active,
       is_featured: plan.is_featured,
+      is_visible: plan.is_visible ?? true,
       sort_order: plan.sort_order,
       prices: plan.prices?.length
         ? plan.prices.map((price) => ({
@@ -475,6 +478,7 @@ export const SubscriptionPlanForm = () => {
     billing_type: "recurring" as const,
     is_active: form_values.is_active,
     is_featured: form_values.is_featured,
+    is_visible: form_values.is_visible,
     sort_order: form_values.sort_order,
     prices: form_values.prices
       .filter((price) => price.amount_euros > 0)
@@ -694,6 +698,25 @@ export const SubscriptionPlanForm = () => {
                   })
                 }
                 aria-label="Plan destacado"
+              />
+            </Field>
+
+            <Field orientation="horizontal" className="rounded-xl border p-4">
+              <FieldContent>
+                <FieldTitle>Visible en catálogo</FieldTitle>
+                <FieldDescription>
+                  Se muestra en la web y en la app. Si está desactivado, el
+                  plan sigue existiendo pero no aparece en el catálogo.
+                </FieldDescription>
+              </FieldContent>
+              <Switch
+                checked={values.is_visible}
+                onCheckedChange={(checked) =>
+                  form.setValue("is_visible", Boolean(checked), {
+                    shouldDirty: true,
+                  })
+                }
+                aria-label="Visible en catálogo"
               />
             </Field>
           </div>
@@ -969,6 +992,9 @@ export const SubscriptionPlanForm = () => {
                 </Badge>
                 <Badge variant="outline">
                   {values.is_featured ? "Destacado" : "No destacado"}
+                </Badge>
+                <Badge variant={values.is_visible ? "outline" : "secondary"}>
+                  {values.is_visible ? "Visible" : "Oculto"}
                 </Badge>
                 <Badge variant="outline">Orden {values.sort_order}</Badge>
               </div>

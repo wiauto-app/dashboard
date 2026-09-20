@@ -109,6 +109,7 @@ export interface SubscriptionPlan {
   stripe_product_id?: string | null;
   is_active: boolean;
   is_featured: boolean;
+  is_visible: boolean;
   sort_order: number;
   effect_config?: PlanEffectConfig;
   prices?: PlanPrice[];
@@ -121,6 +122,7 @@ export interface CreateSubscriptionPlanDto {
   billing_type: SubscriptionPlan["billing_type"];
   is_active?: boolean;
   is_featured?: boolean;
+  is_visible?: boolean;
   sort_order?: number;
   prices?: PlanPrice[];
   features?: PlanFeature[];

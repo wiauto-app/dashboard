@@ -25,6 +25,13 @@ export const subscriptionPlanColumns: DynamicTableColumn[] = [
     modifiable: true,
   },
   {
+    header: "Visible",
+    accessorKey: "is_visible",
+    type: "boolean",
+    sortable: true,
+    modifiable: true,
+  },
+  {
     header: "Orden",
     accessorKey: "sort_order",
     type: "number",
