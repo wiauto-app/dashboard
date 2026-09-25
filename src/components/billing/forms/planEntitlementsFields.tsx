@@ -49,7 +49,6 @@ const entitlement_groups = [
       "photos_per_vehicle",
       "videos_per_vehicle",
       "featured_listings",
-      "video_upload",
     ],
   },
   {
@@ -57,14 +56,21 @@ const entitlement_groups = [
     label: "Equipo y gestión",
     description: "Usuarios y herramientas operativas del concesionario.",
     icon: Users,
-    features: ["users", "advanced_listing_editor"],
+    features: ["users"],
   },
   {
     id: "intelligence",
     label: "IA y analítica",
     description: "Consumo de IA, generación y estadísticas avanzadas.",
     icon: BrainCircuit,
-    features: ["ai_requests", "ai_generation", "statistics"],
+    features: [
+      "ai_requests",
+      "ai_generation",
+      "statistics",
+      "listing_insights",
+      "ai_replies_per_conversation",
+      "ai_lead_conversations",
+    ],
   },
 ] as const;
 
