@@ -26,7 +26,9 @@ export type EntitlementFeature =
   | "featured_listings"
   | "listing_insights"
   | "ai_replies_per_conversation"
-  | "ai_lead_conversations";
+  | "ai_lead_conversations"
+  | "lead_scoring"
+  | "proactive_alerts";
 
 export interface EntitlementBooleanValue {
   bool: boolean;
