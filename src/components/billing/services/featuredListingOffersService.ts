@@ -13,6 +13,7 @@ export interface FeaturedListingOffer {
   id: string;
   title: string;
   description: string | null;
+  features: string[];
   duration_days: number;
   boost_weight: number;
   amount_cents: number;
@@ -28,6 +29,7 @@ export interface FeaturedListingOffer {
 export interface CreateFeaturedListingOfferDto {
   title: string;
   description?: string | null;
+  features?: string[];
   duration_days: number;
   boost_weight: number;
   amount_cents: number;

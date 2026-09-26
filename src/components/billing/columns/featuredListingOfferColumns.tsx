@@ -18,6 +18,14 @@ export const featuredListingOfferColumns: DynamicTableColumn[] = [
     modifiable: true,
   },
   {
+    header: "Características",
+    accessorKey: "features",
+    type: "array",
+    sortable: false,
+    modifiable: false,
+    showArrayItems: true,
+  },
+  {
     header: "Días",
     accessorKey: "duration_days",
     type: "number",

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
+import { Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,9 +13,14 @@ import { useFormDialogStore } from "@/stores/useFormDialogStore";
 import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { featuredListingOffersService } from "../services/featuredListingOffersService";
 
+interface OfferFeatureValue {
+  value: string;
+}
+
 interface OfferFormValues {
   title: string;
   description: string;
+  features: OfferFeatureValue[];
   duration_days: number;
   boost_weight: number;
   amount_euros: number;
@@ -25,6 +31,7 @@ interface OfferFormValues {
 const default_values: OfferFormValues = {
   title: "",
   description: "",
+  features: [],
   duration_days: 30,
   boost_weight: 50,
   amount_euros: 19.99,
@@ -42,6 +49,10 @@ export const FeaturedListingOfferForm = () => {
   const set_is_open = useFormDialogStore((state) => state.setIsOpen);
   const set_selected_id = useSelectedIdStore((state) => state.setSelectedId);
   const form = useForm<OfferFormValues>({ defaultValues: default_values });
+  const features_field = useFieldArray({
+    control: form.control,
+    name: "features",
+  });
 
   const { data: offer_response } = useQuery({
     queryKey: ["featured-listing-offer", selected_id],
@@ -63,6 +74,7 @@ export const FeaturedListingOfferForm = () => {
     form.reset({
       title: offer.title,
       description: offer.description || "",
+      features: (offer.features ?? []).map((value) => ({ value })),
       duration_days: offer.duration_days,
       boost_weight: offer.boost_weight,
       amount_euros: offer.amount_cents / 100,
@@ -72,9 +84,13 @@ export const FeaturedListingOfferForm = () => {
   }, [selected_id, offer_response, form]);
 
   const handleSubmit = form.handleSubmit(async (values) => {
+    const { amount_euros, features, ...rest } = values;
     const payload = {
-      ...values,
-      amount_cents: Math.round(values.amount_euros * 100),
+      ...rest,
+      features: features
+        .map((feature) => feature.value.trim())
+        .filter((feature) => feature.length > 0),
+      amount_cents: Math.round(amount_euros * 100),
       currency: "eur",
     };
     const response = selected_id
@@ -123,6 +139,42 @@ export const FeaturedListingOfferForm = () => {
           />
         )}
       </ControllerInput>
+      <div className="space-y-2">
+        <p className="text-sm font-medium">Características</p>
+        <p className="text-xs text-muted-foreground">
+          Textos cortos que se muestran en la tarjeta de la oferta.
+        </p>
+        {features_field.fields.map((feature, index) => (
+          <div key={feature.id} className="flex items-center gap-2">
+            <Input
+              aria-label={`Característica ${index + 1}`}
+              {...form.register(`features.${index}.value`, {
+                maxLength: {
+                  value: 160,
+                  message: "Máximo 160 caracteres",
+                },
+              })}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={`Quitar característica ${index + 1}`}
+              onClick={() => features_field.remove(index)}
+            >
+              <Trash2 />
+            </Button>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => features_field.append({ value: "" })}
+        >
+          <Plus />
+          Añadir característica
+        </Button>
+      </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <ControllerInput
           control={form.control}
