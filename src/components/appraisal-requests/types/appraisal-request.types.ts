@@ -1,4 +1,11 @@
-export type AppraisalRequestStatus = "pending" | "answered" | "closed";
+export type AppraisalRequestStatus =
+  | "pending"
+  | "answered"
+  | "closed"
+  | "estimated"
+  | "open_for_offers"
+  | "offer_accepted"
+  | "expired";
 
 export type AppraisalRequestPriority = "low" | "high";
 
@@ -18,8 +25,8 @@ export interface AppraisalRequestListItem {
   body_type_id: number | null;
   transmission_type: AppraisalRequestTransmissionType;
   mileage: number;
-  lat: number;
-  lng: number;
+  lat: number | null;
+  lng: number | null;
   address: string | null;
   vehicle_label: string;
   name: string;

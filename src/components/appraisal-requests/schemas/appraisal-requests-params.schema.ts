@@ -11,6 +11,10 @@ const appraisal_request_status_values = [
   "pending",
   "answered",
   "closed",
+  "estimated",
+  "open_for_offers",
+  "offer_accepted",
+  "expired",
 ] as const satisfies readonly AppraisalRequestStatus[];
 
 const appraisal_request_priority_values = [

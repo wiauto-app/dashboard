@@ -10,6 +10,10 @@ export const APPRAISAL_REQUEST_STATUS_OPTIONS: {
   { value: "pending", label: "Pendiente" },
   { value: "answered", label: "Respondida" },
   { value: "closed", label: "Cerrada" },
+  { value: "estimated", label: "Tasada con IA" },
+  { value: "open_for_offers", label: "Abierta a ofertas" },
+  { value: "offer_accepted", label: "Oferta aceptada" },
+  { value: "expired", label: "Vencida" },
 ];
 
 export const get_appraisal_request_status_label = (
