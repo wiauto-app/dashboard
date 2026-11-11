@@ -44,7 +44,7 @@ export const usersColumns: DynamicTableColumn[] = [
     header: "Fecha de creación",
     accessorKey: "user.created_at",
     type: "date",
-    sortable: false,
+    sortable: true,
   },
   {
     header: "Fecha de suspensión",
