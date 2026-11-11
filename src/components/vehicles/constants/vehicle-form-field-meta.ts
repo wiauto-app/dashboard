@@ -5,6 +5,9 @@
 export const VEHICLE_FORM_OPTIONAL_FIELD_KEYS = {
   vin_code: true,
   license_plate: true,
+  ref: true,
+  description: true,
+  traction_id: true,
   transmission_type: true,
   displacement: true,
   autonomy: true,
@@ -16,7 +19,6 @@ export const VEHICLE_FORM_OPTIONAL_FIELD_KEYS = {
   color_id: true,
   dgt_label_id: true,
   warranty_type_id: true,
-  images: true,
   videos: true,
 } as const;
 

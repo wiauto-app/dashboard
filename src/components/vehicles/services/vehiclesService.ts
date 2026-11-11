@@ -1,6 +1,6 @@
 import { apiDelete, apiGet, apiPatch, apiPost, type apiResponse } from "@/services/api";
 import type { PaginatedResult } from "@/types/general.types";
-import type { AdminVehicleDetail, AdminVehicleListItem, Vehicle, VehicleSchema, UpdateVehicleSchema, VehiclesParams } from "../types/vehicles.types";
+import type { AdminVehicleDetail, AdminVehicleListItem, CreateVehicleSchema, UpdateVehicleSchema, Vehicle, VehiclesParams } from "../types/vehicles.types";
 import type { VehicleStatus } from "../constants/vehicle-status.constants";
 import { V1_ADMIN_VEHICLES, V1_VEHICLES } from "./route.constants";
 import { objectToQueryString } from "@/lib/utils";
@@ -49,7 +49,7 @@ export const vehiclesService = {
     return response.data.vehicle;
   },
 
-  async create(data: VehicleSchema): Promise<apiResponse<Vehicle>> {
+  async create(data: CreateVehicleSchema): Promise<apiResponse<Vehicle>> {
     const response = await apiPost<Vehicle>(`${V1_VEHICLES}`, serializeVehiclePayload(data));
     return response;
   },
@@ -61,7 +61,6 @@ export const vehiclesService = {
     const response = await apiPatch<Vehicle>(
       `${V1_VEHICLES}/${id}`,
       serializeVehiclePayload(data, {
-        only_temp_images: true,
         is_update: true,
       }),
     );

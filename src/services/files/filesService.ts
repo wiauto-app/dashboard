@@ -1,10 +1,12 @@
 import { objectToQueryString } from "@/lib/utils";
 import { apiDelete, apiGet, apiPost, uploadSignedFile } from "../api";
 import {
+  CONFIRM_TEMP_UPLOAD_VEHICLE_IMAGE,
   CONFIRM_VIDEO_UPLOAD,
   GENERATE_FILE_SIGNED_URL,
   GENERATE_READ_FILE_SIGNED_URL,
   REMOVE_FILES,
+  TEMP_UPLOAD_VEHICLE_IMAGE,
 } from "./route.constants";
 import { toast } from "sonner";
 
@@ -82,6 +84,24 @@ interface GenerateReadFileSignedUrlResponse {
 interface ConfirmVideoUploadResponse {
   file_key: string;
   file_key_en_storage: string;
+}
+
+interface RequestTempImageUploadDto {
+  mime_type: string;
+  original_filename: string;
+  size_bytes: number;
+}
+
+interface RequestTempImageUploadResponse {
+  upload_id: string;
+  signed_url: string;
+  storage_path: string;
+  expires_at?: string;
+}
+
+export interface ConfirmTempImageUploadResponse {
+  preview_url?: string;
+  expires_at?: string;
 }
 
 interface UploadFileDto {
@@ -284,6 +304,79 @@ export const filesService = {
       pdf: "application/pdf",
     };
     return extension ? (EXT_MAP[extension] ?? null) : null;
+  },
+
+  async requestTempImageUpload(
+    dto: RequestTempImageUploadDto,
+  ): Promise<RequestTempImageUploadResponse | null> {
+    const response = await apiPost<RequestTempImageUploadResponse>(
+      TEMP_UPLOAD_VEHICLE_IMAGE,
+      dto,
+    );
+    if (!response.ok || !response.data) {
+      toast.error(
+        response.message || "No se pudo generar la URL de subida temporal.",
+      );
+      return null;
+    }
+    return response.data;
+  },
+
+  async confirmTempImageUpload(
+    uploadId: string,
+  ): Promise<ConfirmTempImageUploadResponse | null> {
+    const response = await apiPost<ConfirmTempImageUploadResponse | null>(
+      CONFIRM_TEMP_UPLOAD_VEHICLE_IMAGE(uploadId),
+      {},
+    );
+    if (!response.ok) {
+      toast.error(
+        response.message || "No se pudo confirmar la subida de la imagen.",
+      );
+      return null;
+    }
+    return response.data ?? {};
+  },
+
+  async uploadToSignedUrl(
+    signedUrl: string,
+    file: File,
+    contentType: string,
+    onProgress?: (progress: number) => void,
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.upload.addEventListener("progress", (event) => {
+        if (event.lengthComputable && onProgress) {
+          const progress = Math.round((event.loaded / event.total) * 100);
+          onProgress(progress);
+        }
+      });
+
+      xhr.addEventListener("load", () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(true);
+        } else {
+          toast.error(`Error al subir el archivo: ${xhr.statusText}`);
+          resolve(false);
+        }
+      });
+
+      xhr.addEventListener("error", () => {
+        toast.error("Error de red al subir el archivo.");
+        resolve(false);
+      });
+
+      xhr.addEventListener("abort", () => {
+        toast.error("Subida cancelada.");
+        resolve(false);
+      });
+
+      xhr.open("PUT", signedUrl);
+      xhr.setRequestHeader("Content-Type", contentType);
+      xhr.send(file);
+    });
   },
 
   async uploadChatAttachment(file: File): Promise<{ path: string | null }> {

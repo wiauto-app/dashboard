@@ -1,42 +1,22 @@
 import { cn } from "@/lib/utils";
 import React from "react";
+import { ADMIN_VEHICLE_WIZARD_STEPS } from "../constants/admin-vehicle-wizard.constants";
 
 export const VehicleFormSteps = ({ currentStep }: { currentStep: number }) => {
-  const steps = [
-    {
-      label: "Datos del vehículo",
-      key: "vehicle-data",
-    },
-    {
-      label: "Características técnicas",
-      key: "technical-features",
-    },
-  
-    {
-      label: "Precio y descripción",
-      key: "price",
-    },
-    {
-      label: "Recursos y Multimedia",
-      key: "resources-and-multimedia",
-    },
-    {
-      label: "Resumen y publicación",
-      key: "summary-and-publication",
-    },
-  ];
+  const steps = ADMIN_VEHICLE_WIZARD_STEPS.map((step) => ({
+    label: step.label,
+    key: `admin-vehicle-step-${step.id}`,
+  }));
+
   return (
     <div className="max-w-[90%] mx-auto mb-10">
-      <div className="flex items-start relative  justify-between">
+      <div className="flex items-start relative justify-between">
         {steps.map((step, index) => (
           <React.Fragment key={step.key}>
-            <div
-              className="flex  flex-col items-center gap-2 relative"
-              key={step.key}
-            >
+            <div className="flex flex-col items-center gap-2 relative" key={step.key}>
               <div
                 className={cn(
-                  "bg-muted text-black  rounded-full w-8 h-8 flex items-center justify-center",
+                  "bg-muted text-black rounded-full w-8 h-8 flex items-center justify-center",
                   currentStep >= index + 1 &&
                     "bg-primary text-primary-foreground",
                 )}
@@ -54,10 +34,10 @@ export const VehicleFormSteps = ({ currentStep }: { currentStep: number }) => {
             </div>
             <div
               className={cn(
-                "h-1 w-full bg-muted last:hidden relative top-3 ",
+                "h-1 w-full bg-muted last:hidden relative top-3",
                 currentStep >= index + 1 && "bg-primary",
               )}
-            ></div>
+            />
           </React.Fragment>
         ))}
       </div>

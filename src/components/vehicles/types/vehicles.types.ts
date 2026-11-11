@@ -1,4 +1,4 @@
-import type { VehicleFormImage } from "../schemas/vehicle.schema";
+import type { VehicleFormImage, VehicleFormVideo } from "../schemas/vehicle.schema";
 import type z from "zod";
 import type { vehiclesSchema } from "../schemas/vehicles-params.schema";
 import type { createVehicleSchema, updateVehicleSchema, vehicleSchema } from "../schemas/vehicle.schema";
@@ -109,11 +109,18 @@ export interface AdminVehicleVersionCatalog {
 /** Detalle admin para edición (`GET /v1/admin/vehicles/:id`). */
 export interface AdminVehicleDetail {
   id: string;
+  ref?: string | null;
   vin_code?: string | null;
   vehicle_type_id: string | null;
   category_id: string | null;
   description: string;
   price: number;
+  finance_price?: number | null;
+  offer_financing?: boolean;
+  show_first_cuota?: boolean;
+  by_brand_warranty?: boolean;
+  show_exact_location?: boolean;
+  show_review_collab?: boolean;
   vehicle_prices: VehiclePriceHistoryItem[];
   mileage: number;
   condition: "new" | "used";
@@ -143,6 +150,7 @@ export interface AdminVehicleDetail {
   warranty_type_id: string | null;
   cuota_ids: string[];
   images: VehicleFormImage[];
+  videos?: VehicleFormVideo[];
 }
 
 /** Detalle completo del vehículo (creación / edición). */
@@ -197,39 +205,53 @@ export type VehiclesParams = z.infer<typeof vehiclesSchema>
 export type VehicleSchema = z.infer<typeof vehicleSchema>;
 export type CreateVehicleSchema = z.infer<typeof createVehicleSchema>;
 export type UpdateVehicleSchema = z.infer<typeof updateVehicleSchema>;
-/** Valores del formulario antes de validar (permite strings vacíos en selects). */
 
-export const createVehicleDefaultValues: VehicleSchema = {
-  vin_code: undefined,
+/** Valores iniciales del formulario antes de validar (km, precio y ubicación vacíos). */
+export interface CreateVehicleFormDefaultValues
+  extends Omit<CreateVehicleSchema, "mileage" | "price" | "lat" | "lng"> {
+  mileage?: number;
+  price?: number;
+  lat?: number;
+  lng?: number;
+}
+
+export const createVehicleDefaultValues: CreateVehicleFormDefaultValues = {
+  profile_id: "",
   vehicle_type_id: "",
-  description: "",
-  price: 0,
-  vehicle_price_id: undefined,
-  mileage: 0,
-  condition: "used", 
-  
-  lat: 0,
-  lng: 0,
-  
+  ref: "",
+  license_plate: "",
+  vin_code: "",
+  images: [],
+  videos: [],
   version_id: 0,
-  traction_id: "",
-  transmission_type: "manual",
-  power: 0,
-  displacement: 0,
-  publisher_type: "dealership",
-  phone: { phone_code: "", phone: "" },
+  catalog_fuel_can_charge: false,
+  condition: "used",
+  mileage: undefined,
+  price: undefined,
+  lat: undefined,
+  lng: undefined,
+  phone: { phone_code: "+34", phone: "" },
   show_phone: true,
   has_whatsapp: false,
-  email: "",
-  category_id: undefined,
+  description: "",
+  transmission_type: "manual",
+  power: undefined,
+  displacement: 0,
+  traction_id: "",
+  offer_financing: false,
+  show_first_cuota: false,
+  by_brand_warranty: false,
+  show_exact_location: false,
   features_ids: [],
   services_ids: [],
   cuota_ids: [],
-  images: [],
-  videos: [],
   color_id: undefined,
+  category_id: undefined,
   dgt_label_id: undefined,
   warranty_type_id: undefined,
+  publisher_type: "particular",
+  show_review_collab: true,
+  vehicle_price_id: undefined,
 };
 
 

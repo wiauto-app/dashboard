@@ -56,11 +56,11 @@ export const FormDialog = ({
           size === "7xl" && "md:max-w-7xl",
           size === "8xl" && "md:max-w-8xl",
           size === "9xl" &&
-            "max-h-[96dvh] gap-0 overflow-hidden p-0 md:max-w-[min(96vw,96rem)]",
+            " gap-0 overflow-hidden p-0 md:max-w-[min(96vw,96rem)]",
         )}
       >
         <DialogHeader></DialogHeader>
-        {form}
+        <div className="max-h-[80vh] overflow-y-auto">{form}</div>
       </DialogContent>
     </Dialog>
   );

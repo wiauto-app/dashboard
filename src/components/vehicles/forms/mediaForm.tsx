@@ -6,7 +6,13 @@ import { OPTIONAL_FIELD_SUFFIX } from "../constants/vehicle-form-field-meta";
 import { ImagesForm } from "./imagesForm";
 import { VideosForm } from "./videosForm";
 
-export const MediaForm = () => {
+interface MediaFormProps {
+  onImageUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
+}
+
+export const MediaForm = ({
+  onImageUploadStatusChange,
+}: MediaFormProps) => {
   const form = useFormContext<VehicleSchema>();
 
   return (
@@ -15,7 +21,7 @@ export const MediaForm = () => {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="images">
             <ImageIcon className="size-4" />
-            Imágenes {OPTIONAL_FIELD_SUFFIX}
+            Imágenes
           </TabsTrigger>
           <TabsTrigger value="videos">
             <VideoIcon className="size-4" />
@@ -30,6 +36,7 @@ export const MediaForm = () => {
               <ImagesForm
                 value={field.value ?? []}
                 onChange={field.onChange}
+                onUploadStatusChange={onImageUploadStatusChange}
               />
             )}
           />

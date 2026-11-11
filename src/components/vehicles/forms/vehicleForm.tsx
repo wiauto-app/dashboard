@@ -1,19 +1,17 @@
 import { FormProvider, useForm } from "react-hook-form";
 import {
-  updateVehicleSchema,
+  createVehicleSchema,
   vehicleSchema,
 } from "../schemas/vehicle.schema";
-import type { UpdateVehicleSchema, VehicleSchema } from "../types/vehicles.types";
+import type {
+  CreateVehicleSchema,
+  UpdateVehicleSchema,
+} from "../types/vehicles.types";
 import { createVehicleDefaultValues } from "../types/vehicles.types";
 import { VehicleFormSteps } from "./vehicleFormSteps";
-import { useEffect, useMemo, useState } from "react";
-import { VehicleDataForm } from "./vehicleDataForm";
-import { FeaturesForm } from "./featuresForm";
+import { useEffect, useMemo, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PricingDescForm } from "./pricingDescForm";
-import { MediaForm } from "./mediaForm";
-import { VehicleSummaryForm } from "./vehicleSummaryForm";
 import { vehiclesService } from "../services/vehiclesService";
 import { toast } from "sonner";
 import { asFormResolver } from "@/lib/asFormResolver";
@@ -22,14 +20,26 @@ import { useSelectedIdStore } from "@/stores/useSelectedIdStore";
 import { useQuery } from "@tanstack/react-query";
 import { mapAdminVehicleDetailToFormValues } from "../utils/mapAdminVehicleDetailToFormValues";
 import type z from "zod";
+import {
+  ADMIN_VEHICLE_SUBMIT_ATTR,
+  ADMIN_VEHICLE_WIZARD_STEPS,
+  getAdminVehicleStepByIndex,
+  type AdminVehicleFormField,
+} from "../constants/admin-vehicle-wizard.constants";
+import { AdminVehicleDatosStep } from "./steps/adminVehicleDatosStep";
+import { AdminVehicleExtraStep } from "./steps/adminVehicleExtraStep";
+import { AdminVehicleFinanceStep } from "./steps/adminVehicleFinanceStep";
 
 export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [hasIncompleteImageUploads, setHasIncompleteImageUploads] =
+    useState(false);
   const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
   const selectedId = useSelectedIdStore((state) => state.selectedId);
   const setSelectedId = useSelectedIdStore((state) => state.setSelectedId);
+  const isEditMode = Boolean(selectedId);
 
-  const formSchema = selectedId ? updateVehicleSchema : vehicleSchema;
+  const formSchema = isEditMode ? vehicleSchema : createVehicleSchema;
   type FormSchema = z.infer<typeof formSchema>;
 
   const { data: vehicleDetail, isLoading: isLoadingVehicle } = useQuery({
@@ -46,32 +56,56 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   useEffect(() => {
     if (vehicleDetail) {
       const initialValues = mapAdminVehicleDetailToFormValues(vehicleDetail);
-      form.reset(initialValues);
+      form.reset(initialValues as FormSchema);
     }
   }, [vehicleDetail, form]);
 
   useEffect(() => {
     if (!selectedId) {
       form.reset(createVehicleDefaultValues);
+      setCurrentStep(1);
     }
   }, [selectedId, form]);
 
-  const handleNextStep = () => {
-    if (currentStep === 5) {
+  const totalSteps = ADMIN_VEHICLE_WIZARD_STEPS.length;
+  const hasNextStep = useMemo(() => currentStep < totalSteps, [currentStep, totalSteps]);
+  const hasPreviousStep = useMemo(() => currentStep > 1, [currentStep]);
+
+  const getStepValidationFields = (
+    stepIndex: number,
+  ): AdminVehicleFormField[] => {
+    const step = getAdminVehicleStepByIndex(stepIndex);
+    if (!step) {
+      return [];
+    }
+    if (isEditMode) {
+      return step.fields.filter((field) => field !== "profile_id");
+    }
+    return step.fields;
+  };
+
+  const handleNextStep = async () => {
+    if (currentStep === 1 && hasIncompleteImageUploads) {
+      toast.error("Espera a que terminen de subirse las fotos.");
       return;
     }
-    setCurrentStep(currentStep + 1);
+    const fields = getStepValidationFields(currentStep);
+    const is_valid = await form.trigger(
+      fields as Parameters<typeof form.trigger>[0],
+    );
+    if (!is_valid) {
+      toast.error("Revisa los campos del paso antes de continuar.");
+      return;
+    }
+    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
   const handlePreviousStep = () => {
     if (currentStep === 1) {
       return;
     }
-    setCurrentStep(currentStep - 1);
+    setCurrentStep((prev) => prev - 1);
   };
-
-  const hasNextStep = useMemo(() => currentStep < 5, [currentStep]);
-  const hasPreviousStep = useMemo(() => currentStep > 1, [currentStep]);
 
   const handleSubmit = async (data: FormSchema) => {
     if (selectedId) {
@@ -90,7 +124,7 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
       return;
     }
 
-    const response = await vehiclesService.create(data as VehicleSchema);
+    const response = await vehiclesService.create(data as CreateVehicleSchema);
     if (response.ok) {
       toast.success("Vehículo creado correctamente");
       setSelectedId(null);
@@ -99,6 +133,31 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
     } else {
       toast.error(response.message || "Error al crear el vehículo");
     }
+  };
+
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const submitter = (event.nativeEvent as SubmitEvent)
+      .submitter as HTMLElement | null;
+    const isExplicitSubmit =
+      submitter?.getAttribute(ADMIN_VEHICLE_SUBMIT_ATTR) === "true";
+
+    if (!isExplicitSubmit) {
+      return;
+    }
+
+    void form.handleSubmit(handleSubmit)(event);
+  };
+
+  const handleFormKeyDown = (event: KeyboardEvent<HTMLFormElement>) => {
+    if (event.key !== "Enter") return;
+
+    const target = event.target as HTMLElement;
+    if (target.tagName === "TEXTAREA") return;
+    if (target.tagName === "BUTTON" || target.closest("button")) return;
+    if (target.closest(`[${ADMIN_VEHICLE_SUBMIT_ATTR}="true"]`)) return;
+
+    event.preventDefault();
   };
 
   if (selectedId && isLoadingVehicle) {
@@ -117,21 +176,25 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
     <FormProvider {...form}>
       <form
         className="flex flex-col gap-6"
-        onSubmit={form.handleSubmit(handleSubmit)}
+        onSubmit={handleFormSubmit}
+        onKeyDown={handleFormKeyDown}
       >
         <div className="md:col-span-2">
           <VehicleFormSteps currentStep={currentStep} />
         </div>
-        {currentStep === 1 && <VehicleDataForm />}
-        {currentStep === 2 && <FeaturesForm />}
-        {currentStep === 3 && (
-          <PricingDescForm
-            vehicle_prices={vehicleDetail?.vehicle_prices ?? []}
-            isEditMode={!!selectedId}
+        {currentStep === 1 ? (
+          <AdminVehicleDatosStep
+            isCreateMode={!isEditMode}
+            onImageUploadStatusChange={setHasIncompleteImageUploads}
           />
-        )}
-        {currentStep === 4 && <MediaForm />}
-        {currentStep === 5 && <VehicleSummaryForm />}
+        ) : null}
+        {currentStep === 2 ? <AdminVehicleExtraStep /> : null}
+        {currentStep === 3 ? (
+          <AdminVehicleFinanceStep
+            isEditMode={isEditMode}
+            vehicle_prices={vehicleDetail?.vehicle_prices ?? []}
+          />
+        ) : null}
         <div className="col-span-2 flex items-center justify-between">
           <Button
             disabled={!hasPreviousStep}
@@ -142,14 +205,25 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
             <ArrowLeft className="size-4" />
             Anterior
           </Button>
-          {hasNextStep && (
-            <Button type="button" onClick={handleNextStep}>
+          {hasNextStep ? (
+            <Button
+              type="button"
+              disabled={currentStep === 1 && hasIncompleteImageUploads}
+              onClick={() => void handleNextStep()}
+            >
               Siguiente <ArrowRight className="size-4" />
             </Button>
-          )}
-          {currentStep === 5 && (
-            <Button type="submit">
-              {selectedId ? "Actualizar anuncio" : "Guardar"}
+          ) : (
+            <Button
+              type="submit"
+              disabled={hasIncompleteImageUploads}
+              {...{ [ADMIN_VEHICLE_SUBMIT_ATTR]: "true" }}
+            >
+              {hasIncompleteImageUploads
+                ? "Subiendo imágenes…"
+                : selectedId
+                  ? "Actualizar anuncio"
+                  : "Crear anuncio"}
             </Button>
           )}
         </div>

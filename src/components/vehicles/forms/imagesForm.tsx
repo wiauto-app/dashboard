@@ -10,11 +10,11 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { cn, getImageUrl } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { filesService, split_storage_compound_path } from "@/services/files/filesService";
-import { VEHICLE_GALLERY_TEMP_PREFIX } from "@/services/files/temp-storage-path";
 
 import type { VehicleFormImage } from "../schemas/vehicle.schema";
+import { getVehicleFormImageDisplayUrl } from "../utils/getVehicleFormImageDisplayUrl";
 
 const accepted_mime_types = [
   "image/jpeg",
@@ -31,15 +31,20 @@ export const normalize_vehicle_images = (
   [...images]
     .sort((a, b) => a.order - b.order)
     .map((image, index) => ({
-      path: image.path,
+      ...image,
       order: index,
     }));
 
 type PendingItem = {
   temp_key: string;
   file: File;
-  blob_preview: string;
+  preview_url: string;
+  upload_id?: string;
+  status: "uploading" | "confirming" | "completed" | "failed";
 };
+
+const get_committed_image_key = (image: VehicleFormImage) =>
+  image.upload_id ?? image.path ?? image.id ?? "";
 
 const is_valid_image_file = (file: File) => {
   const ok = accepted_mime_types.includes(
@@ -51,7 +56,7 @@ const is_valid_image_file = (file: File) => {
   return ok;
 };
 
-export type ImagesFormProps = {
+export interface ImagesFormProps {
   /** Imágenes confirmadas (ruta + orden), persistidas en el formulario. */
   value?: VehicleFormImage[];
   /** Emite el array completo, con `order` normalizado (0 … n-1). */
@@ -61,12 +66,14 @@ export type ImagesFormProps = {
    * Si no se pasa, se usa un UUID estable por montaje del formulario.
    */
   reference_id?: string;
-};
+  onUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
+}
 
 export const ImagesForm = ({
   value: value_prop,
   onChange,
   reference_id: reference_id_prop,
+  onUploadStatusChange,
 }: ImagesFormProps) => {
   const committed_sorted = useMemo(
     () => normalize_vehicle_images(value_prop ?? []),
@@ -78,10 +85,7 @@ export const ImagesForm = ({
     value_ref.current = normalize_vehicle_images(value_prop ?? []);
   }, [value_prop]);
 
-  const session_reference_id = useRef(
-    reference_id_prop ?? crypto.randomUUID(),
-  );
-  const reference_id = reference_id_prop ?? session_reference_id.current;
+  void reference_id_prop;
 
   const [pending_items, setPendingItems] = useState<PendingItem[]>([]);
   const [is_dragging, setIsDragging] = useState(false);
@@ -102,10 +106,20 @@ export const ImagesForm = ({
   }, [pending_items]);
 
   useEffect(() => {
+    const hasIncompleteUploads = pending_items.some(
+      (item) =>
+        item.status === "uploading" ||
+        item.status === "confirming" ||
+        item.status === "failed",
+    );
+    onUploadStatusChange?.(hasIncompleteUploads);
+  }, [pending_items, onUploadStatusChange]);
+
+  useEffect(() => {
     return () => {
       pending_items_ref.current.forEach((item) => {
-        if (item.blob_preview.startsWith("blob:")) {
-          URL.revokeObjectURL(item.blob_preview);
+        if (item.preview_url.startsWith("blob:")) {
+          URL.revokeObjectURL(item.preview_url);
         }
       });
     };
@@ -115,19 +129,19 @@ export const ImagesForm = ({
     cancelled_upload_keys_ref.current.add(temp_key);
     setPendingItems((prev) => {
       const target = prev.find((p) => p.temp_key === temp_key);
-      if (target?.blob_preview.startsWith("blob:")) {
-        URL.revokeObjectURL(target.blob_preview);
+      if (target?.preview_url.startsWith("blob:")) {
+        URL.revokeObjectURL(target.preview_url);
       }
       return prev.filter((p) => p.temp_key !== temp_key);
     });
   }, []);
 
-  const append_committed_path = useCallback(
-    (path: string) => {
+  const append_committed_image = useCallback(
+    (image: Omit<VehicleFormImage, "order">) => {
       const sorted = normalize_vehicle_images(value_ref.current);
       const next: VehicleFormImage[] = [
         ...sorted,
-        { path, order: sorted.length },
+        { ...image, order: sorted.length },
       ];
       value_ref.current = next;
       onChange?.(next);
@@ -135,10 +149,18 @@ export const ImagesForm = ({
     [onChange],
   );
 
-  const commit_remove_committed_path = useCallback(
-    (path: string) => {
+  const commit_remove_committed = useCallback(
+    (matcher: { upload_id?: string; path?: string }) => {
       const next = normalize_vehicle_images(
-        value_ref.current.filter((image) => image.path !== path),
+        value_ref.current.filter((image) => {
+          if (matcher.upload_id) {
+            return image.upload_id !== matcher.upload_id;
+          }
+          if (matcher.path) {
+            return image.path !== matcher.path;
+          }
+          return true;
+        }),
       );
       value_ref.current = next;
       onChange?.(next);
@@ -147,8 +169,40 @@ export const ImagesForm = ({
   );
 
   const handle_click_remove_committed = useCallback(
-    async (compound_path: string) => {
-      if (locked_remove_paths_ref.current.has(compound_path)) return;
+    async (image: VehicleFormImage) => {
+      const lock_key = get_committed_image_key(image);
+      if (!lock_key || locked_remove_paths_ref.current.has(lock_key)) {
+        return;
+      }
+
+      if (image.upload_id && !image.path) {
+        locked_remove_paths_ref.current.add(lock_key);
+        set_paths_removing((previous) => {
+          const next = new Set(previous);
+          next.add(lock_key);
+          return next;
+        });
+        try {
+          if (image.preview_url?.startsWith("blob:")) {
+            URL.revokeObjectURL(image.preview_url);
+          }
+          commit_remove_committed({ upload_id: image.upload_id });
+        } finally {
+          locked_remove_paths_ref.current.delete(lock_key);
+          set_paths_removing((previous) => {
+            const next = new Set(previous);
+            next.delete(lock_key);
+            return next;
+          });
+        }
+        return;
+      }
+
+      const compound_path = image.path ?? "";
+      if (!compound_path) {
+        commit_remove_committed({ upload_id: image.upload_id });
+        return;
+      }
 
       let bucket_name: ReturnType<
         typeof split_storage_compound_path
@@ -163,10 +217,10 @@ export const ImagesForm = ({
         return;
       }
 
-      locked_remove_paths_ref.current.add(compound_path);
+      locked_remove_paths_ref.current.add(lock_key);
       set_paths_removing((previous) => {
         const next = new Set(previous);
-        next.add(compound_path);
+        next.add(lock_key);
         return next;
       });
 
@@ -179,17 +233,20 @@ export const ImagesForm = ({
           toast.error("No se pudo eliminar el archivo del almacén.");
           return;
         }
-        commit_remove_committed_path(compound_path);
+        if (image.preview_url?.startsWith("blob:")) {
+          URL.revokeObjectURL(image.preview_url);
+        }
+        commit_remove_committed({ path: compound_path, upload_id: image.upload_id });
       } finally {
-        locked_remove_paths_ref.current.delete(compound_path);
+        locked_remove_paths_ref.current.delete(lock_key);
         set_paths_removing((previous) => {
           const next = new Set(previous);
-          next.delete(compound_path);
+          next.delete(lock_key);
           return next;
         });
       }
     },
-    [commit_remove_committed_path],
+    [commit_remove_committed],
   );
 
   const reorder_committed = useCallback(
@@ -208,7 +265,7 @@ export const ImagesForm = ({
       const [moved] = copy.splice(from_index, 1);
       copy.splice(to_index, 0, moved);
       const next = copy.map((image, index) => ({
-        path: image.path,
+        ...image,
         order: index,
       }));
       value_ref.current = next;
@@ -220,52 +277,110 @@ export const ImagesForm = ({
   const run_upload = useCallback(
     async (temp_key: string, file: File) => {
       try {
-        const { path } = await filesService.uploadFile({
-          file,
-          bucket_name: "vehicles-images",
-          file_key: filesService.generateFileKey(VEHICLE_GALLERY_TEMP_PREFIX, file),
-          content_type: file.type as
-            | "image/jpeg"
-            | "image/png"
-            | "image/jpg"
-            | "image/webp",
-          reference_id,
+        const upload_response = await filesService.requestTempImageUpload({
+          mime_type: file.type || "image/jpeg",
+          original_filename: file.name,
+          size_bytes: file.size,
         });
-
-        if (!path) {
-          throw new Error("Sin ruta de archivo");
-        }
 
         if (cancelled_upload_keys_ref.current.has(temp_key)) {
           cancelled_upload_keys_ref.current.delete(temp_key);
           return;
         }
 
+        if (!upload_response) {
+          setPendingItems((prev) =>
+            prev.map((item) =>
+              item.temp_key === temp_key ? { ...item, status: "failed" } : item,
+            ),
+          );
+          toast.error(`No se pudo iniciar la subida de ${file.name}`);
+          return;
+        }
+
+        setPendingItems((prev) =>
+          prev.map((item) =>
+            item.temp_key === temp_key
+              ? { ...item, upload_id: upload_response.upload_id }
+              : item,
+          ),
+        );
+
+        const upload_success = await filesService.uploadToSignedUrl(
+          upload_response.signed_url,
+          file,
+          file.type || "image/jpeg",
+          undefined,
+        );
+
+        if (cancelled_upload_keys_ref.current.has(temp_key)) {
+          cancelled_upload_keys_ref.current.delete(temp_key);
+          return;
+        }
+
+        if (!upload_success) {
+          setPendingItems((prev) =>
+            prev.map((item) =>
+              item.temp_key === temp_key ? { ...item, status: "failed" } : item,
+            ),
+          );
+          toast.error(`No se pudo subir ${file.name}`);
+          return;
+        }
+
+        setPendingItems((prev) =>
+          prev.map((item) =>
+            item.temp_key === temp_key ? { ...item, status: "confirming" } : item,
+          ),
+        );
+
+        const confirm_response = await filesService.confirmTempImageUpload(
+          upload_response.upload_id,
+        );
+
+        if (cancelled_upload_keys_ref.current.has(temp_key)) {
+          cancelled_upload_keys_ref.current.delete(temp_key);
+          return;
+        }
+
+        if (!confirm_response) {
+          setPendingItems((prev) =>
+            prev.map((item) =>
+              item.temp_key === temp_key ? { ...item, status: "failed" } : item,
+            ),
+          );
+          toast.error(`No se pudo confirmar ${file.name}`);
+          return;
+        }
+
+        const pending = pending_items_ref.current.find(
+          (item) => item.temp_key === temp_key,
+        );
+        const signed_preview_url = confirm_response.preview_url;
+
+        append_committed_image({
+          upload_id: upload_response.upload_id,
+          preview_url: signed_preview_url ?? pending?.preview_url,
+          expires_at: confirm_response.expires_at,
+        });
+
         setPendingItems((prev) => {
           const item = prev.find((p) => p.temp_key === temp_key);
-          if (item?.blob_preview.startsWith("blob:")) {
-            URL.revokeObjectURL(item.blob_preview);
+          if (item && !signed_preview_url && item.preview_url.startsWith("blob:")) {
+            URL.revokeObjectURL(item.preview_url);
           }
           return prev.filter((p) => p.temp_key !== temp_key);
         });
-
-        append_committed_path(path);
       } catch {
         toast.error(`No se pudo subir ${file.name}`);
-        if (!cancelled_upload_keys_ref.current.has(temp_key)) {
-          setPendingItems((prev) => {
-            const item = prev.find((p) => p.temp_key === temp_key);
-            if (item?.blob_preview.startsWith("blob:")) {
-              URL.revokeObjectURL(item.blob_preview);
-            }
-            return prev.filter((p) => p.temp_key !== temp_key);
-          });
-        } else {
-          cancelled_upload_keys_ref.current.delete(temp_key);
-        }
+        setPendingItems((prev) =>
+          prev.map((item) =>
+            item.temp_key === temp_key ? { ...item, status: "failed" } : item,
+          ),
+        );
       }
     },
-    [append_committed_path, reference_id],
+    [append_committed_image],
   );
 
   const handle_files_added = useCallback(
@@ -278,7 +393,8 @@ export const ImagesForm = ({
       const new_pending: PendingItem[] = files.map((file) => ({
         temp_key: crypto.randomUUID(),
         file,
-        blob_preview: URL.createObjectURL(file),
+        preview_url: URL.createObjectURL(file),
+        status: "uploading",
       }));
 
       setPendingItems((prev) => [...prev, ...new_pending]);
@@ -465,9 +581,14 @@ export const ImagesForm = ({
           className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
           aria-label="Galería de imágenes del vehículo"
         >
-          {committed_sorted.map((image, index) => (
+          {committed_sorted.map((image, index) => {
+            const image_key = get_committed_image_key(image) || `image-${index}`;
+            const display_url = getVehicleFormImageDisplayUrl(image);
+            const is_removing = paths_removing.has(image_key);
+
+            return (
             <li
-              key={image.path}
+              key={image_key}
               onDragOver={handle_committed_drag_over_item(index)}
               onDragLeave={handle_committed_drag_leave_item}
               onDrop={handle_committed_drop_on_item(index)}
@@ -479,12 +600,14 @@ export const ImagesForm = ({
                 drag_source_index === index ? "opacity-50" : "opacity-100",
               )}
             >
-              <img
-                src={getImageUrl(image.path)}
-                alt=""
-                className="size-full object-cover pointer-events-none"
-                draggable={false}
-              />
+              {display_url ? (
+                <img
+                  src={display_url}
+                  alt=""
+                  className="size-full object-cover pointer-events-none"
+                  draggable={false}
+                />
+              ) : null}
               <div
                 draggable
                 onDragStart={handle_committed_drag_start(index)}
@@ -509,36 +632,33 @@ export const ImagesForm = ({
                 type="button"
                 size="icon-sm"
                 variant="destructive"
-                disabled={paths_removing.has(image.path)}
+                disabled={is_removing}
                 className="absolute top-2 right-2 rounded-full shadow-md disabled:opacity-60"
                 onClick={(e) => {
                   e.stopPropagation();
-                  void handle_click_remove_committed(image.path);
+                  void handle_click_remove_committed(image);
                 }}
-                aria-busy={paths_removing.has(image.path)}
-                aria-label={
-                  paths_removing.has(image.path)
-                    ? "Eliminando imagen…"
-                    : "Quitar imagen"
-                }
+                aria-busy={is_removing}
+                aria-label={is_removing ? "Eliminando imagen…" : "Quitar imagen"}
               >
-                {paths_removing.has(image.path) ? (
+                {is_removing ? (
                   <Loader2 className="size-4 animate-spin" aria-hidden />
                 ) : (
                   <Trash2 className="size-4" aria-hidden />
                 )}
               </Button>
             </li>
-          ))}
+          );
+          })}
 
           {pending_items.map((item) => (
             <li
               key={item.temp_key}
               className="relative aspect-square overflow-hidden rounded-lg border border-border bg-muted"
             >
-              {item.blob_preview ? (
+              {item.preview_url ? (
                 <img
-                  src={item.blob_preview}
+                  src={item.preview_url}
                   alt=""
                   className="size-full object-cover opacity-70"
                 />
