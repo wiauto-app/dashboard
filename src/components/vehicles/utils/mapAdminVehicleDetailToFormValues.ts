@@ -47,7 +47,12 @@ export const mapAdminVehicleDetailToFormValues = (
     features_ids: detail.features_ids ?? [],
     services_ids: detail.services_ids ?? [],
     cuota_ids: detail.cuota_ids ?? [],
-    images: detail.images ?? [],
+    images: (detail.images ?? []).map((image, index) => ({
+      id: image.id,
+      path: image.path?.trim() ? image.path : undefined,
+      preview_url: image.preview_url,
+      order: image.order ?? index,
+    })),
     videos: detail.videos ?? [],
     offer_financing: detail.offer_financing ?? false,
     finance_price: detail.finance_price ?? undefined,

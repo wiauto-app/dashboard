@@ -25,6 +25,20 @@ const accepted_mime_types = [
 
 const VEHICLE_IMAGE_DRAG_TYPE = "application/x-vehicle-image-order";
 
+const try_parse_compound_storage_path = (
+  compound_path: string,
+): { bucket_name: ReturnType<typeof split_storage_compound_path>["bucket_name"]; object_key: string } | null => {
+  const trimmed = compound_path.trim();
+  if (!trimmed || trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return null;
+  }
+  try {
+    return split_storage_compound_path(trimmed);
+  } catch {
+    return null;
+  }
+};
+
 export const normalize_vehicle_images = (
   images: VehicleFormImage[],
 ): VehicleFormImage[] =>
@@ -198,24 +212,23 @@ export const ImagesForm = ({
         return;
       }
 
-      const compound_path = image.path ?? "";
-      if (!compound_path) {
-        commit_remove_committed({ upload_id: image.upload_id });
+      const compound_path = image.path?.trim() ?? "";
+      const storage_parts = compound_path
+        ? try_parse_compound_storage_path(compound_path)
+        : null;
+
+      if (!storage_parts) {
+        if (image.preview_url?.startsWith("blob:")) {
+          URL.revokeObjectURL(image.preview_url);
+        }
+        commit_remove_committed({
+          path: image.path,
+          upload_id: image.upload_id,
+        });
         return;
       }
 
-      let bucket_name: ReturnType<
-        typeof split_storage_compound_path
-      >["bucket_name"];
-      let object_key: string;
-      try {
-        ({ bucket_name, object_key } = split_storage_compound_path(compound_path));
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Ruta de imagen no válida.",
-        );
-        return;
-      }
+      const { bucket_name, object_key } = storage_parts;
 
       locked_remove_paths_ref.current.add(lock_key);
       set_paths_removing((previous) => {
