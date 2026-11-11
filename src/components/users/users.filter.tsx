@@ -11,9 +11,17 @@ import { Field, FieldError } from "../ui/field";
 
 const SelectedFieldsSchema = userParamsSchema.pick({
   name: true,
+  last_name: true,
+  email: true,
 });
 
 type SelectedFields = z.infer<typeof SelectedFieldsSchema>;
+
+const normalizeFilterValue = (value: string | undefined): string | undefined => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : undefined;
+};
+
 export const UsersFilter = () => {
   const setIsOpen = useFilterPopoverStore((state) => state.setIsOpen);
   const { values, handleChange } = useFiltersManager({ path: "/users" });
@@ -21,20 +29,30 @@ export const UsersFilter = () => {
     resolver: standardSchemaResolver(SelectedFieldsSchema),
     defaultValues: {
       name: values.name ?? "",
+      last_name: values.last_name ?? "",
+      email: values.email ?? "",
     },
   });
-  const onSubmit = (data: SelectedFields) => {
-    handleChange("name", data.name);
 
+  const onSubmit = (data: SelectedFields) => {
+    handleChange("name", normalizeFilterValue(data.name));
+    handleChange("last_name", normalizeFilterValue(data.last_name));
+    handleChange("email", normalizeFilterValue(data.email));
     setIsOpen(false);
   };
+
   const handleReset = () => {
     handleChange("name", undefined);
+    handleChange("last_name", undefined);
+    handleChange("email", undefined);
     form.reset({
       name: "",
+      last_name: "",
+      email: "",
     });
     setIsOpen(false);
   };
+
   return (
     <form
       id="filter-form"
@@ -49,7 +67,38 @@ export const UsersFilter = () => {
             <Input
               aria-invalid={fieldState.invalid}
               type="text"
-              placeholder="Buscar"
+              placeholder="Nombre"
+              {...field}
+            />
+            {fieldState.error && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Controller
+        name="last_name"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <Input
+              aria-invalid={fieldState.invalid}
+              type="text"
+              placeholder="Apellido"
+              {...field}
+            />
+            {fieldState.error && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Controller
+        name="email"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <Input
+              aria-invalid={fieldState.invalid}
+              type="text"
+              placeholder="Email"
+              autoComplete="email"
               {...field}
             />
             {fieldState.error && <FieldError errors={[fieldState.error]} />}
