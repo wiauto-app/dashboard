@@ -233,7 +233,7 @@ export function DynamicTable<TData extends object>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="text-muted-foreground"
+                        className="text-muted-foreground truncate max-w-50"
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
