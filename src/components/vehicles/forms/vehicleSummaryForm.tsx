@@ -32,7 +32,6 @@ export const VehicleSummaryForm = () => {
             />
           )}
         </ControllerInput>
-        <ControllerInput name="email" control={form.control} label="Correo electrónico" />
         <Controller
           name="phone"
           control={form.control}

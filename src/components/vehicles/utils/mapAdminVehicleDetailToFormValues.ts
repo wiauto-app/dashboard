@@ -55,5 +55,6 @@ export const mapAdminVehicleDetailToFormValues = (
     by_brand_warranty: detail.by_brand_warranty ?? false,
     show_exact_location: detail.show_exact_location ?? false,
     show_review_collab: detail.show_review_collab ?? true,
+    profile_id: undefined,
   };
 };

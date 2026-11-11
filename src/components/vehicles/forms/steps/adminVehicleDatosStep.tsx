@@ -58,7 +58,7 @@ export const AdminVehicleDatosStep = ({
           {({ field, fieldState }) => (
             <Input
               {...field}
-              value={field.value ?? ""}
+              value={typeof field.value === "string" ? field.value : ""}
               maxLength={50}
               aria-invalid={fieldState.invalid}
               placeholder="Opcional"
