@@ -66,11 +66,17 @@ export const serializeVehiclePayload = (
         if (image.upload_id) {
           return { upload_id: image.upload_id, order: image.order };
         }
-        return {
-          ...(image.id ? { id: image.id } : {}),
-          path: image.path,
-          order: image.order,
-        };
+
+        const path = image.path?.trim();
+
+        if (image.id) {
+          if (path && !is_temp_storage_path(path)) {
+            return { id: image.id, path, order: image.order };
+          }
+          return { id: image.id, order: image.order };
+        }
+
+        return { path: path ?? "", order: image.order };
       });
     }
   }
