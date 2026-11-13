@@ -53,7 +53,15 @@ export const mapAdminVehicleDetailToFormValues = (
       preview_url: image.preview_url,
       order: image.order ?? index,
     })),
-    videos: detail.videos ?? [],
+    videos: [...(detail.videos ?? [])]
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .map((video, index) => ({
+        id: video.id,
+        order: index,
+        url: video.url,
+        thumbnail_url: video.thumbnail_url,
+        status: video.status,
+      })),
     offer_financing: detail.offer_financing ?? false,
     finance_price: detail.finance_price ?? undefined,
     show_first_cuota: detail.show_first_cuota ?? false,

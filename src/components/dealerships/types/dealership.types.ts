@@ -14,6 +14,7 @@ export interface Dealership {
   email: string;
   phone_code: string;
   phone: string;
+  show_phone: boolean;
   address: string;
   lat?: number;
   lng?: number;
@@ -39,9 +40,10 @@ export interface CreateDealershipPayload {
   email: string;
   phone_code: string;
   phone: string;
+  show_phone: boolean;
   address: string;
-  lat?: number | null;
-  lng?: number | null;
+  lat: number;
+  lng: number;
   is_featured?: boolean;
   max_listings?: number;
   max_photos?: number;

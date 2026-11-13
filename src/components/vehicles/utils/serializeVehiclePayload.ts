@@ -22,8 +22,7 @@ export const serializeVehiclePayload = (
   data: VehicleSchema | UpdateVehicleSchema,
   options?: { only_temp_images?: boolean; is_update?: boolean },
 ) => {
-  const { phone, images, vehicle_price_id, videos: _videos, ...rest } = data;
-  void _videos;
+  const { phone, images, vehicle_price_id, videos, ...rest } = data;
 
   const payload: Record<string, unknown> = {
     ...rest,
@@ -74,6 +73,17 @@ export const serializeVehiclePayload = (
         };
       });
     }
+  }
+
+  // Update: `videos` es el estado final (`[]` borra todos). Create: se omite si está vacío.
+  if (videos !== undefined && (options?.is_update || videos.length > 0)) {
+    payload.videos = [...videos]
+      .sort((a, b) => a.order - b.order)
+      .map((video, index) =>
+        video.upload_id
+          ? { upload_id: video.upload_id, order: index }
+          : { id: video.id, order: index },
+      );
   }
 
   return payload;

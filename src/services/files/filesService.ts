@@ -1,7 +1,18 @@
 import { objectToQueryString } from "@/lib/utils";
-import { apiDelete, apiGet, apiPost, uploadSignedFile } from "../api";
+import {
+  apiDelete,
+  apiGet,
+  apiPost,
+  uploadSignedFile,
+  type apiResponse,
+} from "../api";
 import {
   CONFIRM_TEMP_UPLOAD_VEHICLE_IMAGE,
+  VEHICLE_VIDEO_UPLOAD,
+  VEHICLE_VIDEO_UPLOADS,
+  VEHICLE_VIDEO_UPLOAD_COMPLETE,
+  VEHICLE_VIDEO_UPLOAD_PARTS,
+  VEHICLE_VIDEO_UPLOAD_PART_URLS,
   CONFIRM_VIDEO_UPLOAD,
   GENERATE_FILE_SIGNED_URL,
   GENERATE_READ_FILE_SIGNED_URL,
@@ -112,6 +123,36 @@ interface UploadFileDto {
   reference_id?: string;
 }
 
+export interface InitVehicleVideoUploadDto {
+  mime_type: string;
+  size_bytes: number;
+  original_filename: string;
+}
+
+export interface InitVehicleVideoUploadResponse {
+  upload_id: string;
+  part_size: number;
+  part_count: number;
+  expires_at: string;
+}
+
+export interface VehicleVideoPartUrlsResponse {
+  urls: { part_number: number; url: string }[];
+}
+
+export interface VehicleVideoUploadedPartsResponse {
+  parts: { part_number: number; etag: string; size: number }[];
+}
+
+export interface CompleteVehicleVideoUploadResponse {
+  upload_id: string;
+  status: "uploaded";
+  duration_s: number | null;
+  width: number | null;
+  height: number | null;
+  expires_at: string;
+}
+
 /** Tipos MIME de vídeo aceptados por el backend (`GenerateFileSignedUrlHttpDto`). */
 export type VehicleVideoUploadContentType =
   | "video/mp4"
@@ -155,6 +196,48 @@ export function normalize_vehicle_video_upload_content_type(
 }
 
 export const filesService = {
+  /** Abre una sesión multipart de vídeo (`POST /v1/vehicle-videos/uploads`). */
+  initVehicleVideoUpload(
+    dto: InitVehicleVideoUploadDto,
+  ): Promise<apiResponse<InitVehicleVideoUploadResponse>> {
+    return apiPost<InitVehicleVideoUploadResponse>(VEHICLE_VIDEO_UPLOADS, dto);
+  },
+
+  /** URLs prefirmadas para subir partes (máx. 20 por petición). */
+  getVehicleVideoPartUrls(
+    uploadId: string,
+    partNumbers: number[],
+  ): Promise<apiResponse<VehicleVideoPartUrlsResponse>> {
+    return apiPost<VehicleVideoPartUrlsResponse>(
+      VEHICLE_VIDEO_UPLOAD_PART_URLS(uploadId),
+      { part_numbers: partNumbers },
+    );
+  },
+
+  /** Partes ya confirmadas por R2 (para reanudar). */
+  listVehicleVideoUploadParts(
+    uploadId: string,
+  ): Promise<apiResponse<VehicleVideoUploadedPartsResponse>> {
+    return apiGet<VehicleVideoUploadedPartsResponse>(
+      VEHICLE_VIDEO_UPLOAD_PARTS(uploadId),
+    );
+  },
+
+  completeVehicleVideoUpload(
+    uploadId: string,
+    parts: { part_number: number; etag: string }[],
+  ): Promise<apiResponse<CompleteVehicleVideoUploadResponse>> {
+    return apiPost<CompleteVehicleVideoUploadResponse>(
+      VEHICLE_VIDEO_UPLOAD_COMPLETE(uploadId),
+      { parts },
+    );
+  },
+
+  /** Cancela la subida y libera las partes en R2 (204). */
+  abortVehicleVideoUpload(uploadId: string): Promise<apiResponse<void>> {
+    return apiDelete<void>(VEHICLE_VIDEO_UPLOAD(uploadId));
+  },
+
   async generateFileSignedUrl(generateFileSignedUrlDto: GenerateFileSignedUrlDto): Promise<string | null> {
     const response = await apiPost<GenerateFileSignedUrlResponse>(GENERATE_FILE_SIGNED_URL, generateFileSignedUrlDto)
     if (!response.ok) {

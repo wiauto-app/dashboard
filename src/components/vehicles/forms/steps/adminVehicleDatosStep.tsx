@@ -21,11 +21,13 @@ import { VehicleDataForm } from "../vehicleDataForm";
 interface AdminVehicleDatosStepProps {
   isCreateMode: boolean;
   onImageUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
+  onVideoUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
 }
 
 export const AdminVehicleDatosStep = ({
   isCreateMode,
   onImageUploadStatusChange,
+  onVideoUploadStatusChange,
 }: AdminVehicleDatosStepProps) => {
   const form = useFormContext<VehicleSchema | CreateVehicleSchema>();
   const phoneValue = form.watch("phone");
@@ -49,7 +51,10 @@ export const AdminVehicleDatosStep = ({
         </ControllerInput>
       ) : null}
 
-      <MediaForm onImageUploadStatusChange={onImageUploadStatusChange} />
+      <MediaForm
+        onImageUploadStatusChange={onImageUploadStatusChange}
+        onVideoUploadStatusChange={onVideoUploadStatusChange}
+      />
 
       <VehicleDataForm />
 

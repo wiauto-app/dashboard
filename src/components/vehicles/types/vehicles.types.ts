@@ -1,4 +1,4 @@
-import type { VehicleFormImage, VehicleFormVideo } from "../schemas/vehicle.schema";
+import type { VehicleFormImage } from "../schemas/vehicle.schema";
 import type z from "zod";
 import type { vehiclesSchema } from "../schemas/vehicles-params.schema";
 import type { createVehicleSchema, updateVehicleSchema, vehicleSchema } from "../schemas/vehicle.schema";
@@ -106,6 +106,18 @@ export interface AdminVehicleVersionCatalog {
   year_id: number;
 }
 
+/** Vídeo del detalle (`videos[]`). `url` solo existe con `status === "ready"`. */
+export interface AdminVehicleVideo {
+  id: string;
+  url: string | null;
+  thumbnail_url: string | null;
+  duration_s: number | null;
+  width: number | null;
+  height: number | null;
+  order: number;
+  status: "uploaded" | "processing" | "ready" | "failed";
+}
+
 /** Detalle admin para edición (`GET /v1/admin/vehicles/:id`). */
 export interface AdminVehicleDetail {
   id: string;
@@ -150,7 +162,7 @@ export interface AdminVehicleDetail {
   warranty_type_id: string | null;
   cuota_ids: string[];
   images: VehicleFormImage[];
-  videos?: VehicleFormVideo[];
+  videos?: AdminVehicleVideo[];
 }
 
 /** Detalle completo del vehículo (creación / edición). */

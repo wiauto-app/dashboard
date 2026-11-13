@@ -34,6 +34,10 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [hasIncompleteImageUploads, setHasIncompleteImageUploads] =
     useState(false);
+  const [hasIncompleteVideoUploads, setHasIncompleteVideoUploads] =
+    useState(false);
+  const hasIncompleteMediaUploads =
+    hasIncompleteImageUploads || hasIncompleteVideoUploads;
   const setIsOpen = useFormDialogStore((state) => state.setIsOpen);
   const selectedId = useSelectedIdStore((state) => state.selectedId);
   const setSelectedId = useSelectedIdStore((state) => state.setSelectedId);
@@ -89,6 +93,12 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
       toast.error("Espera a que terminen de subirse las fotos.");
       return;
     }
+    if (currentStep === 1 && hasIncompleteVideoUploads) {
+      toast.error(
+        "Espera a que terminen de subirse los vídeos (o quita los que fallaron).",
+      );
+      return;
+    }
     const fields = getStepValidationFields(currentStep);
     const is_valid = await form.trigger(
       fields as Parameters<typeof form.trigger>[0],
@@ -108,6 +118,10 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
   };
 
   const handleSubmit = async (data: FormSchema) => {
+    if (hasIncompleteMediaUploads) {
+      toast.error("Espera a que terminen de subirse las fotos y los vídeos.");
+      return;
+    }
     if (selectedId) {
       const response = await vehiclesService.update(
         selectedId,
@@ -186,6 +200,7 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
           <AdminVehicleDatosStep
             isCreateMode={!isEditMode}
             onImageUploadStatusChange={setHasIncompleteImageUploads}
+            onVideoUploadStatusChange={setHasIncompleteVideoUploads}
           />
         ) : null}
         {currentStep === 2 ? <AdminVehicleExtraStep /> : null}
@@ -208,7 +223,7 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
           {hasNextStep ? (
             <Button
               type="button"
-              disabled={currentStep === 1 && hasIncompleteImageUploads}
+              disabled={currentStep === 1 && hasIncompleteMediaUploads}
               onClick={() => void handleNextStep()}
             >
               Siguiente <ArrowRight className="size-4" />
@@ -216,11 +231,13 @@ export const VehicleForm = ({ onSuccess }: { onSuccess: () => void }) => {
           ) : (
             <Button
               type="submit"
-              disabled={hasIncompleteImageUploads}
+              disabled={hasIncompleteMediaUploads}
               {...{ [ADMIN_VEHICLE_SUBMIT_ATTR]: "true" }}
             >
               {hasIncompleteImageUploads
                 ? "Subiendo imágenes…"
+                : hasIncompleteVideoUploads
+                  ? "Subiendo vídeos…"
                 : selectedId
                   ? "Actualizar anuncio"
                   : "Crear anuncio"}

@@ -8,10 +8,12 @@ import { VideosForm } from "./videosForm";
 
 interface MediaFormProps {
   onImageUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
+  onVideoUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
 }
 
 export const MediaForm = ({
   onImageUploadStatusChange,
+  onVideoUploadStatusChange,
 }: MediaFormProps) => {
   const form = useFormContext<VehicleSchema>();
 
@@ -49,6 +51,7 @@ export const MediaForm = ({
               <VideosForm
                 value={field.value ?? []}
                 onChange={field.onChange}
+                onUploadStatusChange={onVideoUploadStatusChange}
               />
             )}
           />

@@ -38,8 +38,6 @@ const emptyToUndefined = (value: unknown) =>
 const emptyOrZeroToUndefined = (value: unknown) =>
   value === "" || value === null || Number(value) === 0 ? undefined : value;
 
-const MIN_VEHICLE_IMAGES = 1;
-
 const optionalBoundedNumber = (max: number, maxMessage: string) =>
   z.coerce
     .number({ error: "Introduce un número válido." })
@@ -73,13 +71,34 @@ export const vehicle_image_schema = z
 
 export type VehicleFormImage = z.infer<typeof vehicle_image_schema>;
 
-export const vehicle_video_schema = z.object({
-  path: z.string().min(1, { error: "La ruta del vídeo no es válida." }),
-  order: z
-    .number({ error: "El orden del vídeo debe ser un número válido." })
-    .int({ error: "El orden del vídeo debe ser un número entero." })
-    .min(0, { error: "El orden del vídeo no puede ser negativo." }),
-});
+const optional_vehicle_images_array = z
+  .array(vehicle_image_schema)
+  .optional()
+  .default([]);
+
+/**
+ * Vídeo del formulario: `{ upload_id, order }` (subida multipart nueva) o
+ * `{ id, order }` (vídeo ya guardado). El resto de campos son solo de UI y no
+ * se envían al API.
+ */
+export const vehicle_video_schema = z
+  .object({
+    id: z.string().min(1).optional(),
+    upload_id: z.string().min(1).optional(),
+    order: z
+      .number({ error: "El orden del vídeo debe ser un número válido." })
+      .int({ error: "El orden del vídeo debe ser un número entero." })
+      .min(0, { error: "El orden del vídeo no puede ser negativo." }),
+    url: z.string().nullable().optional(),
+    preview_url: z.string().optional(),
+    thumbnail_url: z.string().nullable().optional(),
+    file_name: z.string().optional(),
+    status: z.string().optional(),
+  })
+  .refine((data) => Boolean(data.id) !== Boolean(data.upload_id), {
+    message: "El vídeo no se ha subido correctamente. Vuelve a añadirlo.",
+    path: ["upload_id"],
+  });
 
 export type VehicleFormVideo = z.infer<typeof vehicle_video_schema>;
 
@@ -127,9 +146,7 @@ export const vehicleSchema = z.object({
     .refine((value) => value === "" || /^[A-HJ-NPR-Z0-9]{17}$/.test(value), {
       error: "El VIN debe tener exactamente 17 caracteres válidos.",
     }),
-  images: z.array(vehicle_image_schema).min(MIN_VEHICLE_IMAGES, {
-    error: "Sube al menos una fotografía del vehículo.",
-  }),
+  images: optional_vehicle_images_array,
   videos: optional_vehicle_videos_array,
   version_id: z.coerce
     .number({ error: "Selecciona una versión del catálogo." })

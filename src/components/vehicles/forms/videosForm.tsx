@@ -1,29 +1,34 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
+  AlertCircle,
+  Clapperboard,
   GripVertical,
   Loader2,
+  RotateCcw,
   Trash2,
   Upload,
   VideoIcon,
-  Clapperboard,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { cn, getImageUrl } from "@/lib/utils";
 import {
-  filesService,
-  normalize_vehicle_video_upload_content_type,
-  split_storage_compound_path,
-} from "@/services/files/filesService";
+  abortMultipartVideoUpload,
+  isAbortError,
+  MultipartVideoUploadError,
+  resolveVehicleVideoMimeType,
+  uploadVehicleVideoMultipart,
+  VEHICLE_VIDEO_MAX_BYTES,
+  VEHICLE_VIDEO_MAX_DURATION_SECONDS,
+  type MultipartVideoUploadSession,
+} from "@/lib/upload/multipartVideoUpload";
 
 import type { VehicleFormVideo } from "../schemas/vehicle.schema";
 
-/** 100 MiB — límite de tamaño antes de enviar la subida firmada. */
-const VEHICLE_VIDEO_MAX_BYTES = 100 * 1024 * 1024;
-
-/** Duración máxima permitida (3 minutos), validada desde metadatos del fichero local. */
-const VEHICLE_VIDEO_MAX_DURATION_SECONDS = 3 * 60;
+/** Margen sobre la duración máxima (redondeos de contenedor), igual que el backend. */
+const DURATION_TOLERANCE_SECONDS = 1;
 
 const VIDEO_ACCEPT_ATTRIBUTE = [
   "video/mp4",
@@ -31,91 +36,94 @@ const VIDEO_ACCEPT_ATTRIBUTE = [
   "video/webm",
   "video/x-msvideo",
   "video/x-matroska",
+  "video/x-m4v",
+  "video/3gpp",
+  ".mp4",
+  ".mov",
+  ".webm",
+  ".mkv",
+  ".avi",
+  ".m4v",
+  ".3gp",
 ];
 
 const VEHICLE_VIDEO_DRAG_TYPE = "application/x-vehicle-video-order";
+
+const MAX_SIZE_MB = Math.round(VEHICLE_VIDEO_MAX_BYTES / (1024 * 1024));
 
 export const normalize_vehicle_videos = (
   videos: VehicleFormVideo[],
 ): VehicleFormVideo[] =>
   [...videos]
     .sort((a, b) => a.order - b.order)
-    .map((video, index) => ({
-      path: video.path,
-      order: index,
-    }));
+    .map((video, index) => ({ ...video, order: index }));
+
+const video_key = (video: VehicleFormVideo) =>
+  video.id ?? video.upload_id ?? `order-${video.order}`;
+
+type PendingVideoStatus = "uploading" | "completing" | "failed";
 
 type PendingVideoItem = {
   temp_key: string;
   file: File;
-  blob_preview_url: string;
+  preview_url: string;
+  status: PendingVideoStatus;
+  progress: number;
+  error?: string;
+  /** Si es `false`, reintentar no tiene sentido (p. ej. vídeo > 120 s). */
+  retryable: boolean;
 };
 
-const read_video_duration_seconds_from_file = (file: File): Promise<number> =>
-  new Promise((resolve, reject) => {
+const revoke_blob_url = (url?: string | null) => {
+  if (url?.startsWith("blob:")) URL.revokeObjectURL(url);
+};
+
+/** Duración en segundos, o `null` si el navegador no sabe leerla (p. ej. MKV/AVI). */
+const read_video_duration_seconds = (file: File): Promise<number | null> =>
+  new Promise((resolve) => {
     const object_url = URL.createObjectURL(file);
     const video_element = document.createElement("video");
     video_element.preload = "metadata";
     video_element.muted = true;
 
-    const handle_cleanup = () => {
+    const finish = (value: number | null) => {
       URL.revokeObjectURL(object_url);
+      resolve(value);
     };
 
-    const handle_loaded_metadata = () => {
-      const duration_value = video_element.duration;
-      handle_cleanup();
-      if (!Number.isFinite(duration_value) || duration_value <= 0) {
-        reject(
-          new Error("No se pudo determinar la duración del vídeo con precisión."),
-        );
-        return;
-      }
-      resolve(duration_value);
-    };
-
-    const handle_error = () => {
-      handle_cleanup();
-      reject(new Error("No se pudieron leer los metadatos del vídeo."));
-    };
-
-    video_element.addEventListener("loadedmetadata", handle_loaded_metadata, {
-      once: true,
-    });
-    video_element.addEventListener("error", handle_error, { once: true });
+    video_element.addEventListener(
+      "loadedmetadata",
+      () => {
+        const duration = video_element.duration;
+        finish(Number.isFinite(duration) && duration > 0 ? duration : null);
+      },
+      { once: true },
+    );
+    video_element.addEventListener("error", () => finish(null), { once: true });
     video_element.src = object_url;
   });
 
-const validate_vehicle_video_constraints = async (file: File) => {
+const validate_vehicle_video = async (file: File): Promise<boolean> => {
   if (file.size > VEHICLE_VIDEO_MAX_BYTES) {
     toast.error(
-      `${file.name}: el vídeo supera el límite de 100 MB (${Math.round(file.size / (1024 * 1024))} MB).`,
+      `${file.name}: el vídeo supera el límite de ${MAX_SIZE_MB} MB (${Math.round(file.size / (1024 * 1024))} MB).`,
     );
     return false;
   }
 
-  const content_type_normalized =
-    normalize_vehicle_video_upload_content_type(file);
-  if (!content_type_normalized) {
-    toast.error(
-      `${file.name}: formato no admitido. Usa MP4, MOV, AVI, MKV o WEBM.`,
-    );
+  if (!resolveVehicleVideoMimeType(file)) {
+    toast.error(`${file.name}: formato no admitido. Usa MP4, MOV, WEBM, MKV o AVI.`);
     return false;
   }
 
-  try {
-    const duration_seconds = await read_video_duration_seconds_from_file(file);
-    if (duration_seconds - VEHICLE_VIDEO_MAX_DURATION_SECONDS > 0.5) {
-      toast.error(
-        `${file.name}: la duración máxima permitida es 3 minutos (detectado ~${Math.ceil(duration_seconds)} s).`,
-      );
-      return false;
-    }
-  } catch (error) {
+  // Si el navegador no puede leer la duración, la valida el backend al completar.
+  const duration_seconds = await read_video_duration_seconds(file);
+  if (
+    duration_seconds !== null &&
+    duration_seconds > VEHICLE_VIDEO_MAX_DURATION_SECONDS + DURATION_TOLERANCE_SECONDS
+  ) {
     toast.error(
-      error instanceof Error
-        ? error.message
-        : "No se pudo validar la duración del vídeo.",
+      `${file.name}: la duración máxima es ${VEHICLE_VIDEO_MAX_DURATION_SECONDS} s (detectado ~${Math.ceil(duration_seconds)} s).`,
     );
     return false;
   }
@@ -123,14 +131,22 @@ const validate_vehicle_video_constraints = async (file: File) => {
   return true;
 };
 
+const upload_error_message = (error: unknown) =>
+  error instanceof Error && error.message
+    ? error.message
+    : "No se pudo subir el vídeo.";
+
 export type VideosFormProps = {
   value?: VehicleFormVideo[];
   onChange?: (videos: VehicleFormVideo[]) => void;
+  /** `true` mientras haya vídeos subiendo, completándose o con error. */
+  onUploadStatusChange?: (hasIncompleteUploads: boolean) => void;
 };
 
 export const VideosForm = ({
   value: valueProp,
   onChange,
+  onUploadStatusChange,
 }: VideosFormProps) => {
   const committedSorted = useMemo(
     () => normalize_vehicle_videos(valueProp ?? []),
@@ -142,117 +158,179 @@ export const VideosForm = ({
     valueRef.current = normalize_vehicle_videos(valueProp ?? []);
   }, [valueProp]);
 
-  const [pendingVideoItems, setPendingVideoItems] = useState<PendingVideoItem[]>([]);
+  const [pendingItems, setPendingItems] = useState<PendingVideoItem[]>([]);
   const [isDraggingFiles, setIsDraggingFiles] = useState(false);
-  const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(
-    null,
-  );
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(
-    null,
-  );
-  const [pathsRemoving, setPathsRemoving] = useState(
-    () => new Set<string>(),
-  );
+  const [dragSourceIndex, setDragSourceIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragDepthFilesRef = useRef(0);
   const formFieldId = useId();
-  const cancelledUploadKeysRef = useRef(new Set<string>());
-  const pendingVideoItemsRef = useRef<PendingVideoItem[]>([]);
-  const lockedRemovePathsRef = useRef(new Set<string>());
+
+  const pendingItemsRef = useRef<PendingVideoItem[]>([]);
+  const controllersRef = useRef(new Map<string, AbortController>());
+  const sessionsRef = useRef(new Map<string, MultipartVideoUploadSession>());
+  const lastProgressRef = useRef(new Map<string, number>());
 
   useEffect(() => {
-    pendingVideoItemsRef.current = pendingVideoItems;
-  }, [pendingVideoItems]);
+    pendingItemsRef.current = pendingItems;
+  }, [pendingItems]);
+
+  const onUploadStatusChangeRef = useRef(onUploadStatusChange);
+  useEffect(() => {
+    onUploadStatusChangeRef.current = onUploadStatusChange;
+  }, [onUploadStatusChange]);
 
   useEffect(() => {
+    onUploadStatusChange?.(pendingItems.length > 0);
+  }, [pendingItems, onUploadStatusChange]);
+
+  // Al desmontar (cerrar el diálogo): cancelar subidas en curso y liberar sesiones.
+  useEffect(() => {
+    const controllers = controllersRef.current;
+    const sessions = sessionsRef.current;
     return () => {
-      pendingVideoItemsRef.current.forEach((item) => {
-        if (item.blob_preview_url.startsWith("blob:")) {
-          URL.revokeObjectURL(item.blob_preview_url);
-        }
+      controllers.forEach((controller) => controller.abort());
+      controllers.clear();
+      sessions.forEach((session) => {
+        void abortMultipartVideoUpload(session.upload_id);
       });
+      sessions.clear();
+      pendingItemsRef.current.forEach((item) => revoke_blob_url(item.preview_url));
+      onUploadStatusChangeRef.current?.(false);
     };
   }, []);
 
-  const handleRemovePending = useCallback((tempKey: string) => {
-    cancelledUploadKeysRef.current.add(tempKey);
-    setPendingVideoItems((previous) => {
-      const target = previous.find((p) => p.temp_key === tempKey);
-      if (target?.blob_preview_url.startsWith("blob:")) {
-        URL.revokeObjectURL(target.blob_preview_url);
+  const updatePending = useCallback(
+    (tempKey: string, patch: Partial<PendingVideoItem>) => {
+      setPendingItems((previous) =>
+        previous.map((item) =>
+          item.temp_key === tempKey ? { ...item, ...patch } : item,
+        ),
+      );
+    },
+    [],
+  );
+
+  const commitVideos = useCallback(
+    (next: VehicleFormVideo[]) => {
+      const normalized = normalize_vehicle_videos(next);
+      valueRef.current = normalized;
+      onChange?.(normalized);
+    },
+    [onChange],
+  );
+
+  const runUpload = useCallback(
+    async (tempKey: string, file: File) => {
+      controllersRef.current.get(tempKey)?.abort();
+      const controller = new AbortController();
+      controllersRef.current.set(tempKey, controller);
+      updatePending(tempKey, { status: "uploading", error: undefined });
+
+      try {
+        const result = await uploadVehicleVideoMultipart({
+          file,
+          session: sessionsRef.current.get(tempKey) ?? null,
+          signal: controller.signal,
+          onSession: (session) => {
+            sessionsRef.current.set(tempKey, session);
+          },
+          onPhase: (phase) => {
+            if (phase === "completing") {
+              updatePending(tempKey, { status: "completing", progress: 100 });
+            }
+          },
+          onProgress: ({ percent }) => {
+            if (lastProgressRef.current.get(tempKey) === percent) return;
+            lastProgressRef.current.set(tempKey, percent);
+            updatePending(tempKey, { progress: percent });
+          },
+        });
+
+        if (controller.signal.aborted) return;
+
+        const pending = pendingItemsRef.current.find(
+          (item) => item.temp_key === tempKey,
+        );
+        controllersRef.current.delete(tempKey);
+        sessionsRef.current.delete(tempKey);
+        lastProgressRef.current.delete(tempKey);
+        setPendingItems((previous) =>
+          previous.filter((item) => item.temp_key !== tempKey),
+        );
+        commitVideos([
+          ...valueRef.current,
+          {
+            upload_id: result.upload_id,
+            order: valueRef.current.length,
+            preview_url: pending?.preview_url,
+            file_name: file.name,
+          },
+        ]);
+      } catch (error) {
+        if (isAbortError(error) || controller.signal.aborted) return;
+        controllersRef.current.delete(tempKey);
+
+        const retryable =
+          !(error instanceof MultipartVideoUploadError) || error.retryable;
+        if (!retryable) {
+          // La sesión ya no sirve (vídeo rechazado): liberarla.
+          const session = sessionsRef.current.get(tempKey);
+          if (session) void abortMultipartVideoUpload(session.upload_id);
+          sessionsRef.current.delete(tempKey);
+        }
+        const message = upload_error_message(error);
+        toast.error(`${file.name}: ${message}`);
+        updatePending(tempKey, { status: "failed", error: message, retryable });
       }
-      return previous.filter((p) => p.temp_key !== tempKey);
+    },
+    [commitVideos, updatePending],
+  );
+
+  const handleRetry = useCallback(
+    (item: PendingVideoItem) => {
+      void runUpload(item.temp_key, item.file);
+    },
+    [runUpload],
+  );
+
+  // Al recuperar la conexión, reanudar las subidas que fallaron por red.
+  useEffect(() => {
+    const handleOnline = () => {
+      pendingItemsRef.current
+        .filter((item) => item.status === "failed" && item.retryable)
+        .forEach((item) => void runUpload(item.temp_key, item.file));
+    };
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [runUpload]);
+
+  const handleCancelPending = useCallback((tempKey: string) => {
+    controllersRef.current.get(tempKey)?.abort();
+    controllersRef.current.delete(tempKey);
+    const session = sessionsRef.current.get(tempKey);
+    if (session) void abortMultipartVideoUpload(session.upload_id);
+    sessionsRef.current.delete(tempKey);
+    lastProgressRef.current.delete(tempKey);
+    setPendingItems((previous) => {
+      revoke_blob_url(previous.find((item) => item.temp_key === tempKey)?.preview_url);
+      return previous.filter((item) => item.temp_key !== tempKey);
     });
   }, []);
 
-  const appendCommittedPath = useCallback(
-    (compoundPath: string) => {
-      const sorted = normalize_vehicle_videos(valueRef.current);
-      const next: VehicleFormVideo[] = [
-        ...sorted,
-        { path: compoundPath, order: sorted.length },
-      ];
-      valueRef.current = next;
-      onChange?.(next);
-    },
-    [onChange],
-  );
-
-  const commitRemoveCommittedPath = useCallback(
-    (compoundPath: string) => {
-      const next = normalize_vehicle_videos(
-        valueRef.current.filter((video) => video.path !== compoundPath),
+  const handleRemoveCommitted = useCallback(
+    (video: VehicleFormVideo) => {
+      // Subida nueva aún no asociada al vehículo: liberarla en el backend.
+      // Vídeo ya guardado: se elimina al guardar (estado final de `videos`).
+      if (video.upload_id) {
+        void abortMultipartVideoUpload(video.upload_id);
+        revoke_blob_url(video.preview_url);
+      }
+      commitVideos(
+        valueRef.current.filter((item) => video_key(item) !== video_key(video)),
       );
-      valueRef.current = next;
-      onChange?.(next);
     },
-    [onChange],
-  );
-
-  const handleClickRemoveCommitted = useCallback(
-    async (compoundPath: string) => {
-      if (lockedRemovePathsRef.current.has(compoundPath)) return;
-
-      let bucket_name: ReturnType<
-        typeof split_storage_compound_path
-      >["bucket_name"];
-      let object_key: string;
-      try {
-        ({ bucket_name, object_key } = split_storage_compound_path(compoundPath));
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : "Ruta de vídeo no válida.",
-        );
-        return;
-      }
-
-      lockedRemovePathsRef.current.add(compoundPath);
-      setPathsRemoving((previous) => {
-        const next = new Set(previous);
-        next.add(compoundPath);
-        return next;
-      });
-
-      try {
-        const result = await filesService.removeStoredFiles({
-          bucket_name,
-          paths: [object_key],
-        });
-        if (!result.ok) {
-          toast.error("No se pudo eliminar el archivo del almacén.");
-          return;
-        }
-        commitRemoveCommittedPath(compoundPath);
-      } finally {
-        lockedRemovePathsRef.current.delete(compoundPath);
-        setPathsRemoving((previous) => {
-          const next = new Set(previous);
-          next.delete(compoundPath);
-          return next;
-        });
-      }
-    },
-    [commitRemoveCommittedPath],
+    [commitVideos],
   );
 
   const reorderCommitted = useCallback(
@@ -270,90 +348,32 @@ export const VideosForm = ({
       const copy = [...sorted];
       const [moved] = copy.splice(fromIndex, 1);
       copy.splice(toIndex, 0, moved);
-      const next = copy.map((video, index) => ({
-        path: video.path,
-        order: index,
-      }));
-      valueRef.current = next;
-      onChange?.(next);
+      commitVideos(copy.map((video, index) => ({ ...video, order: index })));
     },
-    [onChange],
-  );
-
-  const runUpload = useCallback(
-    async (tempKey: string, file: File) => {
-      try {
-        const { path } = await filesService.upload_vehicle_video(file);
-        if (!path) {
-          if (!cancelledUploadKeysRef.current.has(tempKey)) {
-            setPendingVideoItems((previous) => {
-              const pending = previous.find((p) => p.temp_key === tempKey);
-              if (pending?.blob_preview_url.startsWith("blob:")) {
-                URL.revokeObjectURL(pending.blob_preview_url);
-              }
-              return previous.filter((p) => p.temp_key !== tempKey);
-            });
-          } else {
-            cancelledUploadKeysRef.current.delete(tempKey);
-          }
-          return;
-        }
-
-        if (cancelledUploadKeysRef.current.has(tempKey)) {
-          cancelledUploadKeysRef.current.delete(tempKey);
-          return;
-        }
-
-        setPendingVideoItems((previous) => {
-          const pending = previous.find((p) => p.temp_key === tempKey);
-          if (pending?.blob_preview_url.startsWith("blob:")) {
-            URL.revokeObjectURL(pending.blob_preview_url);
-          }
-          return previous.filter((p) => p.temp_key !== tempKey);
-        });
-
-        appendCommittedPath(path);
-      } catch {
-        toast.error(`No se pudo completar la subida de ${file.name}`);
-        if (!cancelledUploadKeysRef.current.has(tempKey)) {
-          setPendingVideoItems((previous) => {
-            const pending = previous.find((p) => p.temp_key === tempKey);
-            if (pending?.blob_preview_url.startsWith("blob:")) {
-              URL.revokeObjectURL(pending.blob_preview_url);
-            }
-            return previous.filter((p) => p.temp_key !== tempKey);
-          });
-        } else {
-          cancelledUploadKeysRef.current.delete(tempKey);
-        }
-      }
-    },
-    [appendCommittedPath],
+    [commitVideos],
   );
 
   const handleFilesAdded = useCallback(
     async (fileList: FileList | null) => {
       if (!fileList?.length) return;
 
-      const filtered: File[] = [];
+      const accepted: File[] = [];
       for (const file of Array.from(fileList)) {
-        if (await validate_vehicle_video_constraints(file)) {
-          filtered.push(file);
-        }
+        if (await validate_vehicle_video(file)) accepted.push(file);
       }
-      if (!filtered.length) return;
+      if (!accepted.length) return;
 
-      const newPending: PendingVideoItem[] = filtered.map((file_item) => ({
+      const newItems: PendingVideoItem[] = accepted.map((file) => ({
         temp_key: crypto.randomUUID(),
-        file: file_item,
-        blob_preview_url: URL.createObjectURL(file_item),
+        file,
+        preview_url: URL.createObjectURL(file),
+        status: "uploading",
+        progress: 0,
+        retryable: true,
       }));
 
-      setPendingVideoItems((previous) => [...previous, ...newPending]);
-
-      newPending.forEach((item) => {
-        void runUpload(item.temp_key, item.file);
-      });
+      setPendingItems((previous) => [...previous, ...newItems]);
+      newItems.forEach((item) => void runUpload(item.temp_key, item.file));
     },
     [runUpload],
   );
@@ -422,8 +442,7 @@ export const VideosForm = ({
 
   const handleCommittedDragOverItem = useCallback(
     (index: number) => (e: React.DragEvent) => {
-      if (![...e.dataTransfer.types].includes(VEHICLE_VIDEO_DRAG_TYPE))
-        return;
+      if (![...e.dataTransfer.types].includes(VEHICLE_VIDEO_DRAG_TYPE)) return;
       e.preventDefault();
       e.dataTransfer.dropEffect = "move";
       setDragOverIndex(index);
@@ -431,25 +450,20 @@ export const VideosForm = ({
     [],
   );
 
-  const handleCommittedDragLeaveItem = useCallback(
-    (e: React.DragEvent) => {
-      const related_target = e.relatedTarget as Node | null;
-      if (
-        related_target &&
-        e.currentTarget.contains(related_target)
-      )
-        return;
-      setDragOverIndex(null);
-    },
-    [],
-  );
+  const handleCommittedDragLeaveItem = useCallback((e: React.DragEvent) => {
+    const related_target = e.relatedTarget as Node | null;
+    if (related_target && e.currentTarget.contains(related_target)) return;
+    setDragOverIndex(null);
+  }, []);
 
   const handleCommittedDropOnItem = useCallback(
     (targetIndex: number) => (e: React.DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      const fromString = e.dataTransfer.getData(VEHICLE_VIDEO_DRAG_TYPE);
-      const fromIndex = Number.parseInt(fromString, 10);
+      const fromIndex = Number.parseInt(
+        e.dataTransfer.getData(VEHICLE_VIDEO_DRAG_TYPE),
+        10,
+      );
       setDragSourceIndex(null);
       setDragOverIndex(null);
       if (Number.isNaN(fromIndex)) return;
@@ -459,8 +473,7 @@ export const VideosForm = ({
   );
 
   const inputId = `${formFieldId}-video-input`;
-  const hasGallery =
-    committedSorted.length > 0 || pendingVideoItems.length > 0;
+  const hasGallery = committedSorted.length > 0 || pendingItems.length > 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -516,12 +529,12 @@ export const VideosForm = ({
                 : "Arrastra y suelta tus vídeos"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              o haz clic para seleccionar (máximo 100 MB y 3 minutos de duración
-              cada uno)
+              o haz clic para seleccionar (máximo {MAX_SIZE_MB} MB y{" "}
+              {VEHICLE_VIDEO_MAX_DURATION_SECONDS / 60} minutos cada uno)
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-2">
-            {["MP4", "MOV", "WEBM", "AVI", "MKV"].map((tag) => (
+            {["MP4", "MOV", "WEBM", "MKV", "AVI"].map((tag) => (
               <span
                 key={tag}
                 className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-foreground"
@@ -531,8 +544,8 @@ export const VideosForm = ({
             ))}
           </div>
           <p className="max-w-md text-xs text-muted-foreground">
-            Tras confirmar la subida, el servidor procesa el fichero en segundo
-            plano (puede tardar unos instantes antes de reproducir la versión MP4).
+            El vídeo se sube al elegirlo. Al guardar, el servidor lo optimiza
+            (máx. 1080p) en segundo plano.
           </p>
         </div>
       </div>
@@ -542,121 +555,213 @@ export const VideosForm = ({
           className="grid grid-cols-1 gap-4 sm:grid-cols-2"
           aria-label="Lista de vídeos del vehículo"
         >
-          {committedSorted.map((video, index) => (
-            <li
-              key={video.path}
-              onDragOver={handleCommittedDragOverItem(index)}
-              onDragLeave={handleCommittedDragLeaveItem}
-              onDrop={handleCommittedDropOnItem(index)}
-              className={cn(
-                "relative overflow-hidden rounded-lg border bg-muted transition-[outline,opacity]",
-                dragOverIndex === index
-                  ? "outline-2 outline-offset-2 outline-primary"
-                  : "border-border",
-                dragSourceIndex === index ? "opacity-50" : "opacity-100",
-              )}
-            >
-              <div className="relative aspect-video w-full bg-black">
-                <video
-                  src={getImageUrl(video.path)}
-                  className="size-full object-contain"
-                  controls
-                  preload="metadata"
-                  playsInline
-                >
-                  Tu navegador no admite la reproducción de vídeo HTML5.
-                </video>
-              </div>
-              <div
-                draggable
-                onDragStart={handleCommittedDragStart(index)}
-                onDragEnd={handleCommittedDragEnd}
+          {committedSorted.map((video, index) => {
+            const source = video.preview_url ?? (video.url ? getImageUrl(video.url) : "");
+            const poster = video.thumbnail_url
+              ? getImageUrl(video.thumbnail_url)
+              : undefined;
+            // Vídeos guardados: `uploaded`/`processing` aún no tienen URL reproducible.
+            const is_failed = video.status === "failed";
+            const is_processing =
+              Boolean(video.status) && video.status !== "ready" && !is_failed;
+            return (
+              <li
+                key={video_key(video)}
+                onDragOver={handleCommittedDragOverItem(index)}
+                onDragLeave={handleCommittedDragLeaveItem}
+                onDrop={handleCommittedDropOnItem(index)}
                 className={cn(
-                  "absolute left-2 top-2 flex h-9 w-9 cursor-grab items-center justify-center rounded-md bg-background/90 text-foreground shadow-sm touch-none active:cursor-grabbing",
-                  "hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  "relative overflow-hidden rounded-lg border bg-muted transition-[outline,opacity]",
+                  dragOverIndex === index
+                    ? "outline-2 outline-offset-2 outline-primary"
+                    : "border-border",
+                  dragSourceIndex === index ? "opacity-50" : "opacity-100",
                 )}
-                role="button"
-                tabIndex={0}
-                title="Arrastrar para reordenar"
-                aria-label={`Reordenar vídeo, posición ${index + 1}`}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                  }
-                }}
               >
-                <GripVertical className="size-5" aria-hidden />
-              </div>
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="destructive"
-                disabled={pathsRemoving.has(video.path)}
-                className="absolute top-2 right-2 rounded-full shadow-md disabled:opacity-60"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  void handleClickRemoveCommitted(video.path);
-                }}
-                aria-busy={pathsRemoving.has(video.path)}
-                aria-label={
-                  pathsRemoving.has(video.path)
-                    ? "Eliminando vídeo…"
-                    : "Quitar vídeo"
-                }
-              >
-                {pathsRemoving.has(video.path) ? (
-                  <Loader2 className="size-4 animate-spin" aria-hidden />
-                ) : (
+                <div className="relative aspect-video w-full bg-black">
+                  {source ? (
+                    <video
+                      src={source}
+                      poster={poster}
+                      className="size-full object-contain"
+                      controls
+                      preload="metadata"
+                      playsInline
+                    >
+                      Tu navegador no admite la reproducción de vídeo HTML5.
+                    </video>
+                  ) : poster ? (
+                    <img
+                      src={poster}
+                      alt="Miniatura del vídeo"
+                      className="size-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex size-full items-center justify-center text-muted-foreground">
+                      <VideoIcon className="size-8" aria-hidden />
+                    </div>
+                  )}
+                </div>
+                {is_processing || is_failed ? (
+                  <div
+                    className={cn(
+                      "absolute inset-x-0 bottom-0 flex items-center gap-2 px-3 py-1.5 text-xs font-medium",
+                      is_failed
+                        ? "bg-destructive text-white"
+                        : "bg-background/90 text-foreground",
+                    )}
+                  >
+                    {is_failed ? (
+                      <AlertCircle className="size-3.5 shrink-0" aria-hidden />
+                    ) : (
+                      <Loader2 className="size-3.5 shrink-0 animate-spin" aria-hidden />
+                    )}
+                    <span className="truncate">
+                      {is_failed
+                        ? "Error al procesar el vídeo"
+                        : "Procesando…"}
+                    </span>
+                  </div>
+                ) : null}
+                <div
+                  draggable
+                  onDragStart={handleCommittedDragStart(index)}
+                  onDragEnd={handleCommittedDragEnd}
+                  className={cn(
+                    "absolute left-2 top-2 flex h-9 w-9 cursor-grab items-center justify-center rounded-md bg-background/90 text-foreground shadow-sm touch-none active:cursor-grabbing",
+                    "hover:bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  )}
+                  role="button"
+                  tabIndex={0}
+                  title="Arrastrar para reordenar"
+                  aria-label={`Reordenar vídeo, posición ${index + 1}`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                    }
+                  }}
+                >
+                  <GripVertical className="size-5" aria-hidden />
+                </div>
+                <Button
+                  type="button"
+                  size="icon-sm"
+                  variant="destructive"
+                  className="absolute top-2 right-2 rounded-full shadow-md"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveCommitted(video);
+                  }}
+                  aria-label="Quitar vídeo"
+                >
                   <Trash2 className="size-4" aria-hidden />
-                )}
-              </Button>
-            </li>
-          ))}
+                </Button>
+              </li>
+            );
+          })}
 
-          {pendingVideoItems.map((item) => (
-            <li
-              key={item.temp_key}
-              className="relative overflow-hidden rounded-lg border border-border bg-muted"
-            >
-              <div className="relative aspect-video w-full bg-black">
-                <video
-                  src={item.blob_preview_url}
-                  className="size-full object-contain opacity-80"
-                  muted
-                  playsInline
-                  preload="metadata"
-                />
-              </div>
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/65">
-                <Loader2
-                  className="size-8 animate-spin text-primary"
-                  aria-label="Subiendo vídeo"
-                />
-                <span className="text-xs font-medium text-foreground">
-                  Subiendo…
-                </span>
-              </div>
-              <Button
-                type="button"
-                size="icon-sm"
-                variant="destructive"
-                className="absolute top-10 right-2 rounded-full shadow-md"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRemovePending(item.temp_key);
-                }}
-                aria-label={`Cancelar subida de ${item.file.name}`}
+          {pendingItems.map((item) => {
+            const is_failed = item.status === "failed";
+            return (
+              <li
+                key={item.temp_key}
+                className={cn(
+                  "relative overflow-hidden rounded-lg border bg-muted",
+                  is_failed ? "border-destructive" : "border-border",
+                )}
               >
-                <Trash2 className="size-4" aria-hidden />
-              </Button>
-            </li>
-          ))}
+                <div className="relative aspect-video w-full bg-black">
+                  <video
+                    src={item.preview_url}
+                    className="size-full object-contain opacity-60"
+                    muted
+                    playsInline
+                    preload="metadata"
+                  />
+                </div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 px-6 text-center">
+                  {is_failed ? (
+                    <>
+                      <AlertCircle className="size-7 text-destructive" aria-hidden />
+                      <span className="line-clamp-2 text-xs font-medium text-destructive">
+                        {item.error ?? "Error al subir el vídeo."}
+                      </span>
+                      {item.retryable ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRetry(item);
+                          }}
+                        >
+                          <RotateCcw className="size-3.5" aria-hidden />
+                          Reintentar
+                        </Button>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <Loader2
+                        className="size-7 animate-spin text-primary"
+                        aria-hidden
+                      />
+                      <span className="text-xs font-medium text-foreground">
+                        {item.status === "completing"
+                          ? "Verificando vídeo…"
+                          : `Subiendo… ${item.progress}%`}
+                      </span>
+                      <div
+                        className="h-1.5 w-full max-w-48 overflow-hidden rounded-full bg-muted"
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={item.progress}
+                        aria-label={`Progreso de subida de ${item.file.name}`}
+                      >
+                        <div
+                          className="h-full bg-primary transition-[width] duration-200"
+                          style={{ width: `${item.progress}%` }}
+                        />
+                      </div>
+                    </>
+                  )}
+                  <span className="max-w-full truncate text-[11px] text-muted-foreground">
+                    {item.file.name}
+                  </span>
+                </div>
+                <Button
+                  type="button"
+                  size="icon-sm"
+                  variant="destructive"
+                  className="absolute top-2 right-2 rounded-full shadow-md"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCancelPending(item.temp_key);
+                  }}
+                  aria-label={
+                    is_failed
+                      ? `Quitar ${item.file.name}`
+                      : `Cancelar subida de ${item.file.name}`
+                  }
+                >
+                  {is_failed ? (
+                    <Trash2 className="size-4" aria-hidden />
+                  ) : (
+                    <X className="size-4" aria-hidden />
+                  )}
+                </Button>
+              </li>
+            );
+          })}
         </ul>
       ) : null}
 
       {committedSorted.length > 1 ? (
         <p className="text-sm text-muted-foreground">
-          Usa el asa para arrastrar y cambiar el orden de los vídeos publicados.
+          Usa el asa para arrastrar y cambiar el orden de los vídeos.
         </p>
       ) : null}
 

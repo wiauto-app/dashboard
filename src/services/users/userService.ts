@@ -9,15 +9,29 @@ import { V1_ADMIN_USERS } from "./route.constants"
 
 export type AdminUpdateUserPayload = z.infer<typeof updateUserSchema>
 export type AdminUserProfilePayload = z.infer<typeof profileSchema>
+
+export interface AdminCreateUserDealershipPayload {
+  name: string
+  email: string
+  phone_code: string
+  phone: string
+  address: string
+}
+
 export type AdminUpsertUserPayload = AdminUserProfilePayload & {
   email: string;
   password?: string;
 }
+
+export interface AdminCreateUserPayload extends AdminUpsertUserPayload {
+  dealership?: AdminCreateUserDealershipPayload
+}
+
 type AdminUpdateApiPayload = AdminUpdateUserPayload &
   AdminUserProfilePayload & { id: string };
 
 export const userService = {
-  async createUser(user: AdminUpsertUserPayload): Promise<apiResponse<User>> {
+  async createUser(user: AdminCreateUserPayload): Promise<apiResponse<User>> {
     const response = await apiPost<User>(V1_ADMIN_USERS, user)
     return response
   },
