@@ -9,6 +9,7 @@ import { Badge } from "../ui/badge";
 import { ExternalLink } from "lucide-react";
 import { resolve_column_sizing } from "./virtualized/columnSizing";
 import { SELECT_COLUMN_WIDTH } from "./virtualized/constants";
+import { dynamic_table_cell_content_class } from "./cellLayout";
 
 export const build_table_columns = <TData extends object>(
   columns: DynamicTableColumn[],
@@ -140,7 +141,12 @@ export const build_table_columns = <TData extends object>(
             const text =
               value === null || value === undefined ? "" : String(value);
             return (
-              <span className="line-clamp-2 max-w-xs whitespace-pre-wrap">
+              <span
+                className={cn(
+                  dynamic_table_cell_content_class,
+                  "line-clamp-4 whitespace-pre-wrap",
+                )}
+              >
                 {text || "—"}
               </span>
             );
@@ -157,7 +163,11 @@ export const build_table_columns = <TData extends object>(
             );
           }
 
-          return String(value);
+          return (
+            <span className={dynamic_table_cell_content_class}>
+              {String(value)}
+            </span>
+          );
         },
       },
     );

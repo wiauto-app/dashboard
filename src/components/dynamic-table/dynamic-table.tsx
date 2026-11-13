@@ -32,6 +32,7 @@ import {
   type DynamicTableVirtualization,
 } from "./virtualized/resolveVirtualization";
 import { IconButton } from "../ui/iconButton";
+import { dynamic_table_data_cell_class } from "./cellLayout";
 
 export type DynamicTableProps<TData extends object = object> = {
   columns: DynamicTableColumn[];
@@ -183,7 +184,7 @@ export function DynamicTable<TData extends object>({
           on_edit={handle_edit_row}
         />
       ) : (
-        <Table>
+        <Table className="table-fixed">
           <TableHeader className="border-y bg-background/50">
             {table.getHeaderGroups().map((header_group) => (
               <TableRow key={header_group.id}>
@@ -233,7 +234,7 @@ export function DynamicTable<TData extends object>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="text-muted-foreground truncate max-w-50"
+                        className={dynamic_table_data_cell_class}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,

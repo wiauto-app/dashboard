@@ -10,12 +10,16 @@ import {
   SELECT_COLUMN_WIDTH,
 } from "./constants";
 import { IconButton } from "@/components/ui/iconButton";
+import {
+  dynamic_table_cell_content_class,
+  dynamic_table_data_cell_class,
+} from "../cellLayout";
 
 export const virtual_table_head_class =
   "h-10 px-2 text-left align-middle text-xs font-medium whitespace-nowrap text-muted-foreground [&:has([role=checkbox])]:pr-0";
 
 export const virtual_table_cell_class =
-  "p-2 align-middle whitespace-nowrap text-muted-foreground [&:has([role=checkbox])]:pr-0";
+  "p-2 align-top text-muted-foreground [&:has([role=checkbox])]:pr-0";
 
 export const virtual_table_row_class =
   "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted/50";
@@ -62,10 +66,16 @@ export const VirtualizedBodyCell = <TData,>({
   cell,
 }: VirtualizedBodyCellProps<TData>) => (
   <td
-    className={cn(virtual_table_cell_class, "flex shrink-0 items-center")}
+    className={cn(
+      virtual_table_cell_class,
+      dynamic_table_data_cell_class,
+      "flex shrink-0 items-start overflow-hidden",
+    )}
     style={{ width: cell.column.getSize() }}
   >
-    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+    <div className={dynamic_table_cell_content_class}>
+      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+    </div>
   </td>
 );
 
