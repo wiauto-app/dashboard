@@ -6,7 +6,7 @@ export const resolve_column_sizing = (col: DynamicTableColumn) => {
 
   return {
     size: col.size ?? default_size,
-    minSize: col.minSize ?? 80,
-    maxSize: col.maxSize ?? 400,
+    minSize: col.minSize,
+    maxSize: col.maxSize,
   };
 };

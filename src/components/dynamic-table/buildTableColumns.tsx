@@ -57,15 +57,15 @@ export const build_table_columns = <TData extends object>(
         header: col.header,
         enableSorting: col.sortable,
         size: sizing.size,
-        minSize: sizing.minSize,
-        maxSize: sizing.maxSize,
+        ...(sizing.minSize !== undefined && { minSize: sizing.minSize }),
+        ...(sizing.maxSize !== undefined && { maxSize: sizing.maxSize }),
         cell: ({ getValue }) => {
           const value = getValue();
           if (col.type === "badge") {
             return (
               <span
                 className={cn(
-                  "inline-flex max-w-48 truncate rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium text-foreground capitalize",
+                  "inline-flex max-w-full rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium text-foreground capitalize",
                 )}
               >
                 {format_cell_display(value).replace("_", " ")}

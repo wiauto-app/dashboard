@@ -24,8 +24,9 @@ export interface DynamicTableColumn {
   bucketName?: BucketName;
   /** Prefijo de clave en object storage para columnas `image` (p. ej. `categories`). */
   image_upload_path?: string;
-  /** Ancho en px para virtualización de columnas. */
+  /** Ancho estimado en px (virtualización) o ancho mínimo sugerido. */
   size?: number;
+  /** Solo si necesitas fijar un mínimo o máximo explícito en px. */
   minSize?: number;
   maxSize?: number;
 }

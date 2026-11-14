@@ -120,11 +120,6 @@ export function DynamicTable<TData extends object>({
     onRowSelectionChange: (updater) => {
       set_row_selection(updater);
     },
-    defaultColumn: {
-      size: 180,
-      minSize: 80,
-      maxSize: 400,
-    },
     state: has_selection_column
       ? {
           rowSelection: row_selection,
@@ -184,7 +179,7 @@ export function DynamicTable<TData extends object>({
           on_edit={handle_edit_row}
         />
       ) : (
-        <Table className="table-fixed">
+        <Table>
           <TableHeader className="border-y bg-background/50">
             {table.getHeaderGroups().map((header_group) => (
               <TableRow key={header_group.id}>

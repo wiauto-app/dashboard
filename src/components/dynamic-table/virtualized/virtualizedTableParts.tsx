@@ -44,7 +44,7 @@ export const VirtualizedHeadCell = <TData,>({
 }: VirtualizedHeadCellProps<TData>) => (
   <th
     className={cn(virtual_table_head_class, "flex shrink-0 items-center")}
-    style={{ width: header.getSize() }}
+    style={{ minWidth: header.getSize(), width: "max-content" }}
   >
     {header.column.getCanSort() ? (
       <SorteableHead header={header} path={path} />
@@ -71,7 +71,7 @@ export const VirtualizedBodyCell = <TData,>({
       dynamic_table_data_cell_class,
       "flex shrink-0 items-start overflow-hidden",
     )}
-    style={{ width: cell.column.getSize() }}
+    style={{ minWidth: cell.column.getSize(), width: "max-content" }}
   >
     <div className={dynamic_table_cell_content_class}>
       {flexRender(cell.column.columnDef.cell, cell.getContext())}
