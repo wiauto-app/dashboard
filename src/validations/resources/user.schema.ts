@@ -1,41 +1,10 @@
 import { z } from "zod";
 
 import { profileSchema } from "@/validations/resources/profile.schema";
-
-const adminCreateUserDealershipSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(1, { message: "El nombre del concesionario es obligatorio." }),
-  email: z
-    .string()
-    .trim()
-    .email({ message: "Introduce un correo electrónico válido." }),
-  phone: z.object({
-    phone_code: z
-      .string()
-      .min(1, { message: "El prefijo telefónico es obligatorio." }),
-    phone: z
-      .string()
-      .regex(/^\d{6,}$/, {
-        message: "El teléfono debe tener al menos 6 dígitos.",
-      }),
-  }),
-  address: z
-    .string()
-    .trim()
-    .min(5, { message: "La dirección debe tener al menos 5 caracteres." }),
-});
-
-const adminCreateUserDealershipDraftSchema = z.object({
-  name: z.string(),
-  email: z.string(),
-  phone: z.object({
-    phone_code: z.string(),
-    phone: z.string(),
-  }),
-  address: z.string(),
-});
+import {
+  dealershipMinimalDraftSchema,
+  dealershipMinimalSchema,
+} from "@/validations/resources/dealership-minimal.schema";
 
 export const userSchema = z.object({
   email: z.email({ error: "Introduce un correo electrónico válido." }),
@@ -53,7 +22,7 @@ export const adminCreateUserFormSchema = userSchema
   .merge(profileSchema)
   .extend({
     createDealershipProfile: z.boolean(),
-    dealership: adminCreateUserDealershipDraftSchema.optional(),
+    dealership: dealershipMinimalDraftSchema.optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.createDealershipProfile) {
@@ -69,7 +38,7 @@ export const adminCreateUserFormSchema = userSchema
       return;
     }
 
-    const parsed = adminCreateUserDealershipSchema.safeParse(data.dealership);
+    const parsed = dealershipMinimalSchema.safeParse(data.dealership);
     if (parsed.success) {
       return;
     }
@@ -85,5 +54,5 @@ export const adminCreateUserFormSchema = userSchema
 export type UserSchema = z.infer<typeof userSchema>;
 export type AdminCreateUserFormValues = z.infer<typeof adminCreateUserFormSchema>;
 export type AdminCreateUserDealershipFormValues = z.infer<
-  typeof adminCreateUserDealershipSchema
+  typeof dealershipMinimalSchema
 >;

@@ -2,6 +2,7 @@ import { paginationParamsSchema } from "@/validations/queryParams/pagination-par
 import { z } from "zod";
 
 export const dealershipParamsSchema = z.object({
+  id: z.string().uuid().optional(),
   name: z.string().optional(),
   slug: z.string().optional(),
   email: z.string().optional(),

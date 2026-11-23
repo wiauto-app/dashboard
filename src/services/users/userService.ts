@@ -6,17 +6,12 @@ import { profileSchema } from "@/validations/resources/profile.schema"
 import type z from "zod"
 import { apiDelete, apiPatch, apiPost, type apiResponse } from "../api"
 import { V1_ADMIN_USERS } from "./route.constants"
+import type { DealershipMinimalPayload } from "@/validations/resources/dealership-minimal.schema"
 
 export type AdminUpdateUserPayload = z.infer<typeof updateUserSchema>
 export type AdminUserProfilePayload = z.infer<typeof profileSchema>
 
-export interface AdminCreateUserDealershipPayload {
-  name: string
-  email: string
-  phone_code: string
-  phone: string
-  address: string
-}
+export type AdminCreateUserDealershipPayload = DealershipMinimalPayload
 
 export type AdminUpsertUserPayload = AdminUserProfilePayload & {
   email: string;

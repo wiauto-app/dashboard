@@ -3,12 +3,22 @@ import type { Profile } from "@/types/profiles.types";
 import { deleteRowAction } from "@/components/dynamic-table/deleteResourceDialog";
 import { userService } from "./userService";
 import { PlanAccessGrantDialog } from "@/components/users/planAccessGrantDialog";
+import { ViewDealershipAction } from "@/components/users/viewDealershipAction";
 
 export const userActions = (
   row: Profile,
   onSuccess?: () => void,
 ): DynamicTableAction[] => {
   const actions: DynamicTableAction[] = [
+    ...(row.dealership
+      ? [
+          {
+            key: `view-dealership-${row.id}`,
+            label: "Ver concesionario",
+            component: <ViewDealershipAction dealership={row.dealership} />,
+          },
+        ]
+      : []),
     {
       key: `assign-plan-${row.id}`,
       label: "Asignar plan",

@@ -1,6 +1,12 @@
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Controller, useForm, useWatch, type Resolver } from "react-hook-form";
+import {
+  Controller,
+  useForm,
+  useWatch,
+  type Control,
+  type Resolver,
+} from "react-hook-form";
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
 import {
   adminCreateUserFormSchema,
@@ -20,7 +26,14 @@ import { userService } from "@/services/users/userService";
 import { ImageInput } from "../ui/imageInput";
 import { Switch } from "../ui/switch";
 import { Checkbox } from "../ui/checkbox";
-import { PhoneInput, DEFAULT_PHONE_CODE } from "../ui/phoneInput";
+import {
+  DealershipMinimalFields,
+  type DealershipMinimalFieldsForm,
+} from "../dealerships/dealershipMinimalFields";
+import {
+  createEmptyDealershipMinimalDraft,
+  toDealershipMinimalPayload,
+} from "@/validations/resources/dealership-minimal.schema";
 import { useNavigate } from "@tanstack/react-router";
 
 const createEmptyUserFormValues = (): AdminCreateUserFormValues => ({
@@ -31,12 +44,7 @@ const createEmptyUserFormValues = (): AdminCreateUserFormValues => ({
   is_admin: false,
   avatar_url: "",
   createDealershipProfile: false,
-  dealership: {
-    name: "",
-    email: "",
-    phone: { phone_code: DEFAULT_PHONE_CODE, phone: "" },
-    address: "",
-  },
+  dealership: createEmptyDealershipMinimalDraft(),
 });
 
 export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
@@ -150,13 +158,9 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       formData.createDealershipProfile &&
       formData.dealership
     ) {
-      createPayload.dealership = {
-        name: formData.dealership.name.trim(),
-        email: formData.dealership.email.trim(),
-        phone_code: formData.dealership.phone.phone_code,
-        phone: formData.dealership.phone.phone,
-        address: formData.dealership.address.trim(),
-      };
+      createPayload.dealership = toDealershipMinimalPayload(
+        formData.dealership,
+      );
     }
 
     const response = await userService.createUser(createPayload);
@@ -361,100 +365,11 @@ export const UserForm = ({ onSuccess }: { onSuccess?: () => void }) => {
 
           {createDealershipProfile ? (
             <div className="flex flex-col gap-3 border-t pt-3">
-              <Controller
-                name="dealership.name"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="dealership_name">
-                      Nombre del concesionario
-                    </FieldLabel>
-                    <Input
-                      id="dealership_name"
-                      type="text"
-                      placeholder="Nombre comercial"
-                      aria-invalid={fieldState.invalid}
-                      {...field}
-                    />
-                    {fieldState.error ? (
-                      <FieldError errors={[fieldState.error]} />
-                    ) : null}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="dealership.email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="dealership_email">
-                      Correo de contacto del concesionario
-                    </FieldLabel>
-                    <Input
-                      id="dealership_email"
-                      type="email"
-                      placeholder="contacto@concesionario.com"
-                      aria-invalid={fieldState.invalid}
-                      {...field}
-                    />
-                    {fieldState.error ? (
-                      <FieldError errors={[fieldState.error]} />
-                    ) : null}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="dealership.phone"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="dealership_phone">Teléfono</FieldLabel>
-                    <PhoneInput
-                      value={
-                        field.value ?? {
-                          phone_code: DEFAULT_PHONE_CODE,
-                          phone: "",
-                        }
-                      }
-                      onChange={field.onChange}
-                      ariaInvalid={fieldState.invalid}
-                    />
-                    {form.formState.errors.dealership?.phone?.phone_code ? (
-                      <FieldError
-                        errors={[
-                          form.formState.errors.dealership.phone.phone_code,
-                        ]}
-                      />
-                    ) : null}
-                    {form.formState.errors.dealership?.phone?.phone ? (
-                      <FieldError
-                        errors={[form.formState.errors.dealership.phone.phone]}
-                      />
-                    ) : null}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="dealership.address"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="dealership_address">Dirección</FieldLabel>
-                    <Input
-                      id="dealership_address"
-                      type="text"
-                      placeholder="Calle, número, ciudad"
-                      aria-invalid={fieldState.invalid}
-                      {...field}
-                    />
-                    {fieldState.error ? (
-                      <FieldError errors={[fieldState.error]} />
-                    ) : null}
-                  </Field>
-                )}
+              <DealershipMinimalFields
+                control={
+                  // `dealership` es opcional en el schema de alta; aquí siempre existe.
+                  form.control as unknown as Control<DealershipMinimalFieldsForm>
+                }
               />
 
               <div>

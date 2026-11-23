@@ -28,6 +28,24 @@ export const usersColumns: DynamicTableColumn[] = [
     sortable: false,
   },
   {
+    header: "Concesionario",
+    accessorKey: "dealership.name",
+    type: "text",
+    sortable: false,
+  },
+  {
+    header: "Plan gratuito",
+    accessorKey: "active_grant.plan_name",
+    type: "badge",
+    sortable: false,
+  },
+  {
+    header: "Plan gratuito hasta",
+    accessorKey: "active_grant.expires_at",
+    type: "date",
+    sortable: false,
+  },
+  {
     header: "Proveedores",
     accessorKey: "user.providers",
     type: "array",

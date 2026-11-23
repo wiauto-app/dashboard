@@ -63,7 +63,7 @@ export const VirtualizedTableRow = <TData,>({
       {virtual_padding_left ? (
         <td
           aria-hidden
-          className={cn(virtual_table_cell_class, "flex shrink-0 p-0")}
+          className={cn(virtual_table_cell_class, "flex  p-0")}
           style={{ width: virtual_padding_left }}
         />
       ) : null}
@@ -78,7 +78,7 @@ export const VirtualizedTableRow = <TData,>({
       {virtual_padding_right ? (
         <td
           aria-hidden
-          className={cn(virtual_table_cell_class, "flex shrink-0 p-0")}
+          className={cn(virtual_table_cell_class, "flex  p-0")}
           style={{ width: virtual_padding_right }}
         />
       ) : null}

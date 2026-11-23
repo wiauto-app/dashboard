@@ -1,4 +1,5 @@
 import { apiDelete, apiGet, apiPut, type apiResponse } from "@/services/api";
+import type { DealershipMinimalPayload } from "@/validations/resources/dealership-minimal.schema";
 
 const V1_ADMIN_PLAN_ACCESS_GRANTS = "v1/admin/plan-access-grants";
 
@@ -18,6 +19,8 @@ export interface AssignPlanAccessGrantInput {
   plan_id: string;
   expires_at?: string | null;
   reason?: string | null;
+  /** Solo para planes de concesionario cuando el usuario aún no tiene uno. */
+  dealership?: DealershipMinimalPayload;
 }
 
 export const planAccessGrantService = {

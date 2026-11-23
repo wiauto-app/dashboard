@@ -1,4 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { XIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { DynamicTable } from '@/components/dynamic-table/dynamic-table'
 import { dealershipService } from '@/components/dealerships/services/dealershipService'
 import type { PaginatedResult } from '@/types/general.types';
@@ -24,8 +26,10 @@ function RouteComponent() {
   const response = Route.useLoaderData() as PaginatedResult<Dealership>; 
   const invalidateData = useInvalidateData('/_authenticated/dealership');
   const selectedId = useSelectedIdStore((state) => state.selectedId);
+  const { id: filtered_id } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
 
-  return (
+  const table = (
     <DynamicTable
       table_id="dealerships"
       columns={dealershipColumns}
@@ -34,7 +38,7 @@ function RouteComponent() {
       title="Concesionarios"
       total={response.total}
       route={Route}
-      virtualization={{ enabled: true, height: 600 }}
+      // virtualization={{ enabled: true, height: 600 }}
       form={
         <DealershipForm
           key={selectedId ?? "create"}
@@ -43,5 +47,31 @@ function RouteComponent() {
       }
       actions={(row) => dealershipActions(row, invalidateData)}
     />
-  )
+  );
+
+  if (!filtered_id) {
+    return table;
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/30 px-3 py-2 text-sm">
+        <span className="text-muted-foreground">
+          Mostrando un concesionario concreto.
+        </span>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            void navigate({ search: (prev: DealershipParams) => ({ ...prev, id: undefined }) });
+          }}
+        >
+          <XIcon className="size-4" />
+          Ver todos
+        </Button>
+      </div>
+      {table}
+    </div>
+  );
 }
