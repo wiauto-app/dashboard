@@ -49,7 +49,6 @@ export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
       <div
         className={cn(
           "flex flex-1 flex-col",
-          !open ? "" : " sidebar-background ",
         )}
       >
         <div className="@container/main flex flex-1 flex-col gap-2 bg-background rounded-3xl">
