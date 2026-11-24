@@ -1,5 +1,4 @@
 import { ChatSocketProvider } from "@/components/chat/context/chatSocketContext";
-import { useSidebar } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
@@ -14,7 +13,6 @@ type AuthenticatedLayoutProps = {
 
 export const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const { isLoading, isAuthenticated } = useAuth();
-  const { open } = useSidebar();
   const navigate = useNavigate();
 
   useEffect(() => {
