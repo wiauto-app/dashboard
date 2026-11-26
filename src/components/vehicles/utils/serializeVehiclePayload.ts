@@ -1,5 +1,9 @@
 import { TEMP_STORAGE_SEGMENT } from "@/services/files/temp-storage-path";
-import type { UpdateVehicleSchema, VehicleSchema } from "../types/vehicles.types";
+import type {
+  UpdateVehicleSchema,
+  VehicleApiPayload,
+  VehicleSchema,
+} from "../types/vehicles.types";
 
 export const is_temp_storage_path = (stored_path: string): boolean => {
   const normalized = stored_path.trim().replace(/^\/+/, "");
@@ -23,8 +27,9 @@ export const serializeVehiclePayload = (
   options?: { only_temp_images?: boolean; is_update?: boolean },
 ) => {
   const { phone, images, vehicle_price_id, videos, ...rest } = data;
+  const year_id = data.catalog_year_id;
 
-  const payload: Record<string, unknown> = {
+  const payload: VehicleApiPayload = {
     ...rest,
     phone_code: phone?.phone_code,
     phone: phone?.phone,
@@ -32,6 +37,11 @@ export const serializeVehiclePayload = (
 
   for (const key of catalog_form_field_keys) {
     delete payload[key];
+  }
+
+  // Año concreto del vehículo (version↔year N:M). Omitido = año por defecto de la versión.
+  if (typeof year_id === "number" && year_id > 0) {
+    payload.year_id = year_id;
   }
 
   delete payload.email;

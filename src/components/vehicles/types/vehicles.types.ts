@@ -103,6 +103,7 @@ export interface AdminVehicleVersionCatalog {
   model_id: number;
   body_type_id: number;
   fuel_type_id: number;
+  /** Año del vehículo (no el de la versión: version↔year es N:M). */
   year_id: number;
 }
 
@@ -139,6 +140,8 @@ export interface AdminVehicleDetail {
   lat: number;
   lng: number;
   version_id: number;
+  /** Año del vehículo (`vehicles.year_id`). */
+  year_id?: number | null;
   version: AdminVehicleVersion;
   version_catalog: AdminVehicleVersionCatalog;
   traction_id: string;
@@ -274,3 +277,8 @@ export interface Feature {
   created_at: Date;
   updated_at: Date;
 }
+/** Body de `POST/PATCH /v1/vehicles` tras `serializeVehiclePayload`. */
+export type VehicleApiPayload = Record<string, unknown> & {
+  /** Debe ser un año válido de la versión; omitido = año por defecto de la versión. */
+  year_id?: number;
+};

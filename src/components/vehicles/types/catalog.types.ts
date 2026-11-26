@@ -38,9 +38,12 @@ export interface CatalogVersionItem {
   model_id: number;
   body_type_id: number;
   fuel_type_id: number;
+  /** Año por defecto de la versión. */
   year_id: number;
   name: string;
   slug: string;
+  /** Todos los años de la versión (version↔year N:M). */
+  years?: { id: number; year: number }[];
 }
 
 export interface CatalogVersionPaginationParams extends PaginationParams {

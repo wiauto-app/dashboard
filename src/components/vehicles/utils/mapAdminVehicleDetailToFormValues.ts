@@ -23,7 +23,7 @@ export const mapAdminVehicleDetailToFormValues = (
     catalog_model_id: detail.version_catalog?.model_id,
     catalog_body_type_id: detail.version_catalog?.body_type_id,
     catalog_fuel_type_id: detail.version_catalog?.fuel_type_id,
-    catalog_year_id: detail.version_catalog?.year_id,
+    catalog_year_id: detail.year_id ?? detail.version_catalog?.year_id,
     catalog_fuel_can_charge: false,
     traction_id: detail.traction_id ?? "",
     transmission_type: detail.transmission_type,
