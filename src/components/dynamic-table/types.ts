@@ -6,6 +6,7 @@ export type DynamicTableColumnType =
   | "badge"
   | "text"
   | "textarea"
+  | "long_text"
   | "number"
   | "checkbox"
   | "date"
@@ -29,6 +30,8 @@ export interface DynamicTableColumn {
   /** Solo si necesitas fijar un mínimo o máximo explícito en px. */
   minSize?: number;
   maxSize?: number;
+  /** Solo `long_text`: caracteres visibles antes de truncar con "…" (default 30). */
+  maxChars?: number;
 }
 
 export interface DynamicTableAction {

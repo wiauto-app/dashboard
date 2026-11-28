@@ -75,7 +75,7 @@ export const dealershipColumns: DynamicTableColumn[] = [
   {
     accessorKey: "description",
     header: "Descripción",
-    type: "text",
+    type: "long_text",
     sortable: false,
   },
   {
@@ -105,7 +105,7 @@ export const dealershipColumns: DynamicTableColumn[] = [
   {
     accessorKey: "address",
     header: "Dirección",
-    type: "text",
+    type: "long_text",
     sortable: false,
   },
   {

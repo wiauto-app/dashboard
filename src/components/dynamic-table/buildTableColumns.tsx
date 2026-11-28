@@ -10,6 +10,7 @@ import { ExternalLink } from "lucide-react";
 import { resolve_column_sizing } from "./virtualized/columnSizing";
 import { SELECT_COLUMN_WIDTH } from "./virtualized/constants";
 import { dynamic_table_cell_content_class } from "./cellLayout";
+import { LongTextCell } from "./longTextCell";
 
 export const build_table_columns = <TData extends object>(
   columns: DynamicTableColumn[],
@@ -136,6 +137,9 @@ export const build_table_columns = <TData extends object>(
           }
           if (typeof value === "object") {
             return format_cell_display(value);
+          }
+          if (col.type === "long_text") {
+            return <LongTextCell text={String(value)} maxChars={col.maxChars} />;
           }
           if (col.type === "textarea") {
             const text =

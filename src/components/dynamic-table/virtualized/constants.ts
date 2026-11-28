@@ -19,6 +19,7 @@ export const DEFAULT_COLUMN_SIZE_BY_TYPE: Record<
   boolean: 100,
   array: 120,
   textarea: 240,
+  long_text: 240,
   text: 180,
 };
 

@@ -218,7 +218,7 @@ export const DefaultForm = ({
               defaultValue={selectedData?.[column.accessorKey] ?? ""}
             />
           )}
-          {column.type === "textarea" && (
+          {(column.type === "textarea" || column.type === "long_text") && (
             <Textarea
               id={column.accessorKey}
               name={column.accessorKey}
